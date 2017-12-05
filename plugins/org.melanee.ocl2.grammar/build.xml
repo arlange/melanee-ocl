@@ -1,0 +1,45 @@
+<!--
+/*******************************************************************************
+ * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     - initial API and implementation and initial documentation
+ *    Arne Lange - ocl2 implementation
+ *******************************************************************************/
+-->
+<project name="OCL Parser" default="compileGrammar" basedir=".">
+	<description>
+	 OCL Parser Build File
+	</description>
+
+
+	<property name="antlrsrc" location="gensrc" />
+	<condition property="parsersrc" else="${antlrsrc}/org/melanee/ocl2/grammar/gensrc" value="${antlrsrc}/org/melanee/ocl2/grammar/gensrc">
+		<os family="unix" />
+	</condition>
+
+	<target name="compileGrammar">
+		<echo>"entering"</echo>
+		<exec executable="java">
+			<arg value="-jar" />
+			<arg value="antlr4/antlr-4.5.3-complete.jar" />
+			<arg value="-package" />
+			<arg value="org.melanee.ocl2.grammar.definition.grammar" />
+			<arg value="-listener" />
+			<arg value="-visitor" />
+			<arg value="-o" />
+			<arg value="src/org/melanee/ocl2/grammar/definition" />
+			<arg value="grammar/DeepOcl.g4" />
+		</exec>
+		<echo>"done"</echo>
+		<!--<eclipse.refreshLocal resource="org.melanee.ocl2.grammar" depth="infinite" />-->
+	</target>
+
+	<target name="clean">
+		<delete dir="src/org/melanee/ocl2/grammar/definition/grammar" />
+	</target>
+</project>

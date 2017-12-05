@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Deep OCL 2 Service
+Bundle-SymbolicName: org.melanee.ocl2.service;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.melanee.ocl2.service.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jface,
+ org.eclipse.ui.editors,
+ org.eclipse.ui,
+ org.melanee.ocl2.grammar,
+ org.eclipse.emf.ecore,
+ org.eclipse.emf.common,
+ org.eclipse.ui.views.properties.tabbed,
+ org.eclipse.gmf.runtime.diagram.ui,
+ org.eclipse.ui.ide,
+ org.eclipse.swt,
+ org.melanee.core.models.plm,
+ org.melanee.core.modeleditor,
+ org.melanee.ocl2.models.definition,
+ org.eclipse.emf.common.ui,
+ org.eclipse.emf.edit.ui
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Export-Package: org.melanee.ocl2.service,
+ org.melanee.ocl2.service.exception,
+ org.melanee.ocl2.service.util

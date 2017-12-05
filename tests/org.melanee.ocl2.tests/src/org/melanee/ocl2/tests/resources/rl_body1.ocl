@@ -1,0 +1,2 @@
+context LoyaltyProgram::getServices(): Set(Service)
+body: partners.deliveredServices->asSet()

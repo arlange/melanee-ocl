@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Deep OCL 2 Grammar
+Bundle-SymbolicName: org.melanee.ocl2.grammar
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.melanee.ocl2.grammar.Activator
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Export-Package: org.antlr.v4.runtime,
+ org.antlr.v4.runtime.atn,
+ org.antlr.v4.runtime.misc,
+ org.antlr.v4.runtime.tree,
+ org.melanee.ocl2.grammar;uses:="org.osgi.framework",
+ org.melanee.ocl2.grammar.definition.grammar
+Bundle-ClassPath: .,
+ antlr4/antlr-runtime-4.5.3.jar
+Import-Package: org.antlr.v4.runtime.tree

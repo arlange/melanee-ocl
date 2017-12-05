@@ -1,0 +1,2 @@
+context CustomerCard::printedName:String
+derive: owner.title.concat(" ").concat(owner.name)

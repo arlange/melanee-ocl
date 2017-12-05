@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.melanee.core.constraintlanguage.service">
+      <service
+            class="org.melanee.ocl.service.OCLService"
+            id="org.melanee.ocl.service">
+      </service>
+   </extension>
+   <extension
+         point="org.eclipse.ui.console.consoleFactories">
+      <consoleFactory
+            class="org.melanee.ocl.service.console.consoleFactories.LMLOCLConsoleFactory"
+            label="DeepOCL">
+      </consoleFactory>
+   </extension>
+
+</plugin>

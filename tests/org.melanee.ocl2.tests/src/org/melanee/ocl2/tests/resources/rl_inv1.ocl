@@ -1,0 +1,2 @@
+context CustomerCard
+inv checkDates: validFrom.isBefore(goodThru)

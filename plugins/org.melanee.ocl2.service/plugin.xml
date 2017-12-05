@@ -1,0 +1,42 @@
+<plugin>
+   <extension
+         point="org.melanee.core.constraintlanguage.service">
+      <service
+            class="org.melanee.ocl2.service.OCL2Service"
+            id="org.melanee.ocl2.service">
+      </service>
+   </extension>
+  <!-- <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="Deep OCL Editor"
+            extensions="ocl2"
+            icon="icons/sample.gif"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            class="org.melanee.ocl2.service.editor.OCL2Editor"
+            id="org.melanee.ocl2.service.editor">
+      </editor>
+   </extension>-->
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyTabs" id="proptabs">
+      <propertyTabs
+            contributorId="org.melanee.core.modeleditor">
+         <propertyTab
+               category="extra"
+               id="property.tab.constraint"
+               label="Constraint">
+         </propertyTab>
+      </propertyTabs>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertySections" id="propsections">
+      <propertySections
+            contributorId="org.melanee.core.modeleditor">
+         <propertySection
+               class="org.melanee.ocl2.service.propertytab.ConstraintPropertySection"
+               id="property.section.constraint"
+               tab="property.tab.constraint">
+         </propertySection>
+      </propertySections>
+   </extension>
+</plugin>

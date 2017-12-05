@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: OCL Service
+Bundle-SymbolicName: org.melanee.ocl.service;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.melanee.ocl.service.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.melanee.core.workbench,
+ org.melanee.core.models.plm,
+ org.eclipse.ocl.ecore,
+ org.eclipse.ocl.uml,
+ org.eclipse.ui.console,
+ org.eclipse.ocl.examples.interpreter,
+ org.eclipse.emf.edit,
+ org.eclipse.jface.text,
+ org.eclipse.emf.common,
+ org.eclipse.emf.ecore
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy

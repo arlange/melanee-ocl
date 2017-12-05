@@ -1,0 +1,2 @@
+context LoyaltyAccount::points:Integer
+init: 0

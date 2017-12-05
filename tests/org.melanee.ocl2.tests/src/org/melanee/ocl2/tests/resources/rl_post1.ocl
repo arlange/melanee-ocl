@@ -1,0 +1,2 @@
+context Service::upgradePointsEarned(amount: Integer)
+post: calcPoints() = calcPoints@pre() + amount

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.melanee.ocl.feature_1.0.0.qualifier.jar" id="org.melanee.ocl.feature" version="1.0.0.qualifier">
+      <category name="org.melanee.ocl.update"/>
+   </feature>
+   <category-def name="org.melanee.ocl.update" label="Melanee OCL"/>
+</site>

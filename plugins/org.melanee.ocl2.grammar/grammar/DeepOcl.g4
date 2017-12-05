@@ -1,0 +1,580 @@
+/*******************************************************************************
+ * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     - initial API and implementation and initial documentation
+ *    Arne Lange - ocl2 implementation
+ *******************************************************************************/
+grammar DeepOcl;
+
+contextDeclCS
+:
+	(
+		propertyContextDeclCS
+		| classifierContextCS
+		| operationContextCS
+	)+
+;
+
+operationContextCS
+:
+	CONTEXT levelSpecificationCS?
+	(
+		ID ':'
+	)?
+	(
+		ID '::'
+		(
+			ID '::'
+		)* ID
+		| ID
+	) '('
+	(
+		parameterCS
+		(
+			',' parameterCS
+		)*
+	)? ')'
+	(
+		':' typeExpCS
+	)?
+	(
+		preCS
+		| postCS
+		| bodyCS
+	)*
+;
+
+levelSpecificationCS
+:
+	'(' NumberLiteralExpCS
+	(
+		','
+		(
+			'_'
+			| NumberLiteralExpCS
+		)
+	)? ')'
+;
+
+CONTEXT
+:
+	'context'
+;
+
+bodyCS
+:
+	'body' ID? ':' specificationCS
+;
+
+postCS
+:
+	'post' ID? ':' specificationCS
+;
+
+preCS
+:
+	'pre' ID? ':' specificationCS
+;
+
+defCS
+:
+	'def' ID? ':' ID
+	(
+		(
+			'(' parameterCS?
+			(
+				',' parameterCS
+			)* ')'
+		)? ':' typeExpCS? '=' specificationCS
+	)
+;
+
+typeExpCS
+:
+	typeNameExpCS
+	| typeLiteralCS
+;
+
+typeLiteralCS
+:
+	primitiveTypeCS
+	| collectionTypeCS
+	| tupleTypeCS
+;
+
+tupleTypeCS
+:
+	'Tuple'
+	(
+		'(' tuplePartCS
+		(
+			',' tuplePartCS
+		)* ')'
+		| '<' tuplePartCS
+		(
+			',' tuplePartCS
+		)* '>'
+	)?
+;
+
+tuplePartCS
+:
+	ID ':' typeExpCS
+;
+
+collectionTypeCS
+:
+	collectionTypeIDentifier
+	(
+		'(' typeExpCS ')'
+		| '<' typeExpCS '>'
+	)?
+;
+
+collectionTypeIDentifier
+:
+	'Collection'
+	| 'Bag'
+	| 'OrderedSet'
+	| 'Sequence'
+	| 'Set'
+;
+
+primitiveTypeCS
+:
+	'Boolean'
+	| 'Integer'
+	| 'Real'
+	| 'ID'
+	| 'UnlimitedNatural'
+	| 'OclAny'
+	| 'OclInvalID'
+	| 'OclVoID'
+;
+
+typeNameExpCS
+:
+	ID '::'
+	(
+		ID '::'
+	)* ID
+	| ID
+;
+
+specificationCS
+:
+	infixedExpCS*
+;
+
+expCS
+:
+	infixedExpCS
+;
+
+infixedExpCS
+ :
+ 	prefixedExpCS # prefixedExp
+ 	| iteratorBarExpCS # iteratorBar
+ 	| left = infixedExpCS op =
+ 	(
+ 		'/'
+ 		| '*'
+ 	) right = infixedExpCS # timesDivide
+ 	| left = infixedExpCS op =
+ 	(
+ 		'+'
+ 		| '-'
+ 	) right = infixedExpCS # plusMinus
+ 	| left = infixedExpCS op =
+ 	(
+ 		'<='
+ 		| '>='
+ 		| '<>'
+ 		| '<'
+ 		| '>'
+ 		| '='
+ 	) right = infixedExpCS # equalOperations
+ 	| left = infixedExpCS op = '^' right = infixedExpCS # Message
+ 	| left = infixedExpCS op =
+ 	(
+ 		'and'
+ 		| 'or'
+ 		| 'xor'
+ 	) right = infixedExpCS # andOrXor
+ 	| left = infixedExpCS op = 'implies' right = infixedExpCS # implies
+ ;
+
+
+iteratorBarExpCS
+:
+	'|'
+;
+
+navigationOperatorCS
+:
+	'.' # dot
+	| '->' # arrow
+;
+
+prefixedExpCS
+:
+	UnaryOperatorCS+ primaryExpCS
+	| primaryExpCS
+	(
+		navigationOperatorCS primaryExpCS
+	)*
+	| primaryExpCS
+;
+
+UnaryOperatorCS
+:
+	'-'
+	| 'not'
+;
+
+primaryExpCS
+:
+	letExpCS
+	| ifExpCS
+	| navigatingExpCS
+	| selfExpCS
+	| primitiveLiteralExpCS
+	| tupleLiteralExpCS
+	| collectionLiteralExpCS
+	| typeLiteralExpCS
+	| nestedExpCS
+;
+
+nestedExpCS
+:
+	'(' expCS+ ')'
+;
+
+ifExpCS
+:
+	'if' ifexp = expCS+ 'then' thenexp = expCS+ 'else' elseexp = expCS+ 'endif'
+;
+
+letExpCS
+:
+	'let' letVariableCS
+	(
+		',' letVariableCS
+	)* 'in' in = expCS+
+;
+
+letVariableCS
+:
+	name = ID ':' type = typeExpCS '=' exp = expCS+
+;
+
+typeLiteralExpCS
+:
+	typeLiteralCS
+;
+
+collectionLiteralExpCS
+:
+	collectionTypeCS '{'
+	(
+		collectionLiteralPartCS
+		(
+			',' collectionLiteralPartCS
+		)*
+	)? '}'
+;
+
+collectionLiteralPartCS
+:
+	expCS
+	(
+		'..' expCS
+	)?
+;
+
+tupleLiteralExpCS
+:
+	'Tuple' '{' tupleLiteralPartCS
+	(
+		',' tupleLiteralPartCS
+	)* '}'
+;
+
+tupleLiteralPartCS
+:
+	ID
+	(
+		':' typeExpCS
+	)? '=' expCS
+;
+
+selfExpCS
+:
+	'self'
+;
+
+primitiveLiteralExpCS
+:
+	NumberLiteralExpCS # number
+	| STRING # string
+	| BooleanLiteralExpCS # boolean
+	| InvalIDLiteralExpCS # invalid
+	| NullLiteralExpCS # null
+;
+
+InvalIDLiteralExpCS
+:
+	'invalid'
+;
+
+NumberLiteralExpCS
+:
+	INT
+	(
+		'.' INT
+	)?
+	(
+		(
+			'e'
+			| 'E'
+		)
+		(
+			'+'
+			| '-'
+		)? INT
+	)?
+;
+
+fragment
+DIGIT
+:
+	[0-9]
+;
+
+INT
+:
+	DIGIT+
+;
+
+BooleanLiteralExpCS
+:
+	'true'
+	| 'false'
+;
+
+NullLiteralExpCS
+:
+	'null'
+;
+
+navigatingExpCS
+:
+	opName = indexExpCS
+	(
+		'@' 'pre'
+	)?
+	(
+		'(' '"'? onespace? arg = navigatingArgCS* commaArg = navigatingCommaArgCS*
+		barArg = navigatingBarAgrsCS* semiArg = navigatingSemiAgrsCS* '"'? ')'
+	)*
+;
+
+navigatingSemiAgrsCS
+:
+	';' navigatingArgExpCS
+	(
+		':' typeExpCS
+	)?
+	(
+		'=' expCS+
+	)?
+;
+
+navigatingCommaArgCS
+:
+	',' navigatingArgExpCS
+	(
+		':' typeExpCS
+	)?
+	(
+		'=' expCS+
+	)?
+;
+
+navigatingArgExpCS
+:
+	iteratorVariable = infixedExpCS iteratorBarExpCS nameExpCS
+	navigationOperatorCS body = infixedExpCS*
+	| infixedExpCS+
+;
+
+navigatingBarAgrsCS
+:
+	'|' navigatingArgExpCS
+	(
+		':' typeExpCS
+	)?
+	(
+		'=' expCS+
+	)?
+;
+
+navigatingArgCS
+:
+	navigatingArgExpCS
+	(
+		':' typeExpCS
+	)?
+	(
+		'=' expCS+
+	)?
+;
+
+indexExpCS
+:
+	nameExpCS
+	(
+		'[' expCS
+		(
+			',' expCS
+		)* ']'
+	)?
+;
+
+nameExpCS
+:
+	(
+		(
+			ID '::'
+			(
+				ID '::'
+			)* ID
+		)
+		| ID
+		| STRING
+	) # name
+	| '$' clab = ID '$' # ontologicalName
+	| '#' aspect = ID
+	(
+		'('
+		(
+			NumberLiteralExpCS
+			| ID
+		)?
+		(
+			','
+			(
+				NumberLiteralExpCS
+				| ID
+			)
+		)* ')'
+	)? '#' # linguisticalName
+;
+
+parameterCS
+:
+	(
+		ID ':'
+	)? typeExpCS
+;
+
+invCS
+:
+	'inv'
+	(
+		ID
+		(
+			'(' specificationCS ')'
+		)?
+	)? ':' specificationCS
+;
+
+classifierContextCS
+:
+	CONTEXT levelSpecificationCS?
+	(
+		ID ':'
+	)?
+	(
+		(
+			ID '::'
+			(
+				ID '::'
+			)* ID
+		)
+		| ID
+	)
+	(
+		invCS
+		| defCS
+	)*
+;
+
+propertyContextDeclCS
+:
+	CONTEXT levelSpecificationCS?
+	(
+		(
+			ID '::'
+			(
+				ID '::'
+			)* ID
+		)
+		| ID
+	) ':' typeExpCS
+	(
+		(
+			initCS derCS?
+		)?
+		| derCS initCS?
+	)
+;
+
+derCS
+:
+	'derive' ':' specificationCS
+;
+
+initCS
+:
+	'init' ':' specificationCS
+;
+
+ID
+:
+	[a-zA-Z] [a-zA-Z0-9]*
+;
+
+WS
+:
+	[ \t\n\r]+ -> skip
+;
+
+onespace
+:
+	ONESPACE
+;
+
+ONESPACE
+:
+	' '
+;
+
+STRING
+:
+	'"'
+	(
+		~[\r\n"]
+		| '""'
+	)* '"'
+;
+
+COMMENT
+:
+	'--' .*? '\n' -> skip
+;

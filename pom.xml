@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.melanee.ocl.tycho.build</groupId>
+	<artifactId>parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<tycho.version>0.25.0</tycho.version>
+
+		<!-- p2 Update Sites -->
+		<!--<eclipse-repo.url>http://download.eclipse.org/releases/luna</eclipse-repo.url>
+		<epsilon-repo.url>http://download.eclipse.org/epsilon/interim/</epsilon-repo.url>
+		<swtbot-repo.url>http://download.eclipse.org/technology/swtbot/snapshots</swtbot-repo.url>-->
+		
+		<!-- Maven plugin repositories -->
+		<tycho-maven-snapshots-repo.url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</tycho-maven-snapshots-repo.url>
+		
+		<!-- Release related information -->
+		<!-- 
+			Call with  mvn tycho-versions:set-version to set the
+			version of all MANIFEST.MF, pom.xml to the in 
+			${release.version} specified version.
+		-->
+		<release.version>1.0.0-SNAPSHOT</release.version>
+		<release.targetPlatform>core-4.6</release.targetPlatform>
+	</properties>
+
+	<modules>
+		<module>plugins</module>
+		<module>features</module>
+		<module>tests</module>
+	</modules>
+
+	<!--<repositories>
+		<repository>
+			<id>eclipse</id>
+			<url>${eclipse-repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>eclipse-swtbot</id>
+			<url>${swtbot-repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+	</repositories>-->
+
+	<pluginRepositories>
+		 <!-- Tycho 0.25 is not a snapshot -->
+		<!-- <pluginRepository>
+			<id>maven-tycho-snapshots</id>
+			<url>${tycho-maven-snapshots-repo.url}</url>
+		</pluginRepository> -->
+	</pluginRepositories>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-versions-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<newVersion>${release.version}</newVersion>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<target>
+						<artifact>
+							<groupId>org.melanee.tycho.build</groupId>
+							<artifactId>${release.targetPlatform}</artifactId>
+							<version>2.0.0-SNAPSHOT</version>
+						</artifact>
+					</target>
+					<pomDependencies>consider</pomDependencies>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<useUIHarness>true</useUIHarness>
+					<useUIThread>false</useUIThread>
+					<product>org.eclipse.sdk.ide</product>
+					<application>org.eclipse.ui.ide.workbench</application>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,50 @@
+-- @nsURI genmodel=http://www.eclipse.org/emf/2002/GenModel
+
+
+--*******************************************************************************
+--* Copyright (c) 2011 University of Mannheim: Chair for Software Engineering
+--* All rights reserved. This program and the accompanying materials
+--* are made available under the terms of the Eclipse Public License v1.0
+--* which accompanies this distribution, and is available at
+--* http://www.eclipse.org/legal/epl-v10.html
+--*
+--* Contributors:
+--*     - initial API and implementation and initial documentation
+--*    Arne Lange - ocl2 implementation 
+--*******************************************************************************/
+
+--********************************************************
+--!!IMPORTANT!!
+--Inter-model references need to be allowed in
+--run configurations and Constraint.genmodel must be 
+--specified as input model
+--********************************************************
+
+module GenmodelRefinement;--********************************************************
+--plugin.properties needs to be deleted before genmodel 
+--generation in order to get updated feature descriptions
+--********************************************************
+create OUT: genmodel refining IN: genmodel;
+
+-- Sets the basePackage
+rule RefineGenPackage {
+	from
+		s: genmodel!GenPackage
+	to
+		o: genmodel!GenPackage (
+			basePackage <- 'org.melanee.ocl2.models.definition'
+		)
+}
+
+-- Sets the basePackage operationReflection
+rule RefineGenModel {
+	from
+		s: genmodel!GenModel
+	to
+		o: genmodel!GenModel (
+			operationReflection <- true,
+			dynamicTemplates <- true,
+			templateDirectory <- 'org.melanee.ocl2.models.definition/templates',
+			complianceLevel <- #JDK80
+		)
+}

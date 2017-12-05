@@ -1,0 +1,2 @@
+context LoyaltyProgram
+inv minServices: partners.deliveredServices -> size() >= 1
