@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     - initial API and implementation and initial documentation
+ *    Ralph Gerbig - initial API and implementation and initial documentation
  *    Arne Lange - ocl2 implementation
  *******************************************************************************/
 package org.melanee.ocl2.service;
@@ -251,6 +251,7 @@ public class OCL2Service implements IConstraintLanguageService {
 		switch (constraintKind) {
 		case ("inv"):
 			int invCounter = 0;
+			//TODO what if the type is not Clabject? Level or DeepModel are allowed to have constraints too!
 			for (AbstractConstraint constr : ((Clabject) definitionContext).getConstraint()) {
 				if (constr instanceof InvariantConstraint) {
 					invCounter++;

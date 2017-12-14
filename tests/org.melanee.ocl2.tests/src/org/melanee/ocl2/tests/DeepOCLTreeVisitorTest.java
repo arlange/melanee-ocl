@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     - initial API and implementation and initial documentation
+ *    Ralph Gerbig - initial API and implementation and initial documentation
  *    Arne Lange - ocl2 implementation
  *******************************************************************************/
 package org.melanee.ocl2.tests;
@@ -989,4 +989,5 @@ public class DeepOCLTreeVisitorTest {
 		Collection<Object> result = (Collection<Object>) returnValue;
 		assertEquals(Arrays.asList(this.c, car), result);
 	}
+
 }

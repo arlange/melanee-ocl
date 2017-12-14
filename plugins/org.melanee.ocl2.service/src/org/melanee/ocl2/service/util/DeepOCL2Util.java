@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     - initial API and implementation and initial documentation
+ *    Ralph Gerbig - initial API and implementation and initial documentation
  *    Arne Lange - ocl2 implementation
  *******************************************************************************/
 package org.melanee.ocl2.service.util;
@@ -24,8 +24,6 @@ import org.melanee.core.models.plm.PLM.Clabject;
 import org.melanee.core.models.plm.PLM.DeepModel;
 import org.melanee.core.models.plm.PLM.Element;
 import org.melanee.core.models.plm.PLM.Feature;
-import org.melanee.core.models.plm.PLM.Level;
-import org.melanee.core.models.plm.PLM.Method;
 import org.melanee.core.models.plm.PLM.PLMPackage;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclLexer;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser;

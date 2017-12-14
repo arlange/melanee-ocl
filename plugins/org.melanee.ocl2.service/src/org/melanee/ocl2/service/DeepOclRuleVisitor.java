@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     - initial API and implementation and initial documentation
+ *    Ralph Gerbig - initial API and implementation and initial documentation
  *    Arne Lange - ocl2 implementation
  *******************************************************************************/
 package org.melanee.ocl2.service;
@@ -14,8 +14,11 @@ package org.melanee.ocl2.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import javax.management.RuntimeErrorException;
 import javax.naming.OperationNotSupportedException;
@@ -363,15 +366,15 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 	}
 
 	/**
-	 * so here it gets messy. probably a spot to begin refactoring. every time
-	 * it is almost the same procedure. check if the tempCollection is not null
-	 * and gather the parameters from the tree. iteration operation that return
-	 * another selection rather than Integer or Boolean, get the current
-	 * iterator object from the wrapper that represent the actual navigation in
-	 * the deep model. As long as the iterator has next a new Wrapper object is
-	 * created and as the new context the current navigation is set initially.
-	 * Every operation that returns a new collection as a result is using the
-	 * tempCollection. As mentioned, pretty messy!
+	 * so here it gets messy. probably a spot to begin refactoring. every time it is
+	 * almost the same procedure. check if the tempCollection is not null and gather
+	 * the parameters from the tree. iteration operation that return another
+	 * selection rather than Integer or Boolean, get the current iterator object
+	 * from the wrapper that represent the actual navigation in the deep model. As
+	 * long as the iterator has next a new Wrapper object is created and as the new
+	 * context the current navigation is set initially. Every operation that returns
+	 * a new collection as a result is using the tempCollection. As mentioned,
+	 * pretty messy!
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -711,7 +714,36 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 				}
 				// closure TODO not implemented!!!
 				else if (ctx.opName.getText().equals("closure")) {
-					throw new UnsupportedOperationException("not implemented");
+					// throw new UnsupportedOperationException("not implemented");
+					Collection<Element> list = new HashSet<Element>();
+					DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
+					list.addAll(oldWrapper.getNavigationStack().peek().getSecond());
+					Iterator<Element> it = wrapper.getCurrentCollectionIterator();
+					Queue<Element> closureQueue = new LinkedList<Element>();
+					while (it.hasNext()) {
+						Clabject clab = (Clabject) it.next();
+						closureQueue.add(clab);
+					}
+					while (closureQueue.peek() != null) {
+						Clabject clab = (Clabject) closureQueue.poll();
+						list.add(clab);
+						DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
+						this.wrapper = newWrapper;
+						Object result = visit(ctx.arg);
+						if (result != null) {
+							if (result instanceof Collection) {
+								closureQueue.addAll((Collection<Element>)result);
+							}
+						}
+					}
+					this.wrapper = oldWrapper;
+					// this seems to be very important lines, god knows why!
+					if (list.size() > 0) {
+						this.tempCollection = list;
+						return this.tempCollection;
+					} else {
+						return null;
+					}
 
 				}
 				// reverse logic as select operation
