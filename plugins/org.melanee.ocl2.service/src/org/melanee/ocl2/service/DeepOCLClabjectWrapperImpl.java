@@ -379,9 +379,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 								}
 							}
 						}
-					} else if (connection.getAllConnectionEnd().equals(target)) {
-						// TODO do something.
-					}
+					} 
 				}
 				// if the list is empty, let's try to find a navigation on the
 				// upper levels
@@ -1082,6 +1080,12 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 		return CollectionUtil.at((Collection<?>) arg[0], (Integer) arg[1]);
 	}
 
+	/**
+	 * returns the linguistic aspect of the meta model of the plm
+	 * @param text
+	 * @param params
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public Object getLinguisticAspect(String text, String[] params) {
 		EList<Object> argList = new BasicEList<Object>();

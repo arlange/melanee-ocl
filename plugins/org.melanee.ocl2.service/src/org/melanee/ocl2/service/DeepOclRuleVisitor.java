@@ -704,7 +704,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 						}
 					}
 					this.wrapper = oldWrapper;
-					// this seems to be very important lines, god knows why!
 					if (list.size() > 0) {
 						this.tempCollection = list;
 						return null;
@@ -712,9 +711,14 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 						return null;
 					}
 				}
-				// closure TODO not implemented!!!
+				// closure operation
 				else if (ctx.opName.getText().equals("closure")) {
-					// throw new UnsupportedOperationException("not implemented");
+					// limit the navigation to 300 steps to make sure it isn't in an endless loop
+					// (cycle).
+					// maybe a problem in very big model, where the transitive navigation could be
+					// more than 300 steps...
+					int maxIterations = 300;
+					int counter = 0;
 					Collection<Element> list = new HashSet<Element>();
 					DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
 					list.addAll(oldWrapper.getNavigationStack().peek().getSecond());
@@ -724,7 +728,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 						Clabject clab = (Clabject) it.next();
 						closureQueue.add(clab);
 					}
-					while (closureQueue.peek() != null) {
+					while (!closureQueue.isEmpty() && counter <= maxIterations) {
+						counter++;
 						Clabject clab = (Clabject) closureQueue.poll();
 						list.add(clab);
 						DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
@@ -732,19 +737,17 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 						Object result = visit(ctx.arg);
 						if (result != null) {
 							if (result instanceof Collection) {
-								closureQueue.addAll((Collection<Element>)result);
+								closureQueue.addAll((Collection<Element>) result);
 							}
 						}
 					}
 					this.wrapper = oldWrapper;
-					// this seems to be very important lines, god knows why!
 					if (list.size() > 0) {
 						this.tempCollection = list;
 						return this.tempCollection;
 					} else {
 						return null;
 					}
-
 				}
 				// reverse logic as select operation
 				else if (ctx.opName.getText().equals("reject")) {
@@ -780,7 +783,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 						}
 					}
 					this.wrapper = oldWrapper;
-					// this seems to be very important lines, god knows why!
 					if (list.size() > 0) {
 						this.tempCollection = list;
 						return this.tempCollection;
@@ -1021,7 +1023,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 				try {
 					this.wrapper.invoke(ctx.opName.getText(), arg);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					return new OclInvalid();
 				}
 			}
@@ -1076,7 +1077,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 				e.printStackTrace();
 				return new OclInvalid();
 			}
-			// return this.wrapper.getNavigationStack().peek().getSecond();
 		}
 		return ctx.getText();
 	}
@@ -1243,6 +1243,10 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 		return this.wrapper;
 	}
 
+	/**
+	 * for navigation a level higher in the model, e.g. from O2 to O1 models and
+	 * using their navigation
+	 */
 	@Override
 	public Object visitOntologicalName(OntologicalNameContext ctx) {
 		try {
@@ -1253,12 +1257,14 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 		return ctx.getText();
 	}
 
+	/**
+	 * visit a linguistic aspect, like deep model, level or clabject
+	 */
 	@Override
 	public Object visitLinguisticalName(LinguisticalNameContext ctx) {
 		if (ctx.getText().contains("(")) {
 			// System.out.println(ctx.aspect.getText());
 			String param = ctx.getText().substring(ctx.getText().indexOf('(') + 1, ctx.getText().length() - 2);
-			// System.out.println(param);
 			if (param.contains(",")) {
 				String[] params = param.split(",");
 				return this.wrapper.getLinguisticAspect(ctx.aspect.getText(), params);
@@ -1270,6 +1276,9 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 		return this.wrapper.getLinguisticAspect(ctx.aspect.getText(), null);
 	}
 
+	/**
+	 * reset all constraint types (false)
+	 */
 	private void resetContraintTypes() {
 		this.isBody = false;
 		this.isDef = false;
