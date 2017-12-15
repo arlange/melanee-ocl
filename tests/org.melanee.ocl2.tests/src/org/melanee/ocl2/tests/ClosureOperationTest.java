@@ -178,7 +178,9 @@ public class ClosureOperationTest {
 		bart.setDestination(Bart);
 		homer2.setNavigable(true);
 		bart.setNavigable(true);
-		
+
+		this.O2.getContent().add(homerBart);
+
 		// Marge -> Bart
 		Connection margeBart = PLMFactory.eINSTANCE.createConnection();
 		ConnectionEnd marge = PLMFactory.eINSTANCE.createConnectionEnd();
@@ -193,9 +195,8 @@ public class ClosureOperationTest {
 		marge.setNavigable(true);
 		bart1.setNavigable(true);
 
-
 		this.O2.getContent().add(margeBart);
-		
+
 		// Homer -> Lisa
 		Connection homerLisa = PLMFactory.eINSTANCE.createConnection();
 		ConnectionEnd homer3 = PLMFactory.eINSTANCE.createConnectionEnd();
@@ -228,27 +229,26 @@ public class ClosureOperationTest {
 
 		this.O2.getContent().add(homerMaggie);
 	}
-	
+
 	@After
-	public void destroy(){
-		
+	public void destroy() {
+
 	}
 
 	@Test
-	public void closureOperationParentTest() {
-		DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-				"context Bart \ninv parents: self -> closure(parent)->size()=5"));
+	public void closureOperationParentsOfBartTest() {
+		DeepOclLexer oclLexer = new DeepOclLexer(
+				new ANTLRInputStream("context Bart \ninv parents: self -> closure(parent) -> size() = 5"));
 		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
 		ParseTree tree = parser.contextDeclCS();
 		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.Bart);
 		Object returnValue = visitor.visit(tree);
 		assertEquals("true", returnValue.toString());
 	}
-	
+
 	@Test
-	public void closureOperationParentTest1() {
-		DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-				"self -> closure(parent)"));
+	public void closureOperationParentsOfBartTest1() {
+		DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("self -> closure(parent)"));
 		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
 		ParseTree tree = parser.specificationCS();
 		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.Bart);
@@ -260,9 +260,43 @@ public class ClosureOperationTest {
 		family.add(Marge);
 		family.add(Abe);
 		family.add(Mona);
-		assertEquals(family, returnValue);
-		
-		
+		// assert that the collections have all the same entries (order is not
+		// important)
+		assertTrue(family.containsAll((Collection<?>) returnValue));
+	}
+
+	@Test
+	public void closureOperationChildrenOfAbeTest() {
+		DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("self -> closure(child)"));
+		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+		ParseTree tree = parser.specificationCS();
+		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.Abe);
+		Object returnValue = visitor.visit(tree);
+		assertTrue(returnValue instanceof Collection);
+		List<Element> family = new ArrayList<Element>();
+		family.add(Bart);
+		family.add(Homer);
+		family.add(Abe);
+		family.add(Lisa);
+		family.add(Maggie);
+		assertTrue(family.containsAll((Collection<?>) returnValue));
+	}
+	
+	@Test
+	public void closureOperationChildrenOfAbeTest1() {
+		DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("self -> closure(p|p.child)"));
+		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+		ParseTree tree = parser.specificationCS();
+		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.Abe);
+		Object returnValue = visitor.visit(tree);
+		assertTrue(returnValue instanceof Collection);
+		List<Element> family = new ArrayList<Element>();
+		family.add(Bart);
+		family.add(Homer);
+		family.add(Abe);
+		family.add(Lisa);
+		family.add(Maggie);
+		assertTrue(family.containsAll((Collection<?>) returnValue));
 	}
 
 }
