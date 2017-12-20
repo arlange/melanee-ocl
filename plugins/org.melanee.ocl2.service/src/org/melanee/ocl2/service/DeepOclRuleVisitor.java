@@ -721,7 +721,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 					int counter = 0;
 					Collection<Element> list = new HashSet<Element>();
 					DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
-					list.addAll(oldWrapper.getNavigationStack().peek().getSecond());
+					//list.addAll(oldWrapper.getNavigationStack().peek().getSecond());
 					Iterator<Element> it = wrapper.getCurrentCollectionIterator();
 					Queue<Element> closureQueue = new LinkedList<Element>();
 					while (it.hasNext()) {

@@ -179,8 +179,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * Please look at the operation you want to invoke in order to create the
-	 * exact Object array.
+	 * Please look at the operation you want to invoke in order to create the exact
+	 * Object array.
 	 * 
 	 * @param operation
 	 * @param arg
@@ -299,8 +299,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * navigation Operation. navigation has to be on the same level as the
-	 * current context navigation, if not this operation won't find any stuff.
+	 * navigation Operation. navigation has to be on the same level as the current
+	 * context navigation, if not this operation won't find any stuff.
 	 */
 	@Override
 	public Object navigate(String target) throws NavigationException {
@@ -379,7 +379,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 								}
 							}
 						}
-					} 
+					}
 				}
 				// if the list is empty, let's try to find a navigation on the
 				// upper levels
@@ -617,8 +617,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * arg[0] has to the collection to insert at arg[1] has to the object to
-	 * insert into the collection arg[2] has to the index
+	 * arg[0] has to the collection to insert at arg[1] has to the object to insert
+	 * into the collection arg[2] has to the index
 	 * 
 	 * @param arg
 	 * @return
@@ -755,8 +755,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * DeepOCLClabjectWrapperImpl returns the index of the object of the
-	 * collection
+	 * DeepOCLClabjectWrapperImpl returns the index of the object of the collection
 	 * 
 	 * @param collection
 	 * @param object
@@ -778,8 +777,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * return the inverse collection compared to the select operation returns
-	 * all element for which the expression is false as a collection
+	 * return the inverse collection compared to the select operation returns all
+	 * element for which the expression is false as a collection
 	 * 
 	 * @param collection
 	 * @param expression
@@ -933,10 +932,10 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * collects the value of the attribute (expression), and puts it in a
-	 * collection of that type. method is pretty long and similar to the cast
-	 * and compare method a little further down due the casting of the proper
-	 * data type for the lists that are returned.
+	 * collects the value of the attribute (expression), and puts it in a collection
+	 * of that type. method is pretty long and similar to the cast and compare
+	 * method a little further down due the casting of the proper data type for the
+	 * lists that are returned.
 	 * 
 	 * @param arg
 	 *            : arg[0] collection; arg[1] expression
@@ -1017,8 +1016,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * in arg, there has to be a collection at index=0 and an expression at
-	 * index=1
+	 * in arg, there has to be a collection at index=0 and an expression at index=1
 	 * 
 	 * @param arg
 	 * @return
@@ -1081,7 +1079,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * returns the linguistic aspect of the meta model of the plm
+	 * returns the linguistic aspect of the meta model (plm)
+	 * 
 	 * @param text
 	 * @param params
 	 * @return
@@ -1281,11 +1280,11 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	 */
 
 	/**
-	 * maybe more types are needed, these are enough for the moment. Input
-	 * values are the clabject's attribute and the expression which the value of
-	 * the attribute is compared with. The first value of the returnCollection
-	 * is the casted attribute value and the second value is the properly casted
-	 * expression which the attribute is compared with
+	 * maybe more types are needed, these are enough for the moment. Input values
+	 * are the clabject's attribute and the expression which the value of the
+	 * attribute is compared with. The first value of the returnCollection is the
+	 * casted attribute value and the second value is the properly casted expression
+	 * which the attribute is compared with
 	 * 
 	 * @param a
 	 * @param expressionMap
@@ -1318,12 +1317,11 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 		}
 		System.out.println("nothing of value was returned");
 		return null;
-
 	}
 
 	/**
-	 * splits the expression if the string contains a special character, like =
-	 * >= <= and so on.
+	 * splits the expression if the string contains a special character, like = >=
+	 * <= and so on.
 	 * 
 	 * @param expression
 	 * @return
@@ -1357,12 +1355,10 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 			map.put("operator", operator);
 			return map;
 		}
-
 	}
 
 	/**
-	 * compares integer values and return true or false depending on the
-	 * operator
+	 * compares integer values and return true or false depending on the operator
 	 * 
 	 * @param first
 	 * @param second
@@ -1386,8 +1382,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * compares double values and returns true or false depending on the
-	 * operator
+	 * compares double values and returns true or false depending on the operator
 	 * 
 	 * @param first
 	 * @param second
@@ -1411,8 +1406,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * compares string values and returns true or false depending on the
-	 * operator
+	 * compares string values and returns true or false depending on the operator
 	 * 
 	 * @param first
 	 * @param second
@@ -1476,8 +1470,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	}
 
 	/**
-	 * adds a Tuple to let Variable list. First element is the name of the
-	 * variable and the second element in the tuple is the actual variable
+	 * adds a Tuple to let Variable list. First element is the name of the variable
+	 * and the second element in the tuple is the actual variable
 	 * 
 	 * @param letName
 	 * @param letType
@@ -1543,7 +1537,6 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 						result = true;
 					}
 				}
-
 			}
 		}
 		return result;

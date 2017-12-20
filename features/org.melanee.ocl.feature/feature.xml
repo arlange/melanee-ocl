@@ -117,7 +117,30 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.emf.common"/>
       <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.melanee.ocl2.grammar"/>
+      <import plugin="org.melanee.ocl2.models.definition"/>
    </requires>
+
+   <plugin
+         id="org.melanee.ocl2.service"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.melanee.ocl2.grammar"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.melanee.ocl2.models.definition"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="org.melanee.ocl.service"

@@ -113,17 +113,24 @@ public class OCL2Service implements IConstraintLanguageService {
 		int deriveIndex = 0;
 		for (AbstractConstraint constraint : definitionContext.getConstraint()) {
 			if (constraint instanceof PreConstraint) {
-				constraintList.add("pre" + preIndex);
+				if (constraint.getName() == null || constraint.getName() == "") {
+					constraintList.add("pre" + preIndex);
+				} else {
+					constraintList.add(constraint.getName());
+				}
 				preIndex++;
 			}
 			if (constraint instanceof PostConstraint) {
-				constraintList.add("post" + postIndex);
+				if (constraint.getName() == null || constraint.getName() == "") {
+					constraintList.add("post" + postIndex);
+				} else {
+					constraintList.add(constraint.getName());
+				}
 				postIndex++;
 			}
 			if (constraint instanceof InvariantConstraint) {
 				if (constraint.getName() == null || constraint.getName() == "") {
 					constraintList.add("inv" + invIndex);
-					invIndex++;
 				} else {
 					constraintList.add(constraint.getName());
 				}
@@ -207,10 +214,10 @@ public class OCL2Service implements IConstraintLanguageService {
 	}
 
 	/**
-	 * would be nice if the interface allows to hand over the kind of constraint
-	 * as a string, now the remove constraint operation just checks the name of
-	 * the constraint but not the type. It is possible that 2 different
-	 * constraint types have the same name.
+	 * would be nice if the interface allows to hand over the kind of constraint as
+	 * a string, now the remove constraint operation just checks the name of the
+	 * constraint but not the type. It is possible that 2 different constraint types
+	 * have the same name.
 	 * 
 	 * @param definitionContext
 	 * @param constraintName
@@ -224,9 +231,8 @@ public class OCL2Service implements IConstraintLanguageService {
 	}
 
 	/**
-	 * adds a constraint to the model. need to use the emf.edit command
-	 * framework, because at this point we do not have direct access to change
-	 * the models
+	 * adds a constraint to the model. need to use the emf.edit command framework,
+	 * because at this point we do not have direct access to change the models
 	 */
 	@Override
 	public AbstractConstraint addConstraint(Element definitionContext, String constraintKind) {
@@ -251,7 +257,8 @@ public class OCL2Service implements IConstraintLanguageService {
 		switch (constraintKind) {
 		case ("inv"):
 			int invCounter = 0;
-			//TODO what if the type is not Clabject? Level or DeepModel are allowed to have constraints too!
+			// TODO what if the type is not Clabject? Level or DeepModel are allowed to have
+			// constraints too!
 			for (AbstractConstraint constr : ((Clabject) definitionContext).getConstraint()) {
 				if (constr instanceof InvariantConstraint) {
 					invCounter++;
@@ -260,7 +267,8 @@ public class OCL2Service implements IConstraintLanguageService {
 			InvariantConstraint inv = ConstraintFactory.eINSTANCE.createInvariantConstraint();
 			command = AddCommand.create(editingDomain, definitionContext, PLMPackage.eINSTANCE.getElement_Constraint(),
 					inv);
-			inv.setName("inv" + invCounter);
+			String name = DeepOCL2Util.createConstraintName(getDefinedConstraintsFor(definitionContext), "inv", invCounter);
+			inv.setName(name);
 			constraintLevel.setEndLevel(endLevel);
 			constraintLevel.setStartLevel(startLevel);
 			inv.setLevel(constraintLevel);
@@ -385,8 +393,8 @@ public class OCL2Service implements IConstraintLanguageService {
 	}
 
 	/**
-	 * this class creates the constraint composite, i.e. editor the constructor
-	 * sets up the initial look.
+	 * this class creates the constraint composite, i.e. editor the constructor sets
+	 * up the initial look.
 	 */
 	public class DeepOCL2Composite extends ConstraintPropertySheetComposite {
 		boolean editMode;
@@ -432,8 +440,8 @@ public class OCL2Service implements IConstraintLanguageService {
 				this.dm = ((Method) persistenceService.getDefinitionContext()).getClabject().getDeepModel();
 			}
 			/**
-			 * this is for initializing the editor layout that is then returned
-			 * to the custom propertySheet (parent)
+			 * this is for initializing the editor layout that is then returned to the
+			 * custom propertySheet (parent)
 			 */
 
 			GridLayout gridLayout = new GridLayout(6, true);
@@ -551,8 +559,8 @@ public class OCL2Service implements IConstraintLanguageService {
 		}
 
 		/**
-		 * this is the saving operation on the clabject. everything has to be
-		 * done with the emf command framework.
+		 * this is the saving operation on the clabject. everything has to be done with
+		 * the emf command framework.
 		 */
 		@Override
 		public void save() {
@@ -620,6 +628,7 @@ public class OCL2Service implements IConstraintLanguageService {
 			constraintBox.setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 			message.setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 			nameText.setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+			this.requestLayout();
 
 		}
 
@@ -638,6 +647,7 @@ public class OCL2Service implements IConstraintLanguageService {
 			constraintBox.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			message.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			nameText.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			this.layout();
 
 		}
 

@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.melanee.ocl2.service.util;
 
+import java.util.List;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -157,5 +159,17 @@ public class DeepOCL2Util {
 			}
 		}
 		return true;
+	}
+
+	public static String createConstraintName(String[] strings, String constraint, int index) {
+		String name = constraint.concat(Integer.toString(index));
+		for (String element : strings) {
+			if (element.equals(name)) {
+				name = constraint.concat(Integer.toString(++index));
+			} else {
+				name = constraint.concat(Integer.toString(index));
+			}
+		}
+		return name;
 	}
 }
