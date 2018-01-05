@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.melanee.ocl2.service.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -171,5 +172,16 @@ public class DeepOCL2Util {
 			}
 		}
 		return name;
+	}
+
+	public static List<Clabject> traverseClassifications(Clabject context, List<Clabject> returnList) {
+		if (!context.getDirectTypes().isEmpty()) {
+			returnList.addAll(context.getDirectTypes());
+			for (Clabject newContext : context.getDirectTypes()) {
+				traverseClassifications(newContext, returnList);
+			}
+		}
+		return returnList;
+
 	}
 }

@@ -36,6 +36,7 @@ import org.eclipse.ocl.util.CollectionUtil;
 import org.melanee.core.models.plm.PLM.AbstractConstraint;
 import org.melanee.core.models.plm.PLM.Attribute;
 import org.melanee.core.models.plm.PLM.Clabject;
+import org.melanee.core.models.plm.PLM.Classification;
 import org.melanee.core.models.plm.PLM.Connection;
 import org.melanee.core.models.plm.PLM.ConnectionEnd;
 import org.melanee.core.models.plm.PLM.DeepModel;
@@ -261,28 +262,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 			return instances(arg);
 		} else if (operation.equals("allInstances")) {
 			return allInstances(arg);
-		} else if (operation.equals("indirectInstances")) {
-			return indirectInstances(arg);
-		} else if (operation.equals("directInstances")) {
-			return directInstances(arg);
-		} else if (operation.equals("deepDirectInstances")) {
-			return deepDirectInstances(arg);
-		} else if (operation.equals("deepIndirectInstances")) {
-			return deepIndirectInstances(arg);
-		} else if (operation.equals("deepInstances")) {
-			return deepInstances(arg);
 		} else if (operation.equals("instanceOf")) {
 			return instanceOf(arg);
-		} else if (operation.equals("isDeepInstanceOf")) {
-			return isDeepInstanceOf(arg);
-		} else if (operation.equals("isDirectInstanceOf")) {
-			return isDirectInstanceOf(arg);
-		} else if (operation.equals("isDeepDirectInstanceOf")) {
-			return isDeepDirectInstanceOf(arg);
-		} else if (operation.equals("isIndirectInstanceOf")) {
-			return isIndirectInstanceOf(arg);
-		} else if (operation.equals("isDeepIndirectInstanceOf")) {
-			return isDeepIndirectInstanceOf(arg);
 		} else if (operation.equals("including")) {
 			return including(arg);
 		}
@@ -557,63 +538,57 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 	 * "Deep" methods block
 	 */
 
-	/**
-	 * 
-	 * @param clabject
-	 * @return
-	 */
-	private Boolean isDeepIndirectInstanceOf(Object[] arg) {
-		// TODO Auto-generated method stub
-		return null;
+	public Boolean isDeepDirectInstanceOf(String text) {
+		Clabject context = (Clabject) this.context;
+		List<Clabject> resultList = new ArrayList<>();
+		resultList = DeepOCL2Util.traverseClassifications(context, resultList);
+		for (Clabject clab : resultList) {
+			if (clab.getName().equals(text)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	private Boolean isIndirectInstanceOf(Object[] arg) {
-		// TODO Auto-generated method stub
-		return null;
+	public Boolean isDirectInstanceOf(String text) {
+		Clabject context = (Clabject) this.context;
+		for (Element type : context.getDirectTypes()) {
+			if (type.getName().equals(text)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	private Boolean isDeepDirectInstanceOf(Object[] arg) {
-		// TODO Auto-generated method stub
-		return null;
+	public Boolean isDeepInstanceOf(String text) {
+		Clabject context = (Clabject) this.context;
+		for (Element type : context.getClassificationTreeAsInstance()) {
+			if (type.getName().equals(text)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	private Boolean isDirectInstanceOf(Object[] arg) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private Boolean isDeepInstanceOf(Object[] arg) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object isInstanceOf(String text) {
+		Boolean result = false;
+		try {
+			Clabject context = (Clabject) this.context;
+			for (Element type : context.getDirectTypes()) {
+				Clabject clab = (Clabject) type;
+				if (clab.getName().equals(text)) {
+					result = true;
+				}
+			}
+		} catch (ClassCastException e) {
+			// not castable to Clabject, which is necessary
+			return null;
+		}
+		return result;
 	}
 
 	private Boolean instanceOf(Object[] arg) {
 		return ((Clabject) this.context).isInstanceOf((Clabject) arg[0]);
-	}
-
-	private Collection<?> deepInstances(Object[] arg) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private Collection<?> deepIndirectInstances(Object[] arg) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private Collection<?> deepDirectInstances(Object[] arg) {
-		// TODO not implemented on clabject yet.
-		return null;
-	}
-
-	private Collection<?> directInstances(Object[] arg) {
-		// TODO not implemented on clabject yet.
-		return null;
-	}
-
-	private Collection<?> indirectInstances(Object[] arg) {
-		// TODO not implemented on clabject yet.
-		return null;
 	}
 
 	/**

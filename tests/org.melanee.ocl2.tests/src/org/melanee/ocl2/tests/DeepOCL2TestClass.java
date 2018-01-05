@@ -7,7 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ DeepOclClabjectWrapperTest.class, DeepOclNavigationTests.class, DeepOCLTreeVisitorTest.class,
 		RoyalLoyalTest.class, SavingConstraintsTests.class, DeepOCL2ClassificationTests.class,
-		ClosureOperationTest.class })
+		ClosureOperationTest.class, DeepClassificationChecking.class })
 public class DeepOCL2TestClass {
 
 }

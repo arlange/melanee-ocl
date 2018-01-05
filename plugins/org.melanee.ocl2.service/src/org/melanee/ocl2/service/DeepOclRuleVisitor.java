@@ -721,7 +721,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 					int counter = 0;
 					Collection<Element> list = new HashSet<Element>();
 					DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
-					//list.addAll(oldWrapper.getNavigationStack().peek().getSecond());
+					// list.addAll(oldWrapper.getNavigationStack().peek().getSecond());
 					Iterator<Element> it = wrapper.getCurrentCollectionIterator();
 					Queue<Element> closureQueue = new LinkedList<Element>();
 					while (it.hasNext()) {
@@ -1016,6 +1016,14 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		} else if (ctx.opName.getText().equals("isInstanceOf")) {
+			return this.wrapper.isInstanceOf(ctx.arg.getText());
+		} else if (ctx.opName.getText().equals("isDeepInstanceOf")) {
+			return this.wrapper.isDeepInstanceOf(ctx.arg.getText());
+		} else if (ctx.opName.getText().equals("isDirectInstanceOf")) {
+			return this.wrapper.isDirectInstanceOf(ctx.arg.getText());
+		} else if (ctx.opName.getText().equals("isDeepDirectInstanceOf")) {
+			return this.wrapper.isDeepDirectInstanceOf(ctx.arg.getText());
 		}
 		if (this.wrapper.operationExist(ctx.opName.getText())) {
 			if (ctx.arg.getText() != null && ctx.arg.getText() != "") {
