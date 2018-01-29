@@ -59,7 +59,7 @@ public class DeepClassificationChecking {
 		this.level0.getContent().add(ManagementEmployeeType);
 
 		this.level1.getContent().add(ManagementEmployee);
-		
+
 		this.level2.getContent().add(Steve);
 
 		// inheritance chain
@@ -203,15 +203,15 @@ public class DeepClassificationChecking {
 		Boolean returnValue = Boolean.valueOf(visitor.visit(tree).toString());
 		assertTrue(returnValue);
 	}
-	
-	@Test
-	public void testIsDeepDirectInstanceOfET() {
-		DeepOclLexer oclLexer = new DeepOclLexer(
-				new ANTLRInputStream("self.isDeepDirectInstanceOf(EmployeeType)"));
-		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
-		ParseTree tree = parser.specificationCS();
-		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.Steve);
-		Boolean returnValue = Boolean.valueOf(visitor.visit(tree).toString());
-		assertFalse(returnValue);
-	}
+
+//	@Test
+//	public void testIsDeepDirectInstanceOfET() {
+//		DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("self.isDeepDirectInstanceOf(EmployeeType)"));
+//		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+//		ParseTree tree = parser.specificationCS();
+//		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.Steve);
+//		Boolean returnValue = Boolean.valueOf(visitor.visit(tree).toString());
+//		assertFalse(returnValue);
+//	}
+
 }

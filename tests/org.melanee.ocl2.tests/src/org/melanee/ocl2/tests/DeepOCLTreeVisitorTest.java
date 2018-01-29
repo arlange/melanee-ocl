@@ -990,4 +990,76 @@ public class DeepOCLTreeVisitorTest {
 		assertEquals(Arrays.asList(this.c, car), result);
 	}
 
+	@Test
+	public void iterateTest() {
+		this.c.setName("A");
+		Clabject clab1 = PLMFactory.eINSTANCE.createEntity();
+		clab1.setName("1");
+		Clabject clab2 = PLMFactory.eINSTANCE.createEntity();
+		clab2.setName("2");
+		Clabject clab3 = PLMFactory.eINSTANCE.createEntity();
+		clab3.setName("3");
+		Attribute attr = PLMFactory.eINSTANCE.createAttribute();
+		attr.setDatatype("String");
+		attr.setName("test");
+
+		// Connection setUp customer -> transaction
+		Connection connect1 = PLMFactory.eINSTANCE.createConnection();
+		ConnectionEnd parti5 = PLMFactory.eINSTANCE.createConnectionEnd();
+		ConnectionEnd parti6 = PLMFactory.eINSTANCE.createConnectionEnd();
+		parti5.setConnection(connect1);
+		parti5.setDestination(this.c);
+		parti6.setDestination(clab1);
+		parti6.setMoniker("a");
+		parti6.setNavigable(true);
+		parti6.setConnection(connect1);
+
+		Connection connect2 = PLMFactory.eINSTANCE.createConnection();
+		ConnectionEnd parti15 = PLMFactory.eINSTANCE.createConnectionEnd();
+		ConnectionEnd parti16 = PLMFactory.eINSTANCE.createConnectionEnd();
+		parti15.setConnection(connect2);
+		parti15.setDestination(this.c);
+		parti16.setDestination(clab2);
+		parti16.setMoniker("a");
+		parti16.setNavigable(true);
+		parti16.setConnection(connect2);
+
+		Connection connect3 = PLMFactory.eINSTANCE.createConnection();
+		ConnectionEnd parti7 = PLMFactory.eINSTANCE.createConnectionEnd();
+		ConnectionEnd parti8 = PLMFactory.eINSTANCE.createConnectionEnd();
+		parti7.setConnection(connect3);
+		parti7.setDestination(clab2);
+		parti8.setDestination(clab3);
+		parti8.setMoniker("b");
+		parti8.setNavigable(true);
+		parti8.setConnection(connect3);
+
+		Connection connect4 = PLMFactory.eINSTANCE.createConnection();
+		ConnectionEnd parti9 = PLMFactory.eINSTANCE.createConnectionEnd();
+		ConnectionEnd parti10 = PLMFactory.eINSTANCE.createConnectionEnd();
+		parti9.setConnection(connect4);
+		parti9.setDestination(clab1);
+		parti10.setDestination(clab3);
+		parti10.setMoniker("b");
+		parti10.setNavigable(true);
+		parti10.setConnection(connect4);
+
+		this.l.getContent().add(clab3);
+		this.l.getContent().add(clab1);
+		this.l.getContent().add(clab2);
+		this.l.getContent().add(this.c);
+		this.l.getContent().add(connect4);
+		this.l.getContent().add(connect1);
+		this.l.getContent().add(connect2);
+		this.l.getContent().add(connect3);
+		this.dm.getContent().add(this.l);
+		
+		DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("context A inv test: self.a.b->asSet()->iterate(x : T; acc : T2 = Bag{} | acc->including(x.test))"));
+		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+		ParseTree tree = parser.contextDeclCS();
+		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
+		Object returnValue = visitor.visit(tree);
+		Set<Clabject> resultSet = new HashSet<>();
+//		assertEquals(resultSet, returnValue);
+	}
 }

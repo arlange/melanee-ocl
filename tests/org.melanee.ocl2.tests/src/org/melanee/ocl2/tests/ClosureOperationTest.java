@@ -238,7 +238,7 @@ public class ClosureOperationTest {
 	@Test
 	public void closureOperationParentsOfBartTest() {
 		DeepOclLexer oclLexer = new DeepOclLexer(
-				new ANTLRInputStream("context Bart \ninv parents: self -> closure(parent) -> size() = 5"));
+				new ANTLRInputStream("context Bart inv parents: self -> closure(parent) -> size() = 5"));
 		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
 		ParseTree tree = parser.contextDeclCS();
 		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.Bart);

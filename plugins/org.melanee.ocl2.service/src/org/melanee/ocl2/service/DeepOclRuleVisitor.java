@@ -243,7 +243,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 
 	@Override
 	public Object visitCollectionTypeIDentifier(CollectionTypeIDentifierContext ctx) {
-		return visitChildren(ctx);
+		return ctx.getText();
 	}
 
 	@Override
@@ -254,7 +254,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 
 	@Override
 	public Object visitTypeNameExpCS(TypeNameExpCSContext ctx) {
-		return visitChildren(ctx);
+		return ctx.getText();
 	}
 
 	@Override
@@ -346,8 +346,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 
 	@Override
 	public Object visitCollectionLiteralExpCS(CollectionLiteralExpCSContext ctx) {
-
-		return visitChildren(ctx);
+		return ctx.getText();
+		// return visitChildren(ctx);
 	}
 
 	@Override
@@ -437,6 +437,16 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 						return this.wrapper.getNavigationStack().peek().getSecond().toArray()[index];
 					}
 				}
+				// iterate
+				else if (ctx.opName.getText().equals("iterate")) {
+					if (this.tempCollection != null && this.tempCollection.size() > 0) {
+						Object[] semiArgs = (Object[]) visit(ctx.semiArg);
+						// TODO implement the rest of the iterate functionality.
+//						Object[] barArgs = (Object[]) visit(ctx.barArg);
+						
+					}
+				}
+
 				// last
 				else if (ctx.opName.getText().equals("last")) {
 					if (this.tempCollection != null && this.tempCollection.size() > 0) {
@@ -1044,7 +1054,18 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 
 	@Override
 	public Object visitNavigatingSemiAgrsCS(NavigatingSemiAgrsCSContext ctx) {
-		return visitChildren(ctx);
+		this.collectionOperation = true;
+		Object[] result = new Object[3];
+		if (ctx.var != null && ctx.exp != null && ctx.typeName != null) {
+			result[0] = ctx.var.getText();
+			result[1] = visit(ctx.typeName);
+			result[2] = visit(ctx.exp);
+			this.collectionOperation = false;
+			return result;
+		} else {
+			this.collectionOperation = false;
+			return visitChildren(ctx);
+		}
 	}
 
 	@Override
@@ -1056,9 +1077,12 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 	public Object visitNavigatingArgExpCS(NavigatingArgExpCSContext ctx) {
 		if (ctx.body != null) {
 			return visit(ctx.body);
-		} else {
+		} else if (ctx.name != null) {
+			return visit(ctx.name);
+		} else if (ctx.iteratorVariable != null) {
+			return ctx.getText();
+		} else
 			return visitChildren(ctx);
-		}
 	}
 
 	@Override
@@ -1085,8 +1109,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 				e.printStackTrace();
 				return new OclInvalid();
 			}
-		}
-		return ctx.getText();
+		} else
+			return ctx.getText();
 	}
 
 	@Override

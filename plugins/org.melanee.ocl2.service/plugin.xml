@@ -6,17 +6,6 @@
             id="org.melanee.ocl2.service">
       </service>
    </extension>
-  <!-- <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            name="Deep OCL Editor"
-            extensions="ocl2"
-            icon="icons/sample.gif"
-            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            class="org.melanee.ocl2.service.editor.OCL2Editor"
-            id="org.melanee.ocl2.service.editor">
-      </editor>
-   </extension>-->
    <extension
          point="org.eclipse.ui.views.properties.tabbed.propertyTabs" id="proptabs">
       <propertyTabs

@@ -380,18 +380,18 @@ navigatingExpCS
 	)?
 	(
 		'(' '"'? onespace? arg = navigatingArgCS* commaArg = navigatingCommaArgCS*
-		barArg = navigatingBarAgrsCS* semiArg = navigatingSemiAgrsCS* '"'? ')'
+		semiArg = navigatingSemiAgrsCS* barArg = navigatingBarAgrsCS*  '"'? ')'
 	)*
 ;
 
 navigatingSemiAgrsCS
 :
-	';' navigatingArgExpCS
+	';' var = navigatingArgExpCS
 	(
-		':' typeExpCS
+		':' typeName = typeExpCS
 	)?
 	(
-		'=' expCS+
+		'=' exp = expCS
 	)?
 ;
 
@@ -408,16 +408,16 @@ navigatingCommaArgCS
 
 navigatingArgExpCS
 :
-	iteratorVariable = infixedExpCS iteratorBarExpCS nameExpCS
+	iteratorVariable = infixedExpCS iteratorBarExpCS name = nameExpCS
 	navigationOperatorCS body = infixedExpCS*
 	| infixedExpCS+
 ;
 
 navigatingBarAgrsCS
 :
-	'|' navigatingArgExpCS
+	'|' var =navigatingArgExpCS
 	(
-		':' typeExpCS
+		':' type = typeExpCS
 	)?
 	(
 		'=' expCS+
@@ -455,7 +455,7 @@ nameExpCS
 				ID '::'
 			)* ID
 		)
-		| ID
+		| variableName = ID
 		| STRING
 	) # name
 	| '$' clab = ID '$' # ontologicalName
