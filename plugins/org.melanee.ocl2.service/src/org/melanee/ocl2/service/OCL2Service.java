@@ -267,7 +267,8 @@ public class OCL2Service implements IConstraintLanguageService {
 			InvariantConstraint inv = ConstraintFactory.eINSTANCE.createInvariantConstraint();
 			command = AddCommand.create(editingDomain, definitionContext, PLMPackage.eINSTANCE.getElement_Constraint(),
 					inv);
-			String name = DeepOCL2Util.createConstraintName(getDefinedConstraintsFor(definitionContext), "inv", invCounter);
+			String name = DeepOCL2Util.createConstraintName(getDefinedConstraintsFor(definitionContext), "inv",
+					invCounter);
 			inv.setName(name);
 			constraintLevel.setEndLevel(endLevel);
 			constraintLevel.setStartLevel(startLevel);
@@ -543,6 +544,7 @@ public class OCL2Service implements IConstraintLanguageService {
 
 			constraintBox.setEditable(false);
 			severityCombo.setEditable(false);
+			severityCombo.setEnabled(false);
 			nameText.setEditable(false);
 			message.setEditable(false);
 
@@ -623,6 +625,7 @@ public class OCL2Service implements IConstraintLanguageService {
 			}
 			constraintBox.setEditable(false);
 			severityCombo.setEditable(false);
+			severityCombo.setEnabled(false);
 			nameText.setEditable(false);
 			message.setEditable(false);
 			constraintBox.setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
@@ -642,6 +645,7 @@ public class OCL2Service implements IConstraintLanguageService {
 			}
 			constraintBox.setEditable(true);
 			severityCombo.setEditable(true);
+			severityCombo.setEnabled(true);
 			nameText.setEditable(true);
 			message.setEditable(true);
 			constraintBox.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -667,6 +671,7 @@ public class OCL2Service implements IConstraintLanguageService {
 			nameText.setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 			constraintBox.setEditable(false);
 			severityCombo.setEditable(false);
+			severityCombo.setEnabled(false);
 			nameText.setEditable(false);
 			message.setEditable(false);
 		}
@@ -701,15 +706,22 @@ public class OCL2Service implements IConstraintLanguageService {
 						parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
 						tree = parser.invCS();
 						visitor = new DeepOclRuleVisitor(clabject);
-						Object result = visitor.visit(tree).toString();
-						if (result instanceof OclInvalid || result == null) {
-							validationResult.add(new ValidationResult(con.getSeverity(),
-									"OclInvalid " + con.getMessage(), clabject));
+						try {
+							Object result = visitor.visit(tree).toString();
+							if (result instanceof OclInvalid || result == null) {
+								validationResult.add(new ValidationResult(con.getSeverity(),
+										"OclInvalid " + con.getMessage(), clabject));
+							}
+							Boolean booleanResult = Boolean.parseBoolean(result.toString());
+							if (booleanResult.equals(false)) {
+								validationResult
+										.add(new ValidationResult(con.getSeverity(), con.getMessage(), clabject));
+							}
+						} catch (NullPointerException e) {
+							System.out.println("result was null, check your constraint!");
+							e.printStackTrace();
 						}
-						Boolean booleanResult = Boolean.parseBoolean(result.toString());
-						if (booleanResult.equals(false)) {
-							validationResult.add(new ValidationResult(con.getSeverity(), con.getMessage(), clabject));
-						}
+
 					}
 				}
 			}
@@ -723,18 +735,26 @@ public class OCL2Service implements IConstraintLanguageService {
 				if (next instanceof View) {
 					if (((View) next).getElement() == result.getObject()) {
 						try {
-							View obje = ((View) next);
-							URI uri = obje.eResource().getURI();
+							View obj = ((View) next);
+							URI uri = obj.eResource().getURI();
 							IFile file = ResourcesPlugin.getWorkspace().getRoot()
 									.getFile(new Path(uri.toPlatformString(true)));
 							IResource resource = ResourcesPlugin.getWorkspace().getRoot()
 									.findMember(new Path(uri.toPlatformString(true)));
 							PLMMarkerNavigationProvider.deleteMarkers(resource);
 							String location = EMFCoreUtil.getQualifiedName(result.getObject(), true);
-							String elementId = obje.eResource().getURIFragment(obje);
-							// TODO change 4 to the actual severity of the
-							// constraint. 1 for OK, 2 INFO, 3 WARING, 4 ERROR
-							PLMMarkerNavigationProvider.addMarker(file, elementId, location, result.getMessage(), 4);
+							String elementId = obj.eResource().getURIFragment(obj);
+							// 1 INFO, 2 WARNING, 4 ERROR
+							int severity = 0;
+							if (result.getSeverity().name().equals("error")) {
+								severity = 4;
+							} else if (result.getSeverity().name().equals("warning")) {
+								severity = 2;
+							} else if (result.getSeverity().name().equals("info")) {
+								severity = 1;
+							}
+							PLMMarkerNavigationProvider.addMarker(file, elementId, location, result.getMessage(),
+									severity);
 							continue marker;
 						} catch (Exception e) {
 							e.printStackTrace();
