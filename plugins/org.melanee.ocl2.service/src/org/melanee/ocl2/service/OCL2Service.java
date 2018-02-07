@@ -840,29 +840,33 @@ public class OCL2Service implements IConstraintLanguageService {
 		CompoundCommand cmd = new CompoundCommand();
 		DeepModel dm = DeepOCL2Util.getDeepModelForElement(element);
 		if (dm != null) {
-			for (org.melanee.core.models.plm.PLM.Level level : dm.getContent()) {
-				for (Clabject clab : level.getClabjects()) {
-					for (Feature attr : clab.getFeature()) {
-						Set<AbstractConstraint> constraintSet = new HashSet<AbstractConstraint>(
-								searchAlgo.search(attr, Arrays.asList(DeriveConstraintImpl.class)));
-						for (AbstractConstraint constraint : constraintSet) {
-							String oclExpression = "derive: " + ((Constraint) constraint).getText();
-							// begin parsing and interpreting derive
-							// constraints. Result is a command from the
-							// emf.edit command framework to set the value of
-							// each attribute that has a derive constraint
-							// defined
-							DeepOclLexer ocl2Lexer = new DeepOclLexer(new ANTLRInputStream(oclExpression));
-							DeepOclParser parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
-							ParseTree tree = parser.derCS();
-							DeepOclRuleVisitor visitor = new DeepOclRuleVisitor((Attribute) attr);
-							Object result = visitor.visit(tree);
-							Attribute toChange = (Attribute) attr;
-							editingDomain = TransactionUtil.getEditingDomain(toChange);
-							cmd.append(DeepOCL2Util.createSetCommandForValue(editingDomain, toChange, result));
+			try {
+				for (org.melanee.core.models.plm.PLM.Level level : dm.getContent()) {
+					for (Clabject clab : level.getClabjects()) {
+						for (Feature attr : clab.getFeature()) {
+							Set<AbstractConstraint> constraintSet = new HashSet<AbstractConstraint>(
+									searchAlgo.search(attr, Arrays.asList(DeriveConstraintImpl.class)));
+							for (AbstractConstraint constraint : constraintSet) {
+								String oclExpression = "derive: " + ((Constraint) constraint).getText();
+								// begin parsing and interpreting derive
+								// constraints. Result is a command from the
+								// emf.edit command framework to set the value of
+								// each attribute that has a derive constraint
+								// defined
+								DeepOclLexer ocl2Lexer = new DeepOclLexer(new ANTLRInputStream(oclExpression));
+								DeepOclParser parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
+								ParseTree tree = parser.derCS();
+								DeepOclRuleVisitor visitor = new DeepOclRuleVisitor((Attribute) attr);
+								Object result = visitor.visit(tree);
+								Attribute toChange = (Attribute) attr;
+								editingDomain = TransactionUtil.getEditingDomain(toChange);
+								cmd.append(DeepOCL2Util.createSetCommandForValue(editingDomain, toChange, result));
+							}
 						}
 					}
 				}
+			} catch (NullPointerException e) {
+				e.printStackTrace();
 			}
 		}
 		return cmd;
