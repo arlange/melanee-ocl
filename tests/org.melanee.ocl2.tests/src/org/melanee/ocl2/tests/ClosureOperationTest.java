@@ -242,7 +242,10 @@ public class ClosureOperationTest {
 		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
 		ParseTree tree = parser.contextDeclCS();
 		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.Bart);
+		long startTime = System.currentTimeMillis();
 		Object returnValue = visitor.visit(tree);
+		long endTime = System.currentTimeMillis();
+		System.out.println("self -> closure(parent) -> size() = 5 --> " + (endTime - startTime) + " ms");
 		assertEquals("true", returnValue.toString());
 	}
 
@@ -281,14 +284,17 @@ public class ClosureOperationTest {
 		family.add(Maggie);
 		assertTrue(family.containsAll((Collection<?>) returnValue));
 	}
-	
+
 	@Test
 	public void closureOperationChildrenOfAbeTest1() {
 		DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("self -> closure(p|p.child)"));
 		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
 		ParseTree tree = parser.specificationCS();
 		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.Abe);
+		long startTime = System.currentTimeMillis();
 		Object returnValue = visitor.visit(tree);
+		long endTime = System.currentTimeMillis();
+		System.out.println("self -> closure(p|p.child) --> " + (endTime - startTime) + " ms");
 		assertTrue(returnValue instanceof Collection);
 		List<Element> family = new ArrayList<Element>();
 		family.add(Bart);

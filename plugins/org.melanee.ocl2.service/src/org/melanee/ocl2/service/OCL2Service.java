@@ -695,7 +695,7 @@ public class OCL2Service implements IConstraintLanguageService {
 					// the constraint a million times.
 					Set<AbstractConstraint> constraintSet = new HashSet<AbstractConstraint>(
 							searchAlgo.search(clabject, Arrays.asList(InvariantConstraintImpl.class)));
-					for (AbstractConstraint constraint : constraintSet) {
+					check: for (AbstractConstraint constraint : constraintSet) {
 						Constraint con = (Constraint) constraint;
 						String exp = "inv " + con.getName() + ": " + con.getText();
 
@@ -720,6 +720,7 @@ public class OCL2Service implements IConstraintLanguageService {
 						} catch (NullPointerException e) {
 							System.out.println("result was null, check your constraint!");
 							e.printStackTrace();
+							continue check;
 						}
 
 					}
@@ -727,6 +728,13 @@ public class OCL2Service implements IConstraintLanguageService {
 			}
 		}
 		// create gmf marker for every failed invariant constraint
+		int depth = IResource.DEPTH_INFINITE;
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().deleteMarkers(IMarker.PROBLEM, true, depth);
+		} catch (CoreException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		marker: for (IValidationResult result : validationResult) {
 			TreeIterator<EObject> iterator = ((Clabject) result.getObject()).getDeepModel().eResource().getContents()
 					.get(1).eAllContents();
@@ -739,9 +747,6 @@ public class OCL2Service implements IConstraintLanguageService {
 							URI uri = obj.eResource().getURI();
 							IFile file = ResourcesPlugin.getWorkspace().getRoot()
 									.getFile(new Path(uri.toPlatformString(true)));
-							IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-									.findMember(new Path(uri.toPlatformString(true)));
-							PLMMarkerNavigationProvider.deleteMarkers(resource);
 							String location = EMFCoreUtil.getQualifiedName(result.getObject(), true);
 							String elementId = obj.eResource().getURIFragment(obj);
 							// 1 INFO, 2 WARNING, 4 ERROR

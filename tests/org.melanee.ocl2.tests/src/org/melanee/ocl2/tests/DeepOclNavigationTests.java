@@ -359,7 +359,10 @@ public class DeepOclNavigationTests {
 		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
 		ParseTree tree = parser.contextDeclCS();
 		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(ArnesCar);
+		long startTime = System.currentTimeMillis();
 		Object returnValue = visitor.visit(tree);
+		long endTime = System.currentTimeMillis();
+		System.out.println(endTime - startTime + " ms");
 		assertEquals(Arrays.asList(frontLeft, frontRight, rearLeft, rearRight), returnValue);
 	}
 	
@@ -388,7 +391,10 @@ public class DeepOclNavigationTests {
 		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
 		ParseTree tree = parser.contextDeclCS();
 		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(Dragster);
+		long startTime = System.currentTimeMillis();
 		Object returnValue = visitor.visit(tree);
+		long endTime = System.currentTimeMillis();
+		System.out.println(endTime - startTime + " ms");
 		assertEquals(Arrays.asList(SmallWheel, SmallWheel, BroadWheel, BroadWheel), returnValue);
 	}
 

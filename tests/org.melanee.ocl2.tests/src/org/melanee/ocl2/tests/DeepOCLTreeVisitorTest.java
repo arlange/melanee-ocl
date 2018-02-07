@@ -242,7 +242,10 @@ public class DeepOCLTreeVisitorTest {
 		DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
 		ParseTree tree = parser.contextDeclCS();
 		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
+		long startTime = System.currentTimeMillis();
 		Object returnValue = visitor.visit(tree);
+		long endTime = System.currentTimeMillis();
+		System.out.println(endTime - startTime + " ms");
 		assertEquals("true", returnValue.toString());
 	}
 
@@ -402,7 +405,10 @@ public class DeepOCLTreeVisitorTest {
 
 		ParseTree tree = parser.contextDeclCS();
 		DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
+		long startTime = System.currentTimeMillis();
 		Object returnValue = visitor.visit(tree);
+		long endTime = System.currentTimeMillis();
+		System.out.println(endTime - startTime + " ms");
 		assertTrue(returnValue instanceof OclInvalid);
 	}
 
