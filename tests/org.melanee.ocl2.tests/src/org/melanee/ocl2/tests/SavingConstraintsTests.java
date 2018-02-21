@@ -9,6 +9,7 @@
  *    Ralph Gerbig - initial API and implementation and initial documentation
  *    Arne Lange - ocl2 implementation
  *******************************************************************************/
+
 package org.melanee.ocl2.tests;
 
 import static org.junit.Assert.assertEquals;
@@ -37,7 +38,7 @@ import org.melanee.ocl2.models.definition.constraint.Text;
 import org.melanee.ocl2.service.DeepOclPersistenceService;
 
 /**
- * kind of obsolete now, because saving is done slightly different now.
+ * Tests for the saving mechanisms for constraints in the extended PLM model.
  * 
  * @author Arne Lange
  *
@@ -59,15 +60,15 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     c.setName("Customer");
     Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
     attribute.setName("age");
     c.getFeature().add(attribute);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -97,7 +98,7 @@ public class SavingConstraintsTests {
   public void testInv1() throws FileNotFoundException, IOException {
     /**
      * there is a special case here, because the method isBerfore is in a utility
-     * Date class that is not connected to the clabject CustomerCard
+     * Date class that is not connected to the clabject CustomerCard.
      */
     String everything = "";
     try (BufferedReader br = new BufferedReader(
@@ -113,15 +114,15 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     c.setName("CustomerCard");
     Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
     attribute.setName("validFrom");
     c.getFeature().add(attribute);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -151,7 +152,7 @@ public class SavingConstraintsTests {
   public void testInv2() throws FileNotFoundException, IOException {
     /**
      * there is a special case here, because the method isBerfore is in a utility
-     * Date class that is not connected to the clabject CustomerCard
+     * Date class that is not connected to the clabject CustomerCard.
      */
     String everything = "";
     try (BufferedReader br = new BufferedReader(
@@ -167,8 +168,6 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     Clabject c1 = PLMFactory.eINSTANCE.createEntity();
     Clabject c2 = PLMFactory.eINSTANCE.createEntity();
@@ -176,21 +175,23 @@ public class SavingConstraintsTests {
     c1.setName("Membership");
     c2.setName("ServiceLevel");
 
-    dm.getContent().add(l);
-    l.getContent().add(c);
-    l.getContent().add(c1);
-    l.getContent().add(c2);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
+    level.getContent().add(c1);
+    level.getContent().add(c2);
 
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("currentLevel");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
     parti.setDestination(c1);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti2.setDestination(c2);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
-    l.getContent().add(connect);
+    level.getContent().add(connect);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -232,8 +233,6 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     c.setName("Membership");
     Clabject c1 = PLMFactory.eINSTANCE.createEntity();
@@ -246,38 +245,40 @@ public class SavingConstraintsTests {
     attribute1.setName("color");
     c1.getFeature().add(attribute);
     c2.getFeature().add(attribute1);
-    dm.getContent().add(l);
-    l.getContent().add(c);
-    l.getContent().add(c1);
-    l.getContent().add(c2);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
+    level.getContent().add(c1);
+    level.getContent().add(c2);
 
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("currentLevel");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
     parti.setDestination(c);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti2.setDestination(c1);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
-    l.getContent().add(connect);
+    level.getContent().add(connect);
 
     Connection connect1 = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti3 = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti4 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect1.setName("card");
+    ConnectionEnd parti3 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti3.setConnection(connect1);
     parti3.setDestination(c);
+    ConnectionEnd parti4 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti4.setDestination(c2);
     parti4.setNavigable(true);
     parti4.setConnection(connect1);
-    l.getContent().add(connect1);
+    level.getContent().add(connect1);
 
     Enumeration enumeration = PLMFactory.eINSTANCE.createEnumeration();
     enumeration.setName("Color");
     enumeration.getLiteral().add("silver");
     enumeration.getLiteral().add("gold");
-    dm.getEnumeration().add(enumeration);
+    deepModel.getEnumeration().add(enumeration);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -319,40 +320,40 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     c.setName("LoyaltyProgram");
     Clabject c1 = PLMFactory.eINSTANCE.createEntity();
     c1.setName("Partner");
     Clabject c2 = PLMFactory.eINSTANCE.createEntity();
     c2.setName("Service");
-    dm.getContent().add(l);
-    l.getContent().add(c);
-    l.getContent().add(c1);
-    l.getContent().add(c2);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
+    level.getContent().add(c1);
+    level.getContent().add(c2);
 
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("partners");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
     parti.setDestination(c);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti2.setDestination(c1);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
-    l.getContent().add(connect);
+    level.getContent().add(connect);
 
     Connection connect1 = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti3 = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti4 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect1.setName("deliveredServices");
+    ConnectionEnd parti3 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti3.setConnection(connect1);
     parti3.setDestination(c1);
+    ConnectionEnd parti4 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti4.setDestination(c2);
     parti4.setNavigable(true);
     parti4.setConnection(connect1);
-    l.getContent().add(connect1);
+    level.getContent().add(connect1);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -385,7 +386,6 @@ public class SavingConstraintsTests {
         new FileReader("src/org/melanee/ocl2/tests/resources/rl_inv5.ocl"))) {
       StringBuilder sb = new StringBuilder();
       String line = br.readLine();
-
       while (line != null) {
         sb.append(line);
         sb.append(System.lineSeparator());
@@ -394,8 +394,6 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     c.setName("LoyaltyProgram");
     Clabject c1 = PLMFactory.eINSTANCE.createEntity();
@@ -406,45 +404,47 @@ public class SavingConstraintsTests {
     c3.setName("Membership");
     Clabject c4 = PLMFactory.eINSTANCE.createEntity();
     c4.setName("LoyaltyAccount");
-    dm.getContent().add(l);
-    l.getContent().add(c);
-    l.getContent().add(c1);
-    l.getContent().add(c2);
-    l.getContent().add(c3);
-    l.getContent().add(c4);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
+    level.getContent().add(c1);
+    level.getContent().add(c2);
+    level.getContent().add(c3);
+    level.getContent().add(c4);
 
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("partners");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
     parti.setDestination(c);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti2.setDestination(c1);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
-    l.getContent().add(connect);
+    level.getContent().add(connect);
 
     Connection connect1 = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti3 = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti4 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect1.setName("deliveredServices");
+    ConnectionEnd parti3 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti3.setConnection(connect1);
     parti3.setDestination(c1);
+    ConnectionEnd parti4 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti4.setDestination(c2);
     parti4.setNavigable(true);
     parti4.setConnection(connect1);
-    l.getContent().add(connect1);
+    level.getContent().add(connect1);
 
     Connection connect2 = PLMFactory.eINSTANCE.createConnection();
+    connect2.setName("account");
     ConnectionEnd parti5 = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti6 = PLMFactory.eINSTANCE.createConnectionEnd();
-    connect1.setName("account");
     parti5.setConnection(connect2);
     parti5.setDestination(c3);
+    ConnectionEnd parti6 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti6.setDestination(c4);
     parti6.setNavigable(true);
     parti6.setConnection(connect2);
-    l.getContent().add(connect2);
+    level.getContent().add(connect2);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -486,26 +486,26 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     c.setName("LoyaltyProgram");
     Clabject c1 = PLMFactory.eINSTANCE.createEntity();
     c1.setName("ServiceLevel");
-    dm.getContent().add(l);
-    l.getContent().add(c);
-    l.getContent().add(c1);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
+    level.getContent().add(c1);
 
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("levels");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
     parti.setDestination(c);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti2.setDestination(c1);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
-    l.getContent().add(connect);
+    level.getContent().add(connect);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -547,38 +547,38 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
-    Clabject c = PLMFactory.eINSTANCE.createEntity();
-    Clabject c1 = PLMFactory.eINSTANCE.createEntity();
-    c1.setName("Partner");
+    Clabject clabject1 = PLMFactory.eINSTANCE.createEntity();
+    clabject1.setName("Partner");
     Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
     attribute.setName("deliveredServices");
-    c1.getFeature().add(attribute);
+    clabject1.getFeature().add(attribute);
 
-    c.setName("LoyaltyProgram");
+    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    clabject.setName("LoyaltyProgram");
     Method method = PLMFactory.eINSTANCE.createMethod();
     method.setName("getServices()");
-    c.getFeature().add(method);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    clabject.getFeature().add(method);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(clabject);
 
     // connection between c and d
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("partners");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
-    parti.setDestination(c);
-    parti2.setDestination(c1);
+    parti.setDestination(clabject);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
+    parti2.setDestination(clabject1);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
-    l.getContent().add(connect);
+    level.getContent().add(connect);
 
-    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
+    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(clabject);
     saveConstraints.save(everything);
     StringBuilder oclExpression = new StringBuilder();
-    EList<AbstractConstraint> constraints = c.getConstraint();
+    EList<AbstractConstraint> constraints = clabject.getConstraint();
     for (AbstractConstraint constraint : constraints) {
       Constraint constr = (Constraint) constraint;
       EList<Expression> expressions = constr.getExpression();
@@ -614,38 +614,38 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
-    Clabject c = PLMFactory.eINSTANCE.createEntity();
-    Clabject c1 = PLMFactory.eINSTANCE.createEntity();
-    c1.setName("Partner");
+    Clabject clabject1 = PLMFactory.eINSTANCE.createEntity();
+    clabject1.setName("Partner");
     Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
     attribute.setName("deliveredServices");
-    c1.getFeature().add(attribute);
+    clabject1.getFeature().add(attribute);
 
-    c.setName("LoyaltyProgram");
+    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    clabject.setName("LoyaltyProgram");
     Method method = PLMFactory.eINSTANCE.createMethod();
     method.setName("getServices()");
-    c.getFeature().add(method);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    clabject.getFeature().add(method);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(clabject);
 
     // connection between c and d
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("partners");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
-    parti.setDestination(c);
-    parti2.setDestination(c1);
+    parti.setDestination(clabject);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
+    parti2.setDestination(clabject1);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
-    l.getContent().add(connect);
+    level.getContent().add(connect);
 
-    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
+    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(clabject);
     saveConstraints.save(everything);
     StringBuilder oclExpression = new StringBuilder();
-    EList<AbstractConstraint> constraints = c.getConstraint();
+    EList<AbstractConstraint> constraints = clabject.getConstraint();
     for (AbstractConstraint constraint : constraints) {
       Constraint constr = (Constraint) constraint;
       EList<Expression> expressions = constr.getExpression();
@@ -681,33 +681,33 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
-    Clabject c = PLMFactory.eINSTANCE.createEntity();
-    Clabject c1 = PLMFactory.eINSTANCE.createEntity();
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabject1 = PLMFactory.eINSTANCE.createEntity();
 
-    c.setName("LoyaltyAccount");
-    c1.setName("Test");
-    dm.getContent().add(l);
-    l.getContent().add(c);
-    l.getContent().add(c1);
+    clabject.setName("LoyaltyAccount");
+    clabject1.setName("Test");
+    deepModel.getContent().add(level);
+    level.getContent().add(clabject);
+    level.getContent().add(clabject1);
 
     // connection between c and d
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("transactions");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
-    parti.setDestination(c);
-    parti2.setDestination(c1);
+    parti.setDestination(clabject);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
+    parti2.setDestination(clabject1);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
-    l.getContent().add(connect);
+    level.getContent().add(connect);
 
-    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
+    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(clabject);
     saveConstraints.save(everything);
     StringBuilder oclExpression = new StringBuilder();
-    EList<AbstractConstraint> constraints = c.getConstraint();
+    EList<AbstractConstraint> constraints = clabject.getConstraint();
     for (AbstractConstraint constraint : constraints) {
       Constraint constr = (Constraint) constraint;
       EList<Expression> expressions = constr.getExpression();
@@ -756,11 +756,11 @@ public class SavingConstraintsTests {
 
     // connection between c and d
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("levels");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
     parti.setDestination(c);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     parti2.setDestination(c1);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
@@ -805,38 +805,38 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
-    Clabject c = PLMFactory.eINSTANCE.createEntity();
-    Clabject c1 = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabject1 = PLMFactory.eINSTANCE.createEntity();
 
-    c.setName("Membership");
-    c1.setName("ServiceLevel");
+    clabject.setName("Membership");
+    clabject1.setName("ServiceLevel");
 
     Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
     attribute.setName("name");
-    c1.getFeature().add(attribute);
+    clabject1.getFeature().add(attribute);
 
-    dm.getContent().add(l);
-    l.getContent().add(c);
-    l.getContent().add(c1);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(clabject);
+    level.getContent().add(clabject1);
 
     // connection between c and d
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("currentLevel");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
-    parti.setDestination(c);
-    parti2.setDestination(c1);
+    parti.setDestination(clabject);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
+    parti2.setDestination(clabject1);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
-    l.getContent().add(connect);
+    level.getContent().add(connect);
 
-    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
+    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(clabject);
     saveConstraints.save(everything);
     StringBuilder oclExpression = new StringBuilder();
-    EList<AbstractConstraint> constraints = c.getConstraint();
+    EList<AbstractConstraint> constraints = clabject.getConstraint();
     for (AbstractConstraint constraint : constraints) {
       Constraint constr = (Constraint) constraint;
       EList<Expression> expressions = constr.getExpression();
@@ -872,41 +872,41 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
-    Clabject c = PLMFactory.eINSTANCE.createEntity();
-    Clabject c1 = PLMFactory.eINSTANCE.createEntity();
     Attribute a = PLMFactory.eINSTANCE.createAttribute();
     a.setName("printedname");
     Attribute a2 = PLMFactory.eINSTANCE.createAttribute();
     a2.setName("name");
     Attribute a1 = PLMFactory.eINSTANCE.createAttribute();
     a1.setName("title");
-    c.setName("CustomerCard");
-    c.getFeature().add(a);
-    c1.setName("Owner");
-    c1.getFeature().add(a1);
-    c1.getFeature().add(a2);
-    dm.getContent().add(l);
-    l.getContent().add(c);
-    l.getContent().add(c1);
+    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    clabject.setName("CustomerCard");
+    clabject.getFeature().add(a);
+    Clabject clabject1 = PLMFactory.eINSTANCE.createEntity();
+    clabject1.setName("Owner");
+    clabject1.getFeature().add(a1);
+    clabject1.getFeature().add(a2);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(clabject);
+    level.getContent().add(clabject1);
 
     // connection between c and d
     Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
     connect.setName("owner");
+    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
     parti.setConnection(connect);
-    parti.setDestination(c);
-    parti2.setDestination(c1);
+    parti.setDestination(clabject);
+    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
+    parti2.setDestination(clabject1);
     parti2.setNavigable(true);
     parti2.setConnection(connect);
-    l.getContent().add(connect);
+    level.getContent().add(connect);
 
-    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
+    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(clabject);
     saveConstraints.save(everything);
     StringBuilder oclExpression = new StringBuilder();
-    EList<AbstractConstraint> constraints = c.getConstraint();
+    EList<AbstractConstraint> constraints = clabject.getConstraint();
     for (AbstractConstraint constraint : constraints) {
       Constraint constr = (Constraint) constraint;
       EList<Expression> expressions = constr.getExpression();
@@ -942,15 +942,15 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     Attribute a = PLMFactory.eINSTANCE.createAttribute();
     a.setName("valid");
     c.setName("CustomerCard");
     c.getFeature().add(a);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -991,15 +991,15 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     Attribute a = PLMFactory.eINSTANCE.createAttribute();
     c.setName("LoyaltyAccount");
     a.setName("points");
     c.getFeature().add(a);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -1040,8 +1040,6 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     Attribute a = PLMFactory.eINSTANCE.createAttribute();
     Attribute a1 = PLMFactory.eINSTANCE.createAttribute();
@@ -1049,8 +1047,10 @@ public class SavingConstraintsTests {
     a1.setName("goodThru");
     c.setName("CustomerCard");
     c.getFeature().add(a);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -1091,8 +1091,6 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     Attribute a = PLMFactory.eINSTANCE.createAttribute();
     Method m = PLMFactory.eINSTANCE.createMethod();
@@ -1101,8 +1099,10 @@ public class SavingConstraintsTests {
     c.setName("Customer");
     c.getFeature().add(a);
     c.getFeature().add(m);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -1143,26 +1143,26 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
-    Clabject c = PLMFactory.eINSTANCE.createEntity();
     Attribute a = PLMFactory.eINSTANCE.createAttribute();
     Method m = PLMFactory.eINSTANCE.createMethod();
     m.setName("calcPoints()");
     Method m1 = PLMFactory.eINSTANCE.createMethod();
     m1.setName("upgradePointsEarned()");
     a.setName("age");
-    c.setName("Service");
-    c.getFeature().add(a);
-    c.getFeature().add(m);
-    c.getFeature().add(m1);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    clabject.setName("Service");
+    clabject.getFeature().add(a);
+    clabject.getFeature().add(m);
+    clabject.getFeature().add(m1);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(clabject);
 
-    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
+    DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(clabject);
     saveConstraints.save(everything);
     StringBuilder oclExpression = new StringBuilder();
-    EList<AbstractConstraint> constraints = c.getConstraint();
+    EList<AbstractConstraint> constraints = clabject.getConstraint();
     for (AbstractConstraint constraint : constraints) {
       Constraint constr = (Constraint) constraint;
       EList<Expression> expressions = constr.getExpression();
@@ -1198,8 +1198,6 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     Attribute a = PLMFactory.eINSTANCE.createAttribute();
     Method m = PLMFactory.eINSTANCE.createMethod();
@@ -1208,8 +1206,10 @@ public class SavingConstraintsTests {
     c.setName("Subject");
     c.getFeature().add(a);
     c.getFeature().add(m);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -1250,15 +1250,15 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     Method m = PLMFactory.eINSTANCE.createMethod();
     m.setName("enroll()");
     c.setName("LoyaltyProgram");
     c.getFeature().add(m);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
     saveConstraints.save(everything);
@@ -1299,15 +1299,15 @@ public class SavingConstraintsTests {
       everything = sb.toString();
     }
 
-    DeepModel dm = PLMFactory.eINSTANCE.createDeepModel();
-    Level l = PLMFactory.eINSTANCE.createLevel();
     Clabject c = PLMFactory.eINSTANCE.createEntity();
     c.setName("Customer");
     Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
     attribute.setName("age");
     c.getFeature().add(attribute);
-    dm.getContent().add(l);
-    l.getContent().add(c);
+    DeepModel deepModel = PLMFactory.eINSTANCE.createDeepModel();
+    Level level = PLMFactory.eINSTANCE.createLevel();
+    deepModel.getContent().add(level);
+    level.getContent().add(c);
 
     DeepOclPersistenceService saveConstraints = new DeepOclPersistenceService(c);
 
