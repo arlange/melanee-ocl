@@ -14,9 +14,10 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * The deep OCL IfExp interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface IfExp extends OCLExpression,org.eclipse.ocl.expressions.IfExp<EObject> {
+public interface IfExp extends OCLExpression, org.eclipse.ocl.expressions.IfExp<EObject> {
 
 }

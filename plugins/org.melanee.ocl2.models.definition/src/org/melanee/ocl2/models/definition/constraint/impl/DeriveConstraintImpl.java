@@ -17,30 +17,29 @@ import org.melanee.ocl2.models.definition.constraint.ConstraintPackage;
 import org.melanee.ocl2.models.definition.constraint.DeriveConstraint;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Derive Constraint</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '<em><b>Derive
+ * Constraint</b></em>'. <!-- end-user-doc -->
  *
  * @generated
  */
 public class DeriveConstraintImpl extends ConstraintImpl implements DeriveConstraint {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected DeriveConstraintImpl() {
-		super();
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  protected DeriveConstraintImpl() {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return ConstraintPackage.Literals.DERIVE_CONSTRAINT;
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass() {
+    return ConstraintPackage.Literals.DERIVE_CONSTRAINT;
+  }
 
-} //DeriveConstraintImpl
+} // DeriveConstraintImpl

@@ -8,16 +8,17 @@
  *
  * Contributors:
  *    Dominik Kantner - initial API and implementation and initial documentation
- *******************************************************************************/package org.melanee.ocl.service.ocl.lml.impl;
+ *******************************************************************************/
+package org.melanee.ocl.service.ocl.lml.impl;
 
 import org.melanee.ocl.service.ocl.lml.PrimitiveLiteralExp;
 
 /**
  * The PrimitiveLiteralExpImpl Class
+ * 
  * @author Dominik Kantner
  *
  */
-public class PrimitiveLiteralExpImpl extends LiteralExpImpl implements
-		PrimitiveLiteralExp {
+public class PrimitiveLiteralExpImpl extends LiteralExpImpl implements PrimitiveLiteralExp {
 
 }

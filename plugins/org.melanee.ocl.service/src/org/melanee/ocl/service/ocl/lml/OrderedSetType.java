@@ -12,12 +12,13 @@ package org.melanee.ocl.service.ocl.lml;
 
 import org.eclipse.emf.ecore.EObject;
 
-
 /**
  * The deep OCL OrderedSetType interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface OrderedSetType extends CollectionType, org.eclipse.ocl.types.OrderedSetType<EObject, EObject>  {
+public interface OrderedSetType
+    extends CollectionType, org.eclipse.ocl.types.OrderedSetType<EObject, EObject> {
 
 }

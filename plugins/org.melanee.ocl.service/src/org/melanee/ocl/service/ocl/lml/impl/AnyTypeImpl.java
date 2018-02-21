@@ -29,59 +29,57 @@ import org.melanee.ocl.service.ocl.lml.DeepOCLEnvironment;
 import org.melanee.ocl.service.ocl.lml.DeepOCLEnvironmentFactory;
 import org.melanee.ocl.service.ocl.lml.util.DeepOCLStandardLibraryUtil;
 
-
-
-
 /**
  * The AnyTypeImpl class
- *  @author Dominik Kantner
+ * 
+ * @author Dominik Kantner
  */
-public class AnyTypeImpl extends EObjectImpl implements AnyType{
-	
-	
-	/**
-	 * Stores the name
-	 */
-	protected String name; 
-	
-	
-	/**
-	 * Stores a list of operations 
-	 */
-	protected EList<EObject> operations;
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.utilities.PredefinedType#getName()
-	 */
-	@Override
-	public String getName() {
-		if (name == null) {
-			name = SINGLETON_NAME;
-		}
+public class AnyTypeImpl extends EObjectImpl implements AnyType {
 
-		return name;
-	}
+  /**
+   * Stores the name
+   */
+  protected String name;
 
+  /**
+   * Stores a list of operations
+   */
+  protected EList<EObject> operations;
 
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.utilities.PredefinedType#oclOperations()
-	 */
-	@Override
-	public EList<EObject> oclOperations() {
-		if(operations==null || operations.isEmpty()){
-			Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> lmlEnvironment=new DeepOCLEnvironmentFactory().createEnvironment();
-			List<EObject> standardAnyOperations=OCLStandardLibraryUtil.createAnyTypeOperations(lmlEnvironment);
-			List<EObject> deepAnyOperations=DeepOCLStandardLibraryUtil.createAnyTypeOperations((DeepOCLEnvironment) lmlEnvironment);
-			List<EObject> allAnyOperations=new ArrayList<EObject>();
-			allAnyOperations.addAll(standardAnyOperations);
-			allAnyOperations.addAll(deepAnyOperations);
-			operations=ECollections.asEList(allAnyOperations);
-		}	
-		return operations;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.utilities.PredefinedType#getName()
+   */
+  @Override
+  public String getName() {
+    if (name == null) {
+      name = SINGLETON_NAME;
+    }
 
-	
+    return name;
+  }
 
-	
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.utilities.PredefinedType#oclOperations()
+   */
+  @Override
+  public EList<EObject> oclOperations() {
+    if (operations == null || operations.isEmpty()) {
+      Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> lmlEnvironment = new DeepOCLEnvironmentFactory()
+          .createEnvironment();
+      List<EObject> standardAnyOperations = OCLStandardLibraryUtil
+          .createAnyTypeOperations(lmlEnvironment);
+      List<EObject> deepAnyOperations = DeepOCLStandardLibraryUtil
+          .createAnyTypeOperations((DeepOCLEnvironment) lmlEnvironment);
+      List<EObject> allAnyOperations = new ArrayList<EObject>();
+      allAnyOperations.addAll(standardAnyOperations);
+      allAnyOperations.addAll(deepAnyOperations);
+      operations = ECollections.asEList(allAnyOperations);
+    }
+    return operations;
+  }
 
 }

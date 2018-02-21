@@ -15,35 +15,35 @@ import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 
-
 /**
  * The LMLOCLIdentifierRule class
+ * 
  * @author Dominik Kantner
  *
  */
 public class LMLOCLIdentifierRule extends WordRule {
-    
-    /**
-     * Constuctor
-     */
-    LMLOCLIdentifierRule() {
-        super(new OCLKeywordDetector(), new Token(new TextAttribute(null)));
+
+  /**
+   * Constuctor
+   */
+  LMLOCLIdentifierRule() {
+    super(new OCLKeywordDetector(), new Token(new TextAttribute(null)));
+  }
+
+  /**
+   * private class OCLKeywordDetector
+   * 
+   * @author Dominik Kantner
+   *
+   */
+  private static class OCLKeywordDetector implements IWordDetector {
+
+    public boolean isWordPart(char c) {
+      return isWordStart(c) || c == '$' || (c >= '0' && c <= '9');
     }
-    
-    /**
-     * private class OCLKeywordDetector
-     * @author Dominik Kantner
-     *
-     */
-    private static class OCLKeywordDetector
-        implements IWordDetector {
-    
-        public boolean isWordPart(char c) {
-            return isWordStart(c) || c == '$' || (c >= '0' && c <= '9');
-        }
-    
-        public boolean isWordStart(char c) {
-            return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-        }
+
+    public boolean isWordStart(char c) {
+      return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
+  }
 }

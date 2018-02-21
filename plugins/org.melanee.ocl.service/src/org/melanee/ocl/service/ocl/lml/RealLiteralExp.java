@@ -14,9 +14,11 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * The deep OCL RealLiteralExp interface
+ * 
  * @author Dominik
  *
  */
-public interface RealLiteralExp extends PrimitiveLiteralExp, org.eclipse.ocl.expressions.RealLiteralExp<EObject> {
+public interface RealLiteralExp
+    extends PrimitiveLiteralExp, org.eclipse.ocl.expressions.RealLiteralExp<EObject> {
 
 }

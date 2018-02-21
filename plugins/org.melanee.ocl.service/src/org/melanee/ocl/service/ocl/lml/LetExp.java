@@ -10,15 +10,15 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
-
 import org.eclipse.emf.ecore.EObject;
-
 
 /**
  * The deep OCL LetExp interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface LetExp extends OCLExpression, org.eclipse.ocl.expressions.LetExp<EObject,EObject>{
+public interface LetExp
+    extends OCLExpression, org.eclipse.ocl.expressions.LetExp<EObject, EObject> {
 
 }

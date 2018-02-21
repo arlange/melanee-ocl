@@ -20,45 +20,45 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.ocl.examples.interpreter.console.text.ColorManager;
 
-
 /**
  * The LMLOCLScanner class
+ * 
  * @author Dominik Kantner
  *
  */
 public class LMLOCLScanner extends RuleBasedScanner {
 
-    /**
-     *Constructor
-     * @param manager
-     */
-    LMLOCLScanner(ColorManager manager) {
-        super();
-        
-        IToken literal = new Token(
-            new TextAttribute(manager.getColor(ColorManager.LITERAL)));
+  /**
+   * Constructor
+   * 
+   * @param manager
+   */
+  LMLOCLScanner(ColorManager manager) {
+    super();
 
-        IRule[] rules = new IRule[7];
+    IToken literal = new Token(new TextAttribute(manager.getColor(ColorManager.LITERAL)));
 
-        // Add rule for strings
-        rules[0] = new SingleLineRule("'", "'", literal); //$NON-NLS-1$ //$NON-NLS-2$
+    IRule[] rules = new IRule[7];
 
-        // Keyword (and pseudo-keyword) rule
-        rules[1] = new LMLOCLKeywordRule();
-        
-        // Collection and Tuple Literal rules
-        rules[2] = new LMLOCLCollectionTupleRule(manager, false);
-        rules[3] = new LMLOCLCollectionTupleRule(manager, true);
+    // Add rule for strings
+    rules[0] = new SingleLineRule("'", "'", literal); //$NON-NLS-1$ //$NON-NLS-2$
 
-        // identifier rule
-        rules[4] = new LMLOCLIdentifierRule();
-        
-        // Add a rule for numbers
-        rules[5] = new NumberRule(literal);
-        
-        // Add generic whitespace rule
-        rules[6] = new WhitespaceRule(new LMLOCLWhitespaceDetector());
-        
-        setRules(rules);
-    }
+    // Keyword (and pseudo-keyword) rule
+    rules[1] = new LMLOCLKeywordRule();
+
+    // Collection and Tuple Literal rules
+    rules[2] = new LMLOCLCollectionTupleRule(manager, false);
+    rules[3] = new LMLOCLCollectionTupleRule(manager, true);
+
+    // identifier rule
+    rules[4] = new LMLOCLIdentifierRule();
+
+    // Add a rule for numbers
+    rules[5] = new NumberRule(literal);
+
+    // Add generic whitespace rule
+    rules[6] = new WhitespaceRule(new LMLOCLWhitespaceDetector());
+
+    setRules(rules);
+  }
 }

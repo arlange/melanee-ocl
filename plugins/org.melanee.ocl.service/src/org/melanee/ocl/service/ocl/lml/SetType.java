@@ -10,15 +10,14 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
-
 import org.eclipse.emf.ecore.EObject;
-
 
 /**
  * The deep OCL SetType interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface SetType extends CollectionType, org.eclipse.ocl.types.SetType<EObject, EObject>   {
+public interface SetType extends CollectionType, org.eclipse.ocl.types.SetType<EObject, EObject> {
 
 }

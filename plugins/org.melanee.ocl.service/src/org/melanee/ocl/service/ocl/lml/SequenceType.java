@@ -10,15 +10,15 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
-
 import org.eclipse.emf.ecore.EObject;
-
 
 /**
  * The deep OCL SequenceType interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface SequenceType  extends CollectionType,org.eclipse.ocl.types.SequenceType<EObject, EObject>  {
+public interface SequenceType
+    extends CollectionType, org.eclipse.ocl.types.SequenceType<EObject, EObject> {
 
 }

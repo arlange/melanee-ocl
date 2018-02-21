@@ -12,15 +12,13 @@ package org.melanee.ocl.service.ocl.lml;
 
 import org.eclipse.emf.ecore.EObject;
 
-
-
-
-
 /**
  * The deep OCL OperationCallExp interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface OperationCallExp  extends org.eclipse.ocl.expressions.OperationCallExp<EObject,EObject>{
+public interface OperationCallExp
+    extends org.eclipse.ocl.expressions.OperationCallExp<EObject, EObject> {
 
 }

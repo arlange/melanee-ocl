@@ -10,19 +10,17 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
-
 import org.eclipse.emf.ecore.EObject;
 
 import org.eclipse.ocl.expressions.OCLExpression;
 
-
 /**
  * The deep OCL VariableExp interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface VariableExp 
-extends OCLExpression<EObject>,
-org.eclipse.ocl.expressions.VariableExp<EObject,EObject>{
+public interface VariableExp
+    extends OCLExpression<EObject>, org.eclipse.ocl.expressions.VariableExp<EObject, EObject> {
 
 }

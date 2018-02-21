@@ -12,26 +12,28 @@
 package org.melanee.ocl2.service.util;
 
 /**
- * Tuple class for the navigation stack, it is a workaround for a normal map. JAVA just provides a HashMap.
+ * Tuple class for the navigation stack, it is a workaround for a normal map.
+ * JAVA just provides a HashMap.
+ * 
  * @author Arne Lange
  *
  * @param <X>
  * @param <Y>
  */
 public class Tuple<X, Y> {
-	public final X x;
-	public final Y y;
+  public final X x;
+  public final Y y;
 
-	public Tuple(X x, Y y) {
-		this.x = x;
-		this.y = y;
-	}
+  public Tuple(X x, Y y) {
+    this.x = x;
+    this.y = y;
+  }
 
-	public X getFirst() {
-		return this.x;
-	}
+  public X getFirst() {
+    return this.x;
+  }
 
-	public Y getSecond() {
-		return this.y;
-	}
+  public Y getSecond() {
+    return this.y;
+  }
 }

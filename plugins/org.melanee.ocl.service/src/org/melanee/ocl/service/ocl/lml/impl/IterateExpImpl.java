@@ -19,59 +19,72 @@ import org.melanee.ocl.service.ocl.lml.IterateExp;
 
 /**
  * The IterateExpImpl class
+ * 
  * @author Dominik Kantner
  *
  */
 public class IterateExpImpl extends LoopExpImpl implements IterateExp {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.IterateExp#getResult()
-	 */
-	@Override
-	public Variable<EObject, EObject> getResult() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.expressions.IterateExp#getResult()
+   */
+  @Override
+  public Variable<EObject, EObject> getResult() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.IterateExp#setResult(org.eclipse.ocl.expressions.Variable)
-	 */
-	@Override
-	public void setResult(Variable<EObject, EObject> value) {
-		// TODO Auto-generated method stub
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ocl.expressions.IterateExp#setResult(org.eclipse.ocl.expressions.
+   * Variable)
+   */
+  @Override
+  public void setResult(Variable<EObject, EObject> value) {
+    // TODO Auto-generated method stub
 
-	}
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.IterateExp#checkIterateType(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
-	 */
-	@Override
-	public boolean checkIterateType(DiagnosticChain diagnostics,
-			Map<Object, Object> context) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.expressions.IterateExp#checkIterateType(org.eclipse.emf.
+   * common.util.DiagnosticChain, java.util.Map)
+   */
+  @Override
+  public boolean checkIterateType(DiagnosticChain diagnostics, Map<Object, Object> context) {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.IterateExp#checkBodyType(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
-	 */
-	@Override
-	public boolean checkBodyType(DiagnosticChain diagnostics,
-			Map<Object, Object> context) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ocl.expressions.IterateExp#checkBodyType(org.eclipse.emf.common.
+   * util.DiagnosticChain, java.util.Map)
+   */
+  @Override
+  public boolean checkBodyType(DiagnosticChain diagnostics, Map<Object, Object> context) {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.IterateExp#checkResultInit(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
-	 */
-	@Override
-	public boolean checkResultInit(DiagnosticChain diagnostics,
-			Map<Object, Object> context) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ocl.expressions.IterateExp#checkResultInit(org.eclipse.emf.common
+   * .util.DiagnosticChain, java.util.Map)
+   */
+  @Override
+  public boolean checkResultInit(DiagnosticChain diagnostics, Map<Object, Object> context) {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
 }

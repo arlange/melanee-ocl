@@ -11,11 +11,9 @@
  *******************************************************************************/
 package org.melanee.ocl2.models.definition.constraint;
 
-
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Body Constraint</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> A representation of the model object '<em><b>Body
+ * Constraint</b></em>'. <!-- end-user-doc -->
  *
  *
  * @see org.melanee.ocl2.models.definition.constraint.ConstraintPackage#getBodyConstraint()

@@ -17,30 +17,29 @@ import org.melanee.ocl2.models.definition.constraint.ConstraintPackage;
 import org.melanee.ocl2.models.definition.constraint.PreConstraint;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Pre Constraint</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '<em><b>Pre
+ * Constraint</b></em>'. <!-- end-user-doc -->
  *
  * @generated
  */
 public class PreConstraintImpl extends ConstraintImpl implements PreConstraint {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected PreConstraintImpl() {
-		super();
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  protected PreConstraintImpl() {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return ConstraintPackage.Literals.PRE_CONSTRAINT;
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass() {
+    return ConstraintPackage.Literals.PRE_CONSTRAINT;
+  }
 
-} //PreConstraintImpl
+} // PreConstraintImpl

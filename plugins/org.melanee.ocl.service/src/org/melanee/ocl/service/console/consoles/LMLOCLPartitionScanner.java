@@ -22,31 +22,31 @@ import org.eclipse.jface.text.rules.Token;
 
 /**
  * The LMLOCLPartitionScanner class
+ * 
  * @author Dominik Kantner
  *
  */
 
 public class LMLOCLPartitionScanner extends RuleBasedPartitionScanner {
 
-    public static final String COMMENT = "__ocl_comment"; //$NON-NLS-1$
-    
-    /**
-     * Constructor
-     */
-    LMLOCLPartitionScanner() {
-        super();
-        
-        List<IRule> rules = new java.util.ArrayList<IRule>();
-        
-        IToken commentToken = new Token(COMMENT);
-        
-        // rule for single-line comments
-        rules.add(new EndOfLineRule("--", commentToken)); //$NON-NLS-1$
+  public static final String COMMENT = "__ocl_comment"; //$NON-NLS-1$
 
-        // rule for paragraph comments
-        rules.add(new MultiLineRule("/*", "*/", commentToken)); //$NON-NLS-1$ //$NON-NLS-2$
-        
-        setPredicateRules(rules.toArray(new IPredicateRule[rules.size()]));
-    }
+  /**
+   * Constructor
+   */
+  LMLOCLPartitionScanner() {
+    super();
+
+    List<IRule> rules = new java.util.ArrayList<IRule>();
+
+    IToken commentToken = new Token(COMMENT);
+
+    // rule for single-line comments
+    rules.add(new EndOfLineRule("--", commentToken)); //$NON-NLS-1$
+
+    // rule for paragraph comments
+    rules.add(new MultiLineRule("/*", "*/", commentToken)); //$NON-NLS-1$ //$NON-NLS-2$
+
+    setPredicateRules(rules.toArray(new IPredicateRule[rules.size()]));
+  }
 }
-

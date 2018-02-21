@@ -14,10 +14,11 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * The deep OCL ExpressionInOCL interface
+ * 
  * @author Dominik
  *
  */
-public interface ExpressionInOCL extends org.eclipse.ocl.utilities.ExpressionInOCL<EObject, EObject> {
+public interface ExpressionInOCL
+    extends org.eclipse.ocl.utilities.ExpressionInOCL<EObject, EObject> {
 
-	
 }

@@ -19,30 +19,29 @@ import org.melanee.ocl2.models.definition.constraint.ConstraintPackage;
 import org.melanee.ocl2.models.definition.constraint.Expression;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Expression</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object
+ * '<em><b>Expression</b></em>'. <!-- end-user-doc -->
  *
  * @generated
  */
 public abstract class ExpressionImpl extends MinimalEObjectImpl.Container implements Expression {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected ExpressionImpl() {
-		super();
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  protected ExpressionImpl() {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return ConstraintPackage.Literals.EXPRESSION;
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass() {
+    return ConstraintPackage.Literals.EXPRESSION;
+  }
 
-} //ExpressionImpl
+} // ExpressionImpl

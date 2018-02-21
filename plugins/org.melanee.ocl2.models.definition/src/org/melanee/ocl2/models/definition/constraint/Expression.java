@@ -14,9 +14,8 @@ package org.melanee.ocl2.models.definition.constraint;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Expression</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> A representation of the model object
+ * '<em><b>Expression</b></em>'. <!-- end-user-doc -->
  *
  *
  * @see org.melanee.ocl2.models.definition.constraint.ConstraintPackage#getExpression()

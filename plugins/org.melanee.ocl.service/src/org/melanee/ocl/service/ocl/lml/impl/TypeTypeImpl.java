@@ -29,91 +29,99 @@ import org.melanee.ocl.service.ocl.lml.DeepOCLEnvironmentFactory;
 import org.melanee.ocl.service.ocl.lml.TypeType;
 import org.melanee.ocl.service.ocl.lml.util.DeepOCLStandardLibraryUtil;
 
-
-
 /**
  * The TypeTypeImpl
+ * 
  * @author Dominik Kantner
  *
  */
 public class TypeTypeImpl extends EObjectImpl implements TypeType {
 
-	
-	/**
-	 * stores the referred type
-	 */
-	protected EObject referredType;
-	
-	/**
-	 * stores the operations
-	 */
-	protected EList<EObject> operations;
-	
-	/**
-	 * Constructor 
-	 */
-	protected TypeTypeImpl() {
-		super();
-	}
+  /**
+   * stores the referred type
+   */
+  protected EObject referredType;
 
+  /**
+   * stores the operations
+   */
+  protected EList<EObject> operations;
 
-	/**
-	 * Constructor
-	 * @param referredType
-	 */
-	protected TypeTypeImpl(EObject referredType) {
-		this();
+  /**
+   * Constructor
+   */
+  protected TypeTypeImpl() {
+    super();
+  }
 
-		this.referredType = referredType;
-	}
+  /**
+   * Constructor
+   * 
+   * @param referredType
+   */
+  protected TypeTypeImpl(EObject referredType) {
+    this();
 
-	/**
-	 * @param referredType
-	 * @return A TypeType
-	 */
-	public static TypeType createTypeType(EObject referredType) {
-		return new TypeTypeImpl(referredType);
-	}
+    this.referredType = referredType;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.types.TypeType#getReferredType()
-	 */
-	@Override
-	public EObject getReferredType() {
-		// TODO Auto-generated method stub
-		return this.referredType;
-	}
+  /**
+   * @param referredType
+   * @return A TypeType
+   */
+  public static TypeType createTypeType(EObject referredType) {
+    return new TypeTypeImpl(referredType);
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.utilities.PredefinedType#getName()
-	 */
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return SINGLETON_NAME;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.types.TypeType#getReferredType()
+   */
+  @Override
+  public EObject getReferredType() {
+    // TODO Auto-generated method stub
+    return this.referredType;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.utilities.PredefinedType#oclOperations()
-	 */
-	@Override
-	public EList<EObject> oclOperations() {
-		// TODO Auto-generated method stub
-		if(operations==null || operations.isEmpty()){
-			operations=	ECollections.asEList(OCLStandardLibraryUtil.createTypeTypeOperations(new DeepOCLEnvironmentFactory().createEnvironment()));
-			  // create a new factory with new environment , may be later use already existing env
-			
-			Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> lmlEnvironment=new DeepOCLEnvironmentFactory().createEnvironment();
-			List<EObject> standardTypeOperations=OCLStandardLibraryUtil.createTypeTypeOperations(lmlEnvironment);
-			List<EObject> deepTypeOperations=DeepOCLStandardLibraryUtil.createTypeTypeOperations((DeepOCLEnvironment) lmlEnvironment);
-			List<EObject> allTypeOperations=new ArrayList<EObject>();
-			allTypeOperations.addAll(standardTypeOperations);
-			allTypeOperations.addAll(deepTypeOperations);
-			operations=ECollections.asEList(allTypeOperations);
-		}
-		
-		return operations;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.utilities.PredefinedType#getName()
+   */
+  @Override
+  public String getName() {
+    // TODO Auto-generated method stub
+    return SINGLETON_NAME;
+  }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.utilities.PredefinedType#oclOperations()
+   */
+  @Override
+  public EList<EObject> oclOperations() {
+    // TODO Auto-generated method stub
+    if (operations == null || operations.isEmpty()) {
+      operations = ECollections.asEList(OCLStandardLibraryUtil
+          .createTypeTypeOperations(new DeepOCLEnvironmentFactory().createEnvironment()));
+      // create a new factory with new environment , may be later use already existing
+      // env
+
+      Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> lmlEnvironment = new DeepOCLEnvironmentFactory()
+          .createEnvironment();
+      List<EObject> standardTypeOperations = OCLStandardLibraryUtil
+          .createTypeTypeOperations(lmlEnvironment);
+      List<EObject> deepTypeOperations = DeepOCLStandardLibraryUtil
+          .createTypeTypeOperations((DeepOCLEnvironment) lmlEnvironment);
+      List<EObject> allTypeOperations = new ArrayList<EObject>();
+      allTypeOperations.addAll(standardTypeOperations);
+      allTypeOperations.addAll(deepTypeOperations);
+      operations = ECollections.asEList(allTypeOperations);
+    }
+
+    return operations;
+  }
 
 }

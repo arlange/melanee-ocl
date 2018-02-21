@@ -26,312 +26,402 @@ import org.eclipse.emf.ecore.resource.Resource.Internal;
 import org.eclipse.ocl.utilities.Visitor;
 import org.melanee.ocl.service.ocl.lml.StringLiteralExp;
 
-
 /**
  * The StringLiteralExpImpl class
+ * 
  * @author Dominik Kantner
  *
  */
-public class StringLiteralExpImpl extends PrimitiveLiteralExpImpl implements StringLiteralExp,InternalEObject{
+public class StringLiteralExpImpl extends PrimitiveLiteralExpImpl
+    implements StringLiteralExp, InternalEObject {
 
-	/**
-	 * stores the string symbol
-	 */
-	protected String stringSymbol;
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.StringLiteralExp#getStringSymbol()
-	 */
-	@Override
-	public String getStringSymbol() {
-		// TODO Auto-generated method stub
-		return stringSymbol;
-	}
+  /**
+   * stores the string symbol
+   */
+  protected String stringSymbol;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.StringLiteralExp#setStringSymbol(java.lang.String)
-	 */
-	@Override
-	public void setStringSymbol(String value) {
-		stringSymbol=value;
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.expressions.StringLiteralExp#getStringSymbol()
+   */
+  @Override
+  public String getStringSymbol() {
+    // TODO Auto-generated method stub
+    return stringSymbol;
+  }
 
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.expressions.StringLiteralExp#setStringSymbol(java.lang.
+   * String)
+   */
+  @Override
+  public void setStringSymbol(String value) {
+    stringSymbol = value;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.StringLiteralExp#checkStringType(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
-	 */
-	@Override
-	public boolean checkStringType(DiagnosticChain diagnostics,
-			Map<Object, Object> context) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  }
 
-	/* (non-Javadoc)
-	 * @see org.melanee.ocl.service.LiteralExpImpl#accept(org.eclipse.ocl.utilities.Visitor)
-	 */
-	@SuppressWarnings("unchecked")
-	public <T, U extends Visitor<T, ?, ?, ?, ?, ?, ?, ?, ?, ?>> T accept(U v) {
-		return ((Visitor<T, EObject, ?, ?, ?, ?, ?, ?, ?, ?>) v)
-			.visitStringLiteralExp(this);
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ocl.expressions.StringLiteralExp#checkStringType(org.eclipse.emf.
+   * common.util.DiagnosticChain, java.util.Map)
+   */
+  @Override
+  public boolean checkStringType(DiagnosticChain diagnostics, Map<Object, Object> context) {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eNotificationRequired()
-	 */
-	@Override
-	public boolean eNotificationRequired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.melanee.ocl.service.LiteralExpImpl#accept(org.eclipse.ocl.utilities.
+   * Visitor)
+   */
+  @SuppressWarnings("unchecked")
+  public <T, U extends Visitor<T, ?, ?, ?, ?, ?, ?, ?, ?, ?>> T accept(U v) {
+    return ((Visitor<T, EObject, ?, ?, ?, ?, ?, ?, ?, ?>) v).visitStringLiteralExp(this);
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eURIFragmentSegment(org.eclipse.emf.ecore.EStructuralFeature, org.eclipse.emf.ecore.EObject)
-	 */
-	@Override
-	public String eURIFragmentSegment(EStructuralFeature eFeature,
-			EObject eObject) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eNotificationRequired()
+   */
+  @Override
+  public boolean eNotificationRequired() {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eObjectForURIFragmentSegment(java.lang.String)
-	 */
-	@Override
-	public EObject eObjectForURIFragmentSegment(String uriFragmentSegment) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.emf.ecore.InternalEObject#eURIFragmentSegment(org.eclipse.emf.
+   * ecore.EStructuralFeature, org.eclipse.emf.ecore.EObject)
+   */
+  @Override
+  public String eURIFragmentSegment(EStructuralFeature eFeature, EObject eObject) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eSetClass(org.eclipse.emf.ecore.EClass)
-	 */
-	@Override
-	public void eSetClass(EClass eClass) {
-		// TODO Auto-generated method stub
-		
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.emf.ecore.InternalEObject#eObjectForURIFragmentSegment(java.lang.
+   * String)
+   */
+  @Override
+  public EObject eObjectForURIFragmentSegment(String uriFragmentSegment) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eSetting(org.eclipse.emf.ecore.EStructuralFeature)
-	 */
-	@Override
-	public Setting eSetting(EStructuralFeature feature) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.emf.ecore.InternalEObject#eSetClass(org.eclipse.emf.ecore.EClass)
+   */
+  @Override
+  public void eSetClass(EClass eClass) {
+    // TODO Auto-generated method stub
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eBaseStructuralFeatureID(int, java.lang.Class)
-	 */
-	@Override
-	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eContainerFeatureID()
-	 */
-	@Override
-	public int eContainerFeatureID() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eSetting(org.eclipse.emf.ecore.
+   * EStructuralFeature)
+   */
+  @Override
+  public Setting eSetting(EStructuralFeature feature) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eDerivedStructuralFeatureID(int, java.lang.Class)
-	 */
-	@Override
-	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eBaseStructuralFeatureID(int,
+   * java.lang.Class)
+   */
+  @Override
+  public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eDerivedOperationID(int, java.lang.Class)
-	 */
-	@Override
-	public int eDerivedOperationID(int baseOperationID, Class<?> baseClass) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eContainerFeatureID()
+   */
+  @Override
+  public int eContainerFeatureID() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eSetResource(org.eclipse.emf.ecore.resource.Resource.Internal, org.eclipse.emf.common.notify.NotificationChain)
-	 */
-	@Override
-	public NotificationChain eSetResource(Internal resource,
-			NotificationChain notifications) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eDerivedStructuralFeatureID(int,
+   * java.lang.Class)
+   */
+  @Override
+  public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eInverseAdd(org.eclipse.emf.ecore.InternalEObject, int, java.lang.Class, org.eclipse.emf.common.notify.NotificationChain)
-	 */
-	@Override
-	public NotificationChain eInverseAdd(InternalEObject otherEnd,
-			int featureID, Class<?> baseClass, NotificationChain notifications) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eDerivedOperationID(int,
+   * java.lang.Class)
+   */
+  @Override
+  public int eDerivedOperationID(int baseOperationID, Class<?> baseClass) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eInverseRemove(org.eclipse.emf.ecore.InternalEObject, int, java.lang.Class, org.eclipse.emf.common.notify.NotificationChain)
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, Class<?> baseClass, NotificationChain notifications) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.emf.ecore.InternalEObject#eSetResource(org.eclipse.emf.ecore.
+   * resource.Resource.Internal, org.eclipse.emf.common.notify.NotificationChain)
+   */
+  @Override
+  public NotificationChain eSetResource(Internal resource, NotificationChain notifications) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eBasicSetContainer(org.eclipse.emf.ecore.InternalEObject, int, org.eclipse.emf.common.notify.NotificationChain)
-	 */
-	@Override
-	public NotificationChain eBasicSetContainer(InternalEObject newContainer,
-			int newContainerFeatureID, NotificationChain notifications) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eInverseAdd(org.eclipse.emf.ecore.
+   * InternalEObject, int, java.lang.Class,
+   * org.eclipse.emf.common.notify.NotificationChain)
+   */
+  @Override
+  public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, Class<?> baseClass,
+      NotificationChain notifications) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eBasicRemoveFromContainer(org.eclipse.emf.common.notify.NotificationChain)
-	 */
-	@Override
-	public NotificationChain eBasicRemoveFromContainer(
-			NotificationChain notifications) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.emf.ecore.InternalEObject#eInverseRemove(org.eclipse.emf.ecore.
+   * InternalEObject, int, java.lang.Class,
+   * org.eclipse.emf.common.notify.NotificationChain)
+   */
+  @Override
+  public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID,
+      Class<?> baseClass, NotificationChain notifications) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eProxyURI()
-	 */
-	@Override
-	public URI eProxyURI() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.emf.ecore.InternalEObject#eBasicSetContainer(org.eclipse.emf.
+   * ecore.InternalEObject, int, org.eclipse.emf.common.notify.NotificationChain)
+   */
+  @Override
+  public NotificationChain eBasicSetContainer(InternalEObject newContainer,
+      int newContainerFeatureID, NotificationChain notifications) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eSetProxyURI(org.eclipse.emf.common.util.URI)
-	 */
-	@Override
-	public void eSetProxyURI(URI uri) {
-		// TODO Auto-generated method stub
-		
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.emf.ecore.InternalEObject#eBasicRemoveFromContainer(org.eclipse.
+   * emf.common.notify.NotificationChain)
+   */
+  @Override
+  public NotificationChain eBasicRemoveFromContainer(NotificationChain notifications) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eResolveProxy(org.eclipse.emf.ecore.InternalEObject)
-	 */
-	@Override
-	public EObject eResolveProxy(InternalEObject proxy) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eProxyURI()
+   */
+  @Override
+  public URI eProxyURI() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eInternalContainer()
-	 */
-	@Override
-	public InternalEObject eInternalContainer() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.emf.ecore.InternalEObject#eSetProxyURI(org.eclipse.emf.common.
+   * util.URI)
+   */
+  @Override
+  public void eSetProxyURI(URI uri) {
+    // TODO Auto-generated method stub
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eInternalResource()
-	 */
-	@Override
-	public Internal eInternalResource() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eDirectResource()
-	 */
-	@Override
-	public Internal eDirectResource() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.emf.ecore.InternalEObject#eResolveProxy(org.eclipse.emf.ecore.
+   * InternalEObject)
+   */
+  @Override
+  public EObject eResolveProxy(InternalEObject proxy) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eStore()
-	 */
-	@Override
-	public EStore eStore() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eInternalContainer()
+   */
+  @Override
+  public InternalEObject eInternalContainer() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eSetStore(org.eclipse.emf.ecore.InternalEObject.EStore)
-	 */
-	@Override
-	public void eSetStore(EStore store) {
-		// TODO Auto-generated method stub
-		
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eInternalResource()
+   */
+  @Override
+  public Internal eInternalResource() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eGet(org.eclipse.emf.ecore.EStructuralFeature, boolean, boolean)
-	 */
-	@Override
-	public Object eGet(EStructuralFeature eFeature, boolean resolve,
-			boolean coreType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eDirectResource()
+   */
+  @Override
+  public Internal eDirectResource() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eGet(int, boolean, boolean)
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eStore()
+   */
+  @Override
+  public EStore eStore() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eSet(int, java.lang.Object)
-	 */
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		// TODO Auto-generated method stub
-		
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eSetStore(org.eclipse.emf.ecore.
+   * InternalEObject.EStore)
+   */
+  @Override
+  public void eSetStore(EStore store) {
+    // TODO Auto-generated method stub
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eUnset(int)
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		// TODO Auto-generated method stub
-		
-	}
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eIsSet(int)
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eGet(org.eclipse.emf.ecore.
+   * EStructuralFeature, boolean, boolean)
+   */
+  @Override
+  public Object eGet(EStructuralFeature eFeature, boolean resolve, boolean coreType) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.emf.ecore.InternalEObject#eInvoke(int, org.eclipse.emf.common.util.EList)
-	 */
-	@Override
-	public Object eInvoke(int operationID, EList<?> arguments)
-			throws InvocationTargetException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eGet(int, boolean, boolean)
+   */
+  @Override
+  public Object eGet(int featureID, boolean resolve, boolean coreType) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eSet(int, java.lang.Object)
+   */
+  @Override
+  public void eSet(int featureID, Object newValue) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eUnset(int)
+   */
+  @Override
+  public void eUnset(int featureID) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eIsSet(int)
+   */
+  @Override
+  public boolean eIsSet(int featureID) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.emf.ecore.InternalEObject#eInvoke(int,
+   * org.eclipse.emf.common.util.EList)
+   */
+  @Override
+  public Object eInvoke(int operationID, EList<?> arguments) throws InvocationTargetException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

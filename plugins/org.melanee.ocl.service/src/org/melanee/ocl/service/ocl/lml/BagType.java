@@ -10,14 +10,13 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
-
 import org.eclipse.emf.ecore.EObject;
-
 
 /**
  * The deep OCL BagType Interface
+ * 
  * @author Dominik Kantner
  */
-public interface BagType extends CollectionType, org.eclipse.ocl.types.BagType<EObject, EObject>  {
+public interface BagType extends CollectionType, org.eclipse.ocl.types.BagType<EObject, EObject> {
 
 }

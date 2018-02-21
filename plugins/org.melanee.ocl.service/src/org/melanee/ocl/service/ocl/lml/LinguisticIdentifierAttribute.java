@@ -16,18 +16,20 @@ import org.melanee.core.models.plm.PLM.Clabject;
 
 /**
  * Represent the linguistic identifier attribute interface
+ * 
  * @author Dominik Kantner
  *
  */
 public interface LinguisticIdentifierAttribute extends Attribute {
-	
-	/**
-	 * @param clabject The clabject on which the perspective switch is performed
-	 */
-	public void setClabject(Clabject clabject);
-	
-	/**
-	 * @return The linguistic type
-	 */
-	public EClass getLinguisticType();
+
+  /**
+   * @param clabject
+   *          The clabject on which the perspective switch is performed
+   */
+  public void setClabject(Clabject clabject);
+
+  /**
+   * @return The linguistic type
+   */
+  public EClass getLinguisticType();
 }

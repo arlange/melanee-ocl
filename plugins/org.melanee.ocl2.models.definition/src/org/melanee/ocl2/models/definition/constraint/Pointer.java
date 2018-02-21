@@ -14,15 +14,15 @@ package org.melanee.ocl2.models.definition.constraint;
 import org.melanee.core.models.plm.PLM.Element;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Pointer</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> A representation of the model object
+ * '<em><b>Pointer</b></em>'. <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
  * </p>
  * <ul>
- *   <li>{@link org.melanee.ocl2.models.definition.constraint.Pointer#getPointer <em>Pointer</em>}</li>
+ * <li>{@link org.melanee.ocl2.models.definition.constraint.Pointer#getPointer
+ * <em>Pointer</em>}</li>
  * </ul>
  *
  * @see org.melanee.ocl2.models.definition.constraint.ConstraintPackage#getPointer()
@@ -30,30 +30,33 @@ import org.melanee.core.models.plm.PLM.Element;
  * @generated
  */
 public interface Pointer extends Expression {
-	/**
-	 * Returns the value of the '<em><b>Pointer</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Pointer</em>' reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Pointer</em>' reference.
-	 * @see #setPointer(Element)
-	 * @see org.melanee.ocl2.models.definition.constraint.ConstraintPackage#getPointer_Pointer()
-	 * @model
-	 * @generated
-	 */
-	Element getPointer();
+  /**
+   * Returns the value of the '<em><b>Pointer</b></em>' reference. <!--
+   * begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Pointer</em>' reference isn't clear, there really
+   * should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * 
+   * @return the value of the '<em>Pointer</em>' reference.
+   * @see #setPointer(Element)
+   * @see org.melanee.ocl2.models.definition.constraint.ConstraintPackage#getPointer_Pointer()
+   * @model
+   * @generated
+   */
+  Element getPointer();
 
-	/**
-	 * Sets the value of the '{@link org.melanee.ocl2.models.definition.constraint.Pointer#getPointer <em>Pointer</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Pointer</em>' reference.
-	 * @see #getPointer()
-	 * @generated
-	 */
-	void setPointer(Element value);
+  /**
+   * Sets the value of the
+   * '{@link org.melanee.ocl2.models.definition.constraint.Pointer#getPointer
+   * <em>Pointer</em>}' reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @param value
+   *          the new value of the '<em>Pointer</em>' reference.
+   * @see #getPointer()
+   * @generated
+   */
+  void setPointer(Element value);
 
 } // Pointer

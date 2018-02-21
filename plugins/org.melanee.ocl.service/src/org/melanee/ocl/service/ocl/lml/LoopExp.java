@@ -10,15 +10,14 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
-
 import org.eclipse.emf.ecore.EObject;
-
 
 /**
  * The deep OCL LoopExp interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface LoopExp extends CallExp,org.eclipse.ocl.expressions.LoopExp<EObject, EObject> {
+public interface LoopExp extends CallExp, org.eclipse.ocl.expressions.LoopExp<EObject, EObject> {
 
 }

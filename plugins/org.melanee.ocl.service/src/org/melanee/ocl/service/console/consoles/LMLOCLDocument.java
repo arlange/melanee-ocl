@@ -38,141 +38,136 @@ import org.melanee.ocl.service.ocl.lml.DeepOCLEnvironmentFactory;
 
 /**
  * The LMLOCLDocument class
+ * 
  * @author Dominik Kantner
  *
  */
 public class LMLOCLDocument extends Document {
 
-    private EObject context;
-	private Map<String, EClassifier> parameters;
-    private IOCLFactory<Object> oclFactory;
-    private ModelingLevel level;
-    
+  private EObject context;
+  private Map<String, EClassifier> parameters;
+  private IOCLFactory<Object> oclFactory;
+  private ModelingLevel level;
 
-	/**
-	 * Constructor
-	 * @param initialContent
-	 */
-	public LMLOCLDocument(String initialContent) {
-		super(initialContent);
+  /**
+   * Constructor
+   * 
+   * @param initialContent
+   */
+  public LMLOCLDocument(String initialContent) {
+    super(initialContent);
 
-		IDocumentPartitioner partitioner = new FastPartitioner(
-			new LMLOCLPartitionScanner(),
-			new String[]{LMLOCLPartitionScanner.COMMENT});
+    IDocumentPartitioner partitioner = new FastPartitioner(new LMLOCLPartitionScanner(),
+        new String[] { LMLOCLPartitionScanner.COMMENT });
 
-		partitioner.connect(this);
-		setDocumentPartitioner(partitioner);
-	}
+    partitioner.connect(this);
+    setDocumentPartitioner(partitioner);
+  }
 
-    /**
-     * Constructor
-     */
-    public LMLOCLDocument() {
-    	this(null);
-    }
-    
-    /**
-     * @param context
-     */
-    public void setOCLContext(EObject context) {
-        this.context = context;
-    }
-    
-    /**
-     * @return The context
-     */
-    public EObject getOCLContext() {
-        return context;
-    }
-    
-	
-	/**
-	 * @param parameters
-	 */
-	public void setOCLParameters(Map<String, EClassifier> parameters) {
-		this.parameters = parameters;
-	}
+  /**
+   * Constructor
+   */
+  public LMLOCLDocument() {
+    this(null);
+  }
 
-	
-	/**
-	 * @return The OCLParameters
-	 */
-	public Map<String, EClassifier> getOCLParameters() {
-		return parameters;
-	}
+  /**
+   * @param context
+   */
+  public void setOCLContext(EObject context) {
+    this.context = context;
+  }
 
-	/**
-	 * @param factory
-	 */
-	public void setOCLFactory(IOCLFactory<Object> factory) {
-        this.oclFactory = factory;
+  /**
+   * @return The context
+   */
+  public EObject getOCLContext() {
+    return context;
+  }
+
+  /**
+   * @param parameters
+   */
+  public void setOCLParameters(Map<String, EClassifier> parameters) {
+    this.parameters = parameters;
+  }
+
+  /**
+   * @return The OCLParameters
+   */
+  public Map<String, EClassifier> getOCLParameters() {
+    return parameters;
+  }
+
+  /**
+   * @param factory
+   */
+  public void setOCLFactory(IOCLFactory<Object> factory) {
+    this.oclFactory = factory;
+  }
+
+  /**
+   * @return The OCLFactory
+   */
+  public IOCLFactory<Object> getOCLFactory() {
+    return oclFactory;
+  }
+
+  /**
+   * @param level
+   */
+  public void setModelingLevel(ModelingLevel level) {
+    this.level = level;
+  }
+
+  /**
+   * @return A ModelingLevel
+   */
+  public ModelingLevel getModelingLevel() {
+    return level;
+  }
+
+  /**
+   * This method returns the completion choices
+   * 
+   * @param offset
+   * @return
+   */
+  List<Choice> getOCLChoices(int offset) {
+    if (context == null) {
+      return Collections.emptyList();
     }
-    
-    /**
-     * @return The OCLFactory
-     */
-    public IOCLFactory<Object> getOCLFactory() {
-        return oclFactory;
-    }
-    
-    /**
-     * @param level
-     */
-    public void setModelingLevel(ModelingLevel level) {
-        this.level = level;
-    }
-    
-    /**
-     * @return A ModelingLevel
-     */
-    public ModelingLevel getModelingLevel() {
-        return level;
-    }
-    
-    /**
-     * This method returns the completion choices
-     * @param offset
-     * @return
-     */
-    List<Choice> getOCLChoices(int offset) {
-        if (context == null) {
-            return Collections.emptyList();
+
+    try {
+      String text = get(0, offset);
+
+      OCL<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> ocl = OCL
+          .newInstance(new DeepOCLEnvironmentFactory());
+      OCLHelper<EObject, EObject, EObject, Constraint> helper = ocl.createOCLHelper();
+
+      if (parameters != null) {
+        // create variables with specified names and types
+        @SuppressWarnings("unchecked")
+        Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> environment = (Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject>) helper
+            .getEnvironment();
+        OCLFactory oclFactory = environment.getOCLFactory();
+        UMLReflection<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint> umlReflection = environment
+            .getUMLReflection();
+
+        for (Map.Entry<String, EClassifier> entry : parameters.entrySet()) {
+          Variable<EObject, EObject> variable = oclFactory.createVariable();
+          variable.setName(entry.getKey());
+          variable.setType(umlReflection.getOCLType(entry.getValue()));
+
+          environment.addElement(entry.getKey(), variable, true);
         }
-        
-        try {
-            String text = get(0, offset);
-            
-            OCL<EPackage,EObject,EObject,EObject,Enumeration,EObject,EObject,CallOperationAction,SendSignalAction,Constraint,EObject,EObject> ocl =  OCL.newInstance(new DeepOCLEnvironmentFactory());
-            OCLHelper<EObject, EObject, EObject, Constraint> helper =  ocl.createOCLHelper();
-            
-			if (parameters != null) {
-				// create variables with specified names and types
-				@SuppressWarnings("unchecked")
-				Environment<EPackage, EObject,EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction,  Constraint, EObject, EObject> environment =  (Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject>) helper
-					.getEnvironment();
-				OCLFactory oclFactory = environment.getOCLFactory();
-				UMLReflection<EPackage,EObject,EObject,EObject,Enumeration,EObject,EObject,CallOperationAction,SendSignalAction,Constraint> umlReflection = environment
-					.getUMLReflection();
+      }
 
-				for (Map.Entry<String, EClassifier> entry : parameters
-					.entrySet()) {
-					Variable<EObject, EObject> variable = oclFactory
-						.createVariable();
-					variable.setName(entry.getKey());
-					variable
-						.setType(umlReflection.getOCLType(entry.getValue()));
-
-					environment.addElement(entry.getKey(), variable, true);
-				}
-			}
-
-			helper.setContext(context);
-            return helper.getSyntaxHelp(
-            	ConstraintKind.INVARIANT,
-                text);
-        } catch (Exception e) {
-            // just don't provide proposals
-            return Collections.emptyList();
-        }
+      helper.setContext(context);
+      return helper.getSyntaxHelp(ConstraintKind.INVARIANT, text);
+    } catch (Exception e) {
+      // just don't provide proposals
+      return Collections.emptyList();
     }
+  }
 }

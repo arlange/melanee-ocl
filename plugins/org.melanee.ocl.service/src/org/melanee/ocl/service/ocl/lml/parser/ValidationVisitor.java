@@ -30,45 +30,44 @@ import org.melanee.ocl.service.ocl.lml.util.DeepOCLStandardLibraryUtil;
  *
  */
 public class ValidationVisitor extends
-		org.eclipse.ocl.parser.ValidationVisitor<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject>
-		implements VisitorExtension<Boolean> {
+    org.eclipse.ocl.parser.ValidationVisitor<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject>
+    implements VisitorExtension<Boolean> {
 
-	/**
-	 * Constructor
-	 * 
-	 * @param environment
-	 */
-	public ValidationVisitor(
-			Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> environment) {
-		super(environment);
-	}
+  /**
+   * Constructor
+   * 
+   * @param environment
+   */
+  public ValidationVisitor(
+      Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> environment) {
+    super(environment);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ocl.ecore.utilities.VisitorExtension#
-	 * visitOppositePropertyCallExp(org.eclipse.ocl.ecore.
-	 * OppositePropertyCallExp)
-	 */
-	@Override
-	public Boolean visitOppositePropertyCallExp(OppositePropertyCallExp callExp) {
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.ecore.utilities.VisitorExtension#
+   * visitOppositePropertyCallExp(org.eclipse.ocl.ecore. OppositePropertyCallExp)
+   */
+  @Override
+  public Boolean visitOppositePropertyCallExp(OppositePropertyCallExp callExp) {
 
-		return null;
-	}
+    return null;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ocl.parser.ValidationVisitor#visitOperationCallExp(org.
-	 * eclipse.ocl.expressions.OperationCallExp) need to be overridden so that
-	 * oclAsDeepType works
-	 */
-	public Boolean visitOperationCallExp(OperationCallExp<EObject, EObject> oc) {
-		if (oc.getReferredOperation() instanceof EOperation && ((EOperation) oc.getReferredOperation())
-				.getName() == DeepOCLStandardLibraryUtil.OCL_AS_DEEP_TYPE_NAME) {
-			return true;
-		}
-		return super.visitOperationCallExp(oc);
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.parser.ValidationVisitor#visitOperationCallExp(org.
+   * eclipse.ocl.expressions.OperationCallExp) need to be overridden so that
+   * oclAsDeepType works
+   */
+  public Boolean visitOperationCallExp(OperationCallExp<EObject, EObject> oc) {
+    if (oc.getReferredOperation() instanceof EOperation && ((EOperation) oc.getReferredOperation())
+        .getName() == DeepOCLStandardLibraryUtil.OCL_AS_DEEP_TYPE_NAME) {
+      return true;
+    }
+    return super.visitOperationCallExp(oc);
+  }
 
 }

@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
  * The deep OCL InvalidType interface
+ * 
  * @author Dominik Kantner
  *
  */

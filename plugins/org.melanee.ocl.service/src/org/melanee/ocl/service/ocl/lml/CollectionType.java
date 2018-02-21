@@ -10,16 +10,16 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
-
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 
-
 /**
  * The deep OCL CollectionType Interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface CollectionType extends EDataType, org.eclipse.ocl.types.CollectionType<EObject, EObject>  {
+public interface CollectionType
+    extends EDataType, org.eclipse.ocl.types.CollectionType<EObject, EObject> {
 
 }

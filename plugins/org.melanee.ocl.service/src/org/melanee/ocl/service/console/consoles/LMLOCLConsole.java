@@ -16,62 +16,60 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.part.IPageBookViewPage;
 
-
 /**
  * The LMLOCLConsole class
+ * 
  * @author Dominik Kantner
  *
  */
-public class LMLOCLConsole extends AbstractConsole{
+public class LMLOCLConsole extends AbstractConsole {
 
-	private static LMLOCLConsole instance;
-	private LMLOCLConsolePage page;
-	
-	/**
-	 * Initializes me.
-	 */
-	private LMLOCLConsole() {
-		super(
-			"DeepOCL", null); //$NON-NLS-1$
-	}
+  private static LMLOCLConsole instance;
+  private LMLOCLConsolePage page;
 
-	/**
-	 * Obtains the singleton instance.  It is created, if necessary.
-	 * 
-	 * @return the singleton console instance
-	 */
-	public static LMLOCLConsole getInstance() {
-		if (instance == null) {
-			instance = new LMLOCLConsole();
-			ConsolePlugin.getDefault().getConsoleManager().addConsoles(
-				new IConsole[] {instance});
-		}
-		
-		return instance;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.console.IConsole#createPage(org.eclipse.ui.console.IConsoleView)
-	 */
-	public IPageBookViewPage createPage(IConsoleView view) {
-		page = new LMLOCLConsolePage();
-		return page;
-	}
-	
-	
-	
-	/**
-	 * Closes me and clears the singleton instance reference, so that it will
-	 * be reinitialized when another console is requested.
-	 */
-	void close() {
-		try {
-			ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
-				new IConsole[] {this});
-			dispose();
-		} finally {
-			instance = null;
-		}
-	}
+  /**
+   * Initializes me.
+   */
+  private LMLOCLConsole() {
+    super("DeepOCL", null); //$NON-NLS-1$
+  }
+
+  /**
+   * Obtains the singleton instance. It is created, if necessary.
+   * 
+   * @return the singleton console instance
+   */
+  public static LMLOCLConsole getInstance() {
+    if (instance == null) {
+      instance = new LMLOCLConsole();
+      ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { instance });
+    }
+
+    return instance;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ui.console.IConsole#createPage(org.eclipse.ui.console.
+   * IConsoleView)
+   */
+  public IPageBookViewPage createPage(IConsoleView view) {
+    page = new LMLOCLConsolePage();
+    return page;
+  }
+
+  /**
+   * Closes me and clears the singleton instance reference, so that it will be
+   * reinitialized when another console is requested.
+   */
+  void close() {
+    try {
+      ConsolePlugin.getDefault().getConsoleManager().removeConsoles(new IConsole[] { this });
+      dispose();
+    } finally {
+      instance = null;
+    }
+  }
 
 }

@@ -16,26 +16,28 @@ import org.melanee.ocl.service.ocl.lml.BagType;
 
 /**
  * The BagTypeImpl clas
+ * 
  * @author Dominik
  *
  */
 public class BagTypeImpl extends CollectionTypeImpl implements BagType {
-	
-	
-	/**
-	 * This constructor also sets the name for the bag
-	 * @param elementType
-	 */
-	public BagTypeImpl(EObject elementType) {
-		super(elementType);
-		this.name="Bag" + "()";
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.melanee.ocl.service.CollectionTypeImpl#getKind()
-	 */
-	public CollectionKind getKind() {
-		return CollectionKind.BAG_LITERAL;
-	}
+
+  /**
+   * This constructor also sets the name for the bag
+   * 
+   * @param elementType
+   */
+  public BagTypeImpl(EObject elementType) {
+    super(elementType);
+    this.name = "Bag" + "()";
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.melanee.ocl.service.CollectionTypeImpl#getKind()
+   */
+  public CollectionKind getKind() {
+    return CollectionKind.BAG_LITERAL;
+  }
 }

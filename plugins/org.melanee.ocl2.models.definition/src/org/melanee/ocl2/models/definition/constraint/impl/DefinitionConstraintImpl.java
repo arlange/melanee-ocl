@@ -17,30 +17,29 @@ import org.melanee.ocl2.models.definition.constraint.ConstraintPackage;
 import org.melanee.ocl2.models.definition.constraint.DefinitionConstraint;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Definition Constraint</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object
+ * '<em><b>Definition Constraint</b></em>'. <!-- end-user-doc -->
  *
  * @generated
  */
 public class DefinitionConstraintImpl extends ConstraintImpl implements DefinitionConstraint {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected DefinitionConstraintImpl() {
-		super();
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  protected DefinitionConstraintImpl() {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return ConstraintPackage.Literals.DEFINITION_CONSTRAINT;
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass() {
+    return ConstraintPackage.Literals.DEFINITION_CONSTRAINT;
+  }
 
-} //DefinitionConstraintImpl
+} // DefinitionConstraintImpl

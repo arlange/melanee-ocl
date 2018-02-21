@@ -18,36 +18,36 @@ import org.eclipse.ocl.utilities.ExpressionInOCL;
 
 /**
  * The deep OCL Constraint interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface Constraint extends ENamedElement{
+public interface Constraint extends ENamedElement {
 
-	/**
-	 * @return The according Expression in OCL
-	 */
-	ExpressionInOCL<EObject,EObject> getSpecification();
+  /**
+   * @return The according Expression in OCL
+   */
+  ExpressionInOCL<EObject, EObject> getSpecification();
 
+  /**
+   * @param value
+   *          The according Expression in OCL
+   */
+  void setSpecification(ExpressionInOCL<EObject, EObject> value);
 
-	/**
-	 * @param value The according Expression in OCL
-	 */
-	void setSpecification(ExpressionInOCL<EObject,EObject> value);
+  /**
+   * @return A list of constrained elements
+   */
+  EList<EModelElement> getConstrainedElements();
 
-	
-	/**
-	 * @return A list of constrained elements
-	 */
-	EList<EModelElement> getConstrainedElements();
+  /**
+   * @return The stereotype
+   */
+  String getStereotype();
 
-
-	/**
-	 * @return The stereotype
-	 */
-	String getStereotype();
-
-	/**
-	 * @param value The stereotype
-	 */
-	void setStereotype(String value);
+  /**
+   * @param value
+   *          The stereotype
+   */
+  void setStereotype(String value);
 }

@@ -17,30 +17,33 @@ import org.melanee.ocl.service.ocl.lml.OrderedSetType;
 
 /**
  * The OrderedSetTypeImpl class
+ * 
  * @author Dominik Kantner
  *
  */
-public class OrderedSetTypeImpl extends CollectionTypeImpl implements
-		OrderedSetType {
-	
-	/**
-	 * Constructor
-	 * @param elementType
-	 */
-	public OrderedSetTypeImpl(EObject elementType) {
-		super(elementType);
-		if(elementType instanceof EClass){
-			String elemName=((EClass)elementType).getName();
-			this.name="OrderedSet" + "("+elemName+")";
-		}
-		else{
-			this.name="OrderedSet" + "()";
-		}
-	}
-	/* (non-Javadoc)
-	 * @see org.melanee.ocl.service.CollectionTypeImpl#getKind()
-	 */
-	public CollectionKind getKind() {
-		return CollectionKind.ORDERED_SET_LITERAL;
-	}
+public class OrderedSetTypeImpl extends CollectionTypeImpl implements OrderedSetType {
+
+  /**
+   * Constructor
+   * 
+   * @param elementType
+   */
+  public OrderedSetTypeImpl(EObject elementType) {
+    super(elementType);
+    if (elementType instanceof EClass) {
+      String elemName = ((EClass) elementType).getName();
+      this.name = "OrderedSet" + "(" + elemName + ")";
+    } else {
+      this.name = "OrderedSet" + "()";
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.melanee.ocl.service.CollectionTypeImpl#getKind()
+   */
+  public CollectionKind getKind() {
+    return CollectionKind.ORDERED_SET_LITERAL;
+  }
 }

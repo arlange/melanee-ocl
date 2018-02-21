@@ -18,88 +18,110 @@ import org.melanee.ocl.service.ocl.lml.DeepOCLEnvironment;
 
 /**
  * The TypeResolverImpl class
+ * 
  * @author Dominik Kantner
  *
  */
-public class TypeResolverImpl extends AbstractTypeResolver<EPackage, EObject, EObject, EObject, EObject>{
+public class TypeResolverImpl
+    extends AbstractTypeResolver<EPackage, EObject, EObject, EObject, EObject> {
 
-	/**
-	 * Constructor
-	 * @param env
-	 */
-	public TypeResolverImpl(DeepOCLEnvironment env){
-		super(env);
-	}
-	
-	/**
-	 * Constructor
-	 * @param env
-	 * @param resource
-	 */
-	public TypeResolverImpl(DeepOCLEnvironment env, Resource resource){
-		super(env,resource);
-	}
+  /**
+   * Constructor
+   * 
+   * @param env
+   */
+  public TypeResolverImpl(DeepOCLEnvironment env) {
+    super(env);
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.AbstractTypeResolver#createShadowClass(java.lang.Object)
-	 */
-	@Override
-	protected EObject createShadowClass(EObject type) {
-		// TODO Auto-generated EObject stub
-		return null;
-	}
+  /**
+   * Constructor
+   * 
+   * @param env
+   * @param resource
+   */
+  public TypeResolverImpl(DeepOCLEnvironment env, Resource resource) {
+    super(env, resource);
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.AbstractTypeResolver#addProperty(java.lang.Object, java.lang.Object)
-	 */
-	@Override
-	protected void addProperty(EObject owner, EObject property) {
-		// TODO Auto-generated EObject stub
-		
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.AbstractTypeResolver#createShadowClass(java.lang.Object)
+   */
+  @Override
+  protected EObject createShadowClass(EObject type) {
+    // TODO Auto-generated EObject stub
+    return null;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.AbstractTypeResolver#addOperation(java.lang.Object, java.lang.Object)
-	 */
-	@Override
-	protected void addOperation(EObject owner, EObject operation) {
-		// TODO Auto-generated EObject stub
-		
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.AbstractTypeResolver#addProperty(java.lang.Object,
+   * java.lang.Object)
+   */
+  @Override
+  protected void addProperty(EObject owner, EObject property) {
+    // TODO Auto-generated EObject stub
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.AbstractTypeResolver#getShadowedClassifier(java.lang.Object)
-	 */
-	@Override
-	protected EObject getShadowedClassifier(EObject shadow) {
-		// TODO Auto-generated EObject stub
-		return null;
-	}
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.AbstractTypeResolver#createPackage(java.lang.String)
-	 */
-	@Override
-	protected EPackage createPackage(String name) {
-		// TODO Auto-generated EObject stub
-		return null;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.AbstractTypeResolver#addOperation(java.lang.Object,
+   * java.lang.Object)
+   */
+  @Override
+  protected void addOperation(EObject owner, EObject operation) {
+    // TODO Auto-generated EObject stub
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.AbstractTypeResolver#findPackage(java.lang.String)
-	 */
-	@Override
-	protected EPackage findPackage(String name) {
-		// TODO Auto-generated EObject stub
-		return null;
-	}
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.AbstractTypeResolver#addClassifier(java.lang.Object, java.lang.Object)
-	 */
-	@Override
-	protected void addClassifier(EPackage pkg, EObject classifier) {
-		// TODO Auto-generated EObject stub
-		
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ocl.AbstractTypeResolver#getShadowedClassifier(java.lang.Object)
+   */
+  @Override
+  protected EObject getShadowedClassifier(EObject shadow) {
+    // TODO Auto-generated EObject stub
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.AbstractTypeResolver#createPackage(java.lang.String)
+   */
+  @Override
+  protected EPackage createPackage(String name) {
+    // TODO Auto-generated EObject stub
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.AbstractTypeResolver#findPackage(java.lang.String)
+   */
+  @Override
+  protected EPackage findPackage(String name) {
+    // TODO Auto-generated EObject stub
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.AbstractTypeResolver#addClassifier(java.lang.Object,
+   * java.lang.Object)
+   */
+  @Override
+  protected void addClassifier(EPackage pkg, EObject classifier) {
+    // TODO Auto-generated EObject stub
+
+  }
 }

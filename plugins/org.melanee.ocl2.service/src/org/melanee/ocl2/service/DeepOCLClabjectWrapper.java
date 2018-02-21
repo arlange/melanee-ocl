@@ -18,16 +18,16 @@ import org.melanee.ocl2.service.exception.NavigationException;
 
 public interface DeepOCLClabjectWrapper {
 
-	Object navigate(String target) throws NavigationException;
+  Object navigate(String target) throws NavigationException;
 
-	Boolean oclIsTypeOf(String target);
+  Boolean oclIsTypeOf(String target);
 
-	Boolean oclIsKindOf(String target);
+  Boolean oclIsKindOf(String target);
 
-	Integer oclIntegerMax(int i1, int i2);
+  Integer oclIntegerMax(int i1, int i2);
 
-	Integer oclIntegerMin(int i1, int i2);
+  Integer oclIntegerMin(int i1, int i2);
 
-	Object invoke(String operation, Object[] args) throws Exception;
+  Object invoke(String operation, Object[] args) throws Exception;
 
 }

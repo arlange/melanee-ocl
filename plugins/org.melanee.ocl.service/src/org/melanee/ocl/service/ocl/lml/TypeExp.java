@@ -14,6 +14,7 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * The deep OCL TypeExp interface
+ * 
  * @author Dominik Kantner
  *
  */

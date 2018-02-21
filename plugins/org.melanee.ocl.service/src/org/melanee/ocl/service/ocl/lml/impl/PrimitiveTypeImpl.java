@@ -20,38 +20,46 @@ import org.melanee.ocl.service.ocl.lml.PrimitiveType;
 
 /**
  * The PrimitiveTypeImpl Class
+ * 
  * @author Dominik Kantner
  *
  */
 public class PrimitiveTypeImpl extends EDataTypeImpl implements PrimitiveType {
 
-	/**
-	 * stores operations
-	 */
-	protected EList<EObject> operations;
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.utilities.PredefinedType#oclOperations()
-	 */
-	@Override
-	public EList<EObject> oclOperations() {
-		// TODO Auto-generated method stub
-		if(operations==null){
-			String myName=getName();
-			if(INTEGER_NAME.equals(myName)){
-				operations=ECollections.asEList(OCLStandardLibraryUtil.createIntegerOperations(new DeepOCLEnvironmentFactory().createEnvironment()));
-			}
-			if(REAL_NAME.equals(myName)){
-				operations=ECollections.asEList(OCLStandardLibraryUtil.createRealOperations(new DeepOCLEnvironmentFactory().createEnvironment()));
-			}
-			
-			if(BOOLEAN_NAME.equals(myName)){
-				operations=ECollections.asEList(OCLStandardLibraryUtil.createBooleanOperations(new DeepOCLEnvironmentFactory().createEnvironment()));
-			}
-			if(STRING_NAME.equals(myName)){
-				operations=ECollections.asEList(OCLStandardLibraryUtil.createStringOperations(new DeepOCLEnvironmentFactory().createEnvironment()));
-			}
-		}
-		return operations;
-	}
+  /**
+   * stores operations
+   */
+  protected EList<EObject> operations;
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.utilities.PredefinedType#oclOperations()
+   */
+  @Override
+  public EList<EObject> oclOperations() {
+    // TODO Auto-generated method stub
+    if (operations == null) {
+      String myName = getName();
+      if (INTEGER_NAME.equals(myName)) {
+        operations = ECollections.asEList(OCLStandardLibraryUtil
+            .createIntegerOperations(new DeepOCLEnvironmentFactory().createEnvironment()));
+      }
+      if (REAL_NAME.equals(myName)) {
+        operations = ECollections.asEList(OCLStandardLibraryUtil
+            .createRealOperations(new DeepOCLEnvironmentFactory().createEnvironment()));
+      }
+
+      if (BOOLEAN_NAME.equals(myName)) {
+        operations = ECollections.asEList(OCLStandardLibraryUtil
+            .createBooleanOperations(new DeepOCLEnvironmentFactory().createEnvironment()));
+      }
+      if (STRING_NAME.equals(myName)) {
+        operations = ECollections.asEList(OCLStandardLibraryUtil
+            .createStringOperations(new DeepOCLEnvironmentFactory().createEnvironment()));
+      }
+    }
+    return operations;
+  }
 
 }

@@ -13,23 +13,23 @@ package org.melanee.ocl2.service.exception;
 
 public class InterpreterException extends Exception {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
-	String exceptionMessage;
+  String exceptionMessage;
 
-	public InterpreterException(Throwable cause) {
-		super(cause);
-	}
+  public InterpreterException(Throwable cause) {
+    super(cause);
+  }
 
-	public InterpreterException(String message, Throwable cause) {
-		super("OCL2 Interpreter Exception\n" + message, cause);
-	}
+  public InterpreterException(String message, Throwable cause) {
+    super("OCL2 Interpreter Exception\n" + message, cause);
+  }
 
-	// Constructor that accepts a message
-	public InterpreterException(String message) {
-		super("OCL2 Interpreter Exception\n" + message);
-	}
+  // Constructor that accepts a message
+  public InterpreterException(String message) {
+    super("OCL2 Interpreter Exception\n" + message);
+  }
 }

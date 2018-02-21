@@ -10,15 +10,15 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
-
 import org.eclipse.emf.ecore.EObject;
-
 
 /**
  * The deep OCL IntegerLiteralExp interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface IntegerLiteralExp extends PrimitiveLiteralExp,org.eclipse.ocl.expressions.IntegerLiteralExp<EObject>{
+public interface IntegerLiteralExp
+    extends PrimitiveLiteralExp, org.eclipse.ocl.expressions.IntegerLiteralExp<EObject> {
 
 }

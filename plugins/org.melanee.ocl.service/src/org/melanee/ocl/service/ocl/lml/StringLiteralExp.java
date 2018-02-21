@@ -14,10 +14,11 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * The deep OCL StringLiteralExp interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface StringLiteralExp extends PrimitiveLiteralExp, org.eclipse.ocl.expressions.StringLiteralExp<EObject> {
-	
+public interface StringLiteralExp
+    extends PrimitiveLiteralExp, org.eclipse.ocl.expressions.StringLiteralExp<EObject> {
 
 }

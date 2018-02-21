@@ -15,18 +15,20 @@ import org.melanee.core.models.plm.PLM.Clabject;
 
 /**
  * Represents the levelcast attribute interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface LevelCastAttribute extends Attribute{
-	
-	/**
-	 * @param cast Set the Clabject to which the levelcast is done
-	 */
-	public void setCast(Clabject cast);
-	
-	/**
-	 * @return the Clabject to which levelcast is done
-	 */
-	public Clabject getCast();
+public interface LevelCastAttribute extends Attribute {
+
+  /**
+   * @param cast
+   *          Set the Clabject to which the levelcast is done
+   */
+  public void setCast(Clabject cast);
+
+  /**
+   * @return the Clabject to which levelcast is done
+   */
+  public Clabject getCast();
 }

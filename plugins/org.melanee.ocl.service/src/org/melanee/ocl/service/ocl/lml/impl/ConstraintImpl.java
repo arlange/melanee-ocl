@@ -21,75 +21,87 @@ import org.melanee.ocl.service.ocl.lml.Constraint;
 
 /**
  * The ConstraintImpl Class
+ * 
  * @author Dominik Kantner
  *
  */
-public class ConstraintImpl extends ENamedElementImpl implements Constraint{
+public class ConstraintImpl extends ENamedElementImpl implements Constraint {
 
-	
-	/**
-	 * stores the specification
-	 */
-	protected ExpressionInOCL<EObject, EObject> specification;
-	
-	/**
-	 * stores a list of constrained Elements
-	 */
-	protected EList<EModelElement> constrainedElements;
-	
-	/**
-	 * stores the stereotype
-	 */
-	protected String stereotype="";
-	/* (non-Javadoc)
-	 * @see org.melanee.ocl.service.Constraint#getSpecification()
-	 */
-	@Override
-	public ExpressionInOCL<EObject, EObject> getSpecification() {
-		// TODO Auto-generated method stub
-		return this.specification;
-	}
+  /**
+   * stores the specification
+   */
+  protected ExpressionInOCL<EObject, EObject> specification;
 
-	/* (non-Javadoc)
-	 * @see org.melanee.ocl.service.Constraint#setSpecification(org.eclipse.ocl.utilities.ExpressionInOCL)
-	 */
-	@Override
-	public void setSpecification(ExpressionInOCL<EObject, EObject> value) {
-	 this.specification=value;
-		
-	}
+  /**
+   * stores a list of constrained Elements
+   */
+  protected EList<EModelElement> constrainedElements;
 
-	/* (non-Javadoc)
-	 * @see org.melanee.ocl.service.Constraint#getConstrainedElements()
-	 */
-	@Override
-	public EList<EModelElement> getConstrainedElements() {
-		// TODO Auto-generated method stub
-		if (constrainedElements == null) {
-			constrainedElements = new EObjectResolvingEList<EModelElement>(
-				EModelElement.class, this,
-				EcorePackage.CONSTRAINT__CONSTRAINED_ELEMENTS);
-		}
-		return constrainedElements;
+  /**
+   * stores the stereotype
+   */
+  protected String stereotype = "";
 
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.melanee.ocl.service.Constraint#getSpecification()
+   */
+  @Override
+  public ExpressionInOCL<EObject, EObject> getSpecification() {
+    // TODO Auto-generated method stub
+    return this.specification;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.melanee.ocl.service.Constraint#getStereotype()
-	 */
-	@Override
-	public String getStereotype() {
-		// TODO Auto-generated method stub
-		return this.stereotype;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.melanee.ocl.service.Constraint#setSpecification(org.eclipse.ocl.utilities
+   * .ExpressionInOCL)
+   */
+  @Override
+  public void setSpecification(ExpressionInOCL<EObject, EObject> value) {
+    this.specification = value;
 
-	/* (non-Javadoc)
-	 * @see org.melanee.ocl.service.Constraint#setStereotype(java.lang.String)
-	 */
-	@Override
-	public void setStereotype(String value) {
-		this.stereotype=value;
-		
-	}
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.melanee.ocl.service.Constraint#getConstrainedElements()
+   */
+  @Override
+  public EList<EModelElement> getConstrainedElements() {
+    // TODO Auto-generated method stub
+    if (constrainedElements == null) {
+      constrainedElements = new EObjectResolvingEList<EModelElement>(EModelElement.class, this,
+          EcorePackage.CONSTRAINT__CONSTRAINED_ELEMENTS);
+    }
+    return constrainedElements;
+
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.melanee.ocl.service.Constraint#getStereotype()
+   */
+  @Override
+  public String getStereotype() {
+    // TODO Auto-generated method stub
+    return this.stereotype;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.melanee.ocl.service.Constraint#setStereotype(java.lang.String)
+   */
+  @Override
+  public void setStereotype(String value) {
+    this.stereotype = value;
+
+  }
 
 }

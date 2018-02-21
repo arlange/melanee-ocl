@@ -12,14 +12,13 @@ package org.melanee.ocl.service.ocl.lml;
 
 import org.eclipse.emf.ecore.EObject;
 
-
-
-
 /**
  * The deep OCL PropertyCallExp interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface PropertyCallExp extends org.eclipse.ocl.expressions.PropertyCallExp<EObject,EObject>  {
+public interface PropertyCallExp
+    extends org.eclipse.ocl.expressions.PropertyCallExp<EObject, EObject> {
 
 }

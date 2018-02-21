@@ -22,94 +22,100 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ocl.examples.interpreter.console.text.ColorManager;
 
-
 /**
  * The LMLOCLConfiguration class
+ * 
  * @author Dominik Kantner
  *
  */
 public class LMLOCLConfiguration extends SourceViewerConfiguration {
-    private LMLOCLScanner oclScanner;
-    private LMLOCLCommentScanner oclCommentScanner;
-    private ColorManager colorManager;
+  private LMLOCLScanner oclScanner;
+  private LMLOCLCommentScanner oclCommentScanner;
+  private ColorManager colorManager;
 
-    /**
-     * Constructor
-     * @param colorManager
-     */
-    LMLOCLConfiguration(ColorManager colorManager) {
-        this.colorManager = colorManager;
-    }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
-     */
-    @Override
-    public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-        return new String[] {
-            IDocument.DEFAULT_CONTENT_TYPE,
-            LMLOCLPartitionScanner.COMMENT};
-    }
+  /**
+   * Constructor
+   * 
+   * @param colorManager
+   */
+  LMLOCLConfiguration(ColorManager colorManager) {
+    this.colorManager = colorManager;
+  }
 
-    /**
-     * @return LMLOCLScanner
-     */
-    protected LMLOCLScanner getOCLScanner() {
-        if (oclScanner == null) {
-            oclScanner = new LMLOCLScanner(colorManager);
-            oclScanner.setDefaultReturnToken(
-                new Token(
-                    new TextAttribute(colorManager.getColor(ColorManager.DEFAULT))));
-        }
-        
-        return oclScanner;
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.jface.text.source.SourceViewerConfiguration#
+   * getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
+   */
+  @Override
+  public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
+    return new String[] { IDocument.DEFAULT_CONTENT_TYPE, LMLOCLPartitionScanner.COMMENT };
+  }
+
+  /**
+   * @return LMLOCLScanner
+   */
+  protected LMLOCLScanner getOCLScanner() {
+    if (oclScanner == null) {
+      oclScanner = new LMLOCLScanner(colorManager);
+      oclScanner.setDefaultReturnToken(
+          new Token(new TextAttribute(colorManager.getColor(ColorManager.DEFAULT))));
     }
 
-    /**
-     * @return LMLOCLCommentScanner
-     */
-    protected LMLOCLCommentScanner getOCLCommentScanner() {
-        if (oclCommentScanner == null) {
-            oclCommentScanner = new LMLOCLCommentScanner(colorManager);
-            oclCommentScanner.setDefaultReturnToken(
-                new Token(
-                    new TextAttribute(colorManager.getColor(ColorManager.COMMENT))));
-        }
-        
-        return oclCommentScanner;
+    return oclScanner;
+  }
+
+  /**
+   * @return LMLOCLCommentScanner
+   */
+  protected LMLOCLCommentScanner getOCLCommentScanner() {
+    if (oclCommentScanner == null) {
+      oclCommentScanner = new LMLOCLCommentScanner(colorManager);
+      oclCommentScanner.setDefaultReturnToken(
+          new Token(new TextAttribute(colorManager.getColor(ColorManager.COMMENT))));
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
-     */
-    @Override
-    public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-        PresentationReconciler reconciler = new PresentationReconciler();
+    return oclCommentScanner;
+  }
 
-        DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getOCLScanner());
-        reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
-        reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.jface.text.source.SourceViewerConfiguration#
+   * getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
+   */
+  @Override
+  public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+    PresentationReconciler reconciler = new PresentationReconciler();
 
-        dr = new DefaultDamagerRepairer(getOCLCommentScanner());
-        reconciler.setDamager(dr, LMLOCLPartitionScanner.COMMENT);
-        reconciler.setRepairer(dr, LMLOCLPartitionScanner.COMMENT);
+    DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getOCLScanner());
+    reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
+    reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
-        return reconciler;
-    }
+    dr = new DefaultDamagerRepairer(getOCLCommentScanner());
+    reconciler.setDamager(dr, LMLOCLPartitionScanner.COMMENT);
+    reconciler.setRepairer(dr, LMLOCLPartitionScanner.COMMENT);
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentAssistant(org.eclipse.jface.text.source.ISourceViewer)
-     */
-    @Override
-    public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
-        ContentAssistant result = new ContentAssistant();
-        
-        result.setContentAssistProcessor(new LMLOCLCompletionProcessor(),
-            IDocument.DEFAULT_CONTENT_TYPE);
-        result.enableAutoActivation(true);
-        //result.enablePrefixCompletion(true);
-        
-        return result;
-    }
+    return reconciler;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.jface.text.source.SourceViewerConfiguration#getContentAssistant(
+   * org.eclipse.jface.text.source.ISourceViewer)
+   */
+  @Override
+  public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
+    ContentAssistant result = new ContentAssistant();
+
+    result.setContentAssistProcessor(new LMLOCLCompletionProcessor(),
+        IDocument.DEFAULT_CONTENT_TYPE);
+    result.enableAutoActivation(true);
+    // result.enablePrefixCompletion(true);
+
+    return result;
+  }
 }
-

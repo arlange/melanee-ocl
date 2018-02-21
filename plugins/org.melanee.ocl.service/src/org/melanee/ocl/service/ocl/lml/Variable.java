@@ -7,22 +7,19 @@
  *
  * Contributors:
  *    Dominik Kantner - initial API and implementation and initial documentation
- *******************************************************************************/ 
+ *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.ocl.utilities.TypedElement;
 
-
-
-
 /**
  * The deep OCL Variable interface
+ * 
  * @author Dominik Kantner
  *
  */
 public interface Variable
-extends TypedElement<EObject>,
-org.eclipse.ocl.expressions.Variable<EObject, EObject> {
-	
+    extends TypedElement<EObject>, org.eclipse.ocl.expressions.Variable<EObject, EObject> {
+
 } // Variable

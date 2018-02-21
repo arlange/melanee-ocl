@@ -17,30 +17,29 @@ import org.melanee.ocl2.models.definition.constraint.ConstraintPackage;
 import org.melanee.ocl2.models.definition.constraint.InvariantConstraint;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Invariant Constraint</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object
+ * '<em><b>Invariant Constraint</b></em>'. <!-- end-user-doc -->
  *
  * @generated
  */
 public class InvariantConstraintImpl extends ConstraintImpl implements InvariantConstraint {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected InvariantConstraintImpl() {
-		super();
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  protected InvariantConstraintImpl() {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return ConstraintPackage.Literals.INVARIANT_CONSTRAINT;
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass() {
+    return ConstraintPackage.Literals.INVARIANT_CONSTRAINT;
+  }
 
-} //InvariantConstraintImpl
+} // InvariantConstraintImpl

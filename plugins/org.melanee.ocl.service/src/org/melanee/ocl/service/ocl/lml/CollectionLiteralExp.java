@@ -12,13 +12,13 @@ package org.melanee.ocl.service.ocl.lml;
 
 import org.eclipse.emf.ecore.EObject;
 
-
-
 /**
  * The deep OCL CollectionLiteralExp Interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface CollectionLiteralExp extends LiteralExp, org.eclipse.ocl.expressions.CollectionLiteralExp<EObject> {
+public interface CollectionLiteralExp
+    extends LiteralExp, org.eclipse.ocl.expressions.CollectionLiteralExp<EObject> {
 
 }

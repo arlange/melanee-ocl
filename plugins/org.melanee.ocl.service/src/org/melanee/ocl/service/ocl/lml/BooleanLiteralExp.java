@@ -14,8 +14,10 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * The deep OCL BooleanLiteralExp Interface
+ * 
  * @author Dominik Kantner
  */
-public interface BooleanLiteralExp extends PrimitiveLiteralExp, org.eclipse.ocl.expressions.BooleanLiteralExp<EObject> {
+public interface BooleanLiteralExp
+    extends PrimitiveLiteralExp, org.eclipse.ocl.expressions.BooleanLiteralExp<EObject> {
 
 }

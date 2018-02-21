@@ -20,75 +20,73 @@ import org.eclipse.swt.SWT;
 
 /**
  * The LMLOCLCollectionTupleRule class
+ * 
  * @author Dominik Kantner
  *
  */
 public class LMLOCLCollectionTupleRule extends WordRule {
 
-    /**
-     * stores the collection keywords
-     */
-    private static final String[] KEYWORDS = {
-        "Set", //$NON-NLS-1$
-        "OrderedSet", //$NON-NLS-1$
-        "Bag", //$NON-NLS-1$
-        "Sequence", //$NON-NLS-1$
-        "Tuple", //$NON-NLS-1$
-    };
+  /**
+   * stores the collection keywords
+   */
+  private static final String[] KEYWORDS = { "Set", //$NON-NLS-1$
+      "OrderedSet", //$NON-NLS-1$
+      "Bag", //$NON-NLS-1$
+      "Sequence", //$NON-NLS-1$
+      "Tuple", //$NON-NLS-1$
+  };
 
-    /**
-     * stores the braces kinds
-     */
-    private static final String[] BRACES = {
-        "{", //$NON-NLS-1$
-        "}", //$NON-NLS-1$
-        "}}", //$NON-NLS-1$
-        "}}}", //$NON-NLS-1$
-    };
-    
-   
-    /**
-     * Constructor
-     * @param colorManager
-     * @param isBraces
-     */
-    LMLOCLCollectionTupleRule(ColorManager colorManager, boolean isBraces) {
-        super(new CollectionTupleDetector(isBraces));
-        
-        IToken token = new Token(new TextAttribute(
-            colorManager.getColor(ColorManager.COLLECTION_TUPLE), null, SWT.BOLD));
-        
-        if (isBraces) {
-            for (String word : BRACES) {
-                addWord(word, token);
-            }
-        } else {
-            for (String word : KEYWORDS) {
-                addWord(word, token);
-            }
-        }
-    }
-    
-    /**
-     * private class CollectionTupleDetector
-     * @author Dominik Kantner
-     *
-     */
-    private static class CollectionTupleDetector implements IWordDetector {
-        private final boolean isBraces;
-        
-        CollectionTupleDetector(boolean isBraces) {
-            this.isBraces = isBraces;
-        }
-        
-        public boolean isWordPart(char c) {
-            return isBraces? (c == '{') || (c == '}') :
-                (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-        }
+  /**
+   * stores the braces kinds
+   */
+  private static final String[] BRACES = { "{", //$NON-NLS-1$
+      "}", //$NON-NLS-1$
+      "}}", //$NON-NLS-1$
+      "}}}", //$NON-NLS-1$
+  };
 
-        public boolean isWordStart(char c) {
-            return isWordPart(c);
-        }
+  /**
+   * Constructor
+   * 
+   * @param colorManager
+   * @param isBraces
+   */
+  LMLOCLCollectionTupleRule(ColorManager colorManager, boolean isBraces) {
+    super(new CollectionTupleDetector(isBraces));
+
+    IToken token = new Token(
+        new TextAttribute(colorManager.getColor(ColorManager.COLLECTION_TUPLE), null, SWT.BOLD));
+
+    if (isBraces) {
+      for (String word : BRACES) {
+        addWord(word, token);
+      }
+    } else {
+      for (String word : KEYWORDS) {
+        addWord(word, token);
+      }
     }
+  }
+
+  /**
+   * private class CollectionTupleDetector
+   * 
+   * @author Dominik Kantner
+   *
+   */
+  private static class CollectionTupleDetector implements IWordDetector {
+    private final boolean isBraces;
+
+    CollectionTupleDetector(boolean isBraces) {
+      this.isBraces = isBraces;
+    }
+
+    public boolean isWordPart(char c) {
+      return isBraces ? (c == '{') || (c == '}') : (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+    public boolean isWordStart(char c) {
+      return isWordPart(c);
+    }
+  }
 }
-

@@ -12,12 +12,12 @@ package org.melanee.ocl.service.ocl.lml;
 
 import org.eclipse.emf.ecore.EObject;
 
-
 /**
  * 
  * The deep OCL AnyType Interface
+ * 
  * @author Dominik Kantner
  */
-public interface AnyType extends EObject,  org.eclipse.ocl.types.AnyType<EObject> {
+public interface AnyType extends EObject, org.eclipse.ocl.types.AnyType<EObject> {
 
 }

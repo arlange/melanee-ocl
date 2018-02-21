@@ -16,19 +16,20 @@ import org.eclipse.ocl.examples.interpreter.console.text.ColorManager;
 
 /**
  * The LMLOCLCommentScannerClass
+ * 
  * @author Dominik Kantner
  *
  */
-public class LMLOCLCommentScanner 
-extends RuleBasedScanner {
+public class LMLOCLCommentScanner extends RuleBasedScanner {
 
-/**
- * Constructor
- * @param manager
- */
-LMLOCLCommentScanner(ColorManager manager) {
+  /**
+   * Constructor
+   * 
+   * @param manager
+   */
+  LMLOCLCommentScanner(ColorManager manager) {
     super();
-    
+
     setRules(new IRule[0]);
-}
+  }
 }

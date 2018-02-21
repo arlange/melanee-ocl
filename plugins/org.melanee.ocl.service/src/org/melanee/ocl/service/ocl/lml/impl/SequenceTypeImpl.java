@@ -10,32 +10,35 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml.impl;
 
-
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.ocl.expressions.CollectionKind;
 import org.melanee.ocl.service.ocl.lml.SequenceType;
 
 /**
  * The SequenceTypeImpl Class
+ * 
  * @author Dominik Kantner
  *
  */
-public class SequenceTypeImpl extends CollectionTypeImpl implements
-		SequenceType {
-	
-	/**
-	 * Constructor
-	 * @param elementType
-	 */
-	public SequenceTypeImpl(EObject elementType) {
-		super(elementType);
-		this.name="Sequence" + "()";
-	}
-	/* (non-Javadoc)
-	 * @see org.melanee.ocl.service.CollectionTypeImpl#getKind()
-	 */
-	public CollectionKind getKind() {
-		// TODO Auto-generated method stub
-		return CollectionKind.SEQUENCE_LITERAL;
-	}
+public class SequenceTypeImpl extends CollectionTypeImpl implements SequenceType {
+
+  /**
+   * Constructor
+   * 
+   * @param elementType
+   */
+  public SequenceTypeImpl(EObject elementType) {
+    super(elementType);
+    this.name = "Sequence" + "()";
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.melanee.ocl.service.CollectionTypeImpl#getKind()
+   */
+  public CollectionKind getKind() {
+    // TODO Auto-generated method stub
+    return CollectionKind.SEQUENCE_LITERAL;
+  }
 }

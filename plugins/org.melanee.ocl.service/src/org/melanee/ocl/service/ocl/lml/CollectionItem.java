@@ -10,14 +10,15 @@
  *******************************************************************************/
 package org.melanee.ocl.service.ocl.lml;
 
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
  * The deep OCL CollectionItem interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface CollectionItem extends CollectionLiteralPart, org.eclipse.ocl.expressions.CollectionItem<EObject>{
+public interface CollectionItem
+    extends CollectionLiteralPart, org.eclipse.ocl.expressions.CollectionItem<EObject> {
 
 }

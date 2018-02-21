@@ -12,20 +12,20 @@
 package org.melanee.ocl2.service.exception;
 
 public class NavigationException extends Exception {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	String exceptionMessage;
+  String exceptionMessage;
 
-	public NavigationException(Throwable cause) {
-		super(cause);
-	}
+  public NavigationException(Throwable cause) {
+    super(cause);
+  }
 
-	public NavigationException(String message, Throwable cause) {
-		super("OCL2 Interpreter Exception\n" + message, cause);
-	}
+  public NavigationException(String message, Throwable cause) {
+    super("OCL2 Interpreter Exception\n" + message, cause);
+  }
 
-	// Constructor that accepts a message
-	public NavigationException(String message) {
-		super("OCL2 Interpreter Exception\n" + message);
-	}
+  // Constructor that accepts a message
+  public NavigationException(String message) {
+    super("OCL2 Interpreter Exception\n" + message);
+  }
 }

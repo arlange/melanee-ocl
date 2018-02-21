@@ -14,9 +14,11 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * The deep OCL OCLCollectionLiteralPart interface
+ * 
  * @author Dominik Kantner
  *
  */
-public interface CollectionLiteralPart extends  org.eclipse.ocl.expressions.CollectionLiteralPart<EObject>{
+public interface CollectionLiteralPart
+    extends org.eclipse.ocl.expressions.CollectionLiteralPart<EObject> {
 
 }

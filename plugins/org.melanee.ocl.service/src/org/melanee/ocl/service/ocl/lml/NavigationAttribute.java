@@ -16,46 +16,44 @@ import org.melanee.core.models.plm.PLM.Connection;
 
 /**
  * The deep OCL NavigationAttribute interface
+ * 
  * @author Dominik Kantner
  */
-public interface NavigationAttribute extends Attribute{
-	
-	/**
-	 * @param clabject
-	 */
-	public void setClabject(Clabject clabject);
-	
-	/**
-	 * @param clabject
-	 */
-	public void setNavigationValue(Clabject clabject);
-	
-	/**
-	 * @param single
-	 */
-	public void setSingle(boolean single);
-	
-	/**
-	 * @return
-	 */
-	public boolean isSingle();
-	
-	/**
-	 * @param connection
-	 */
-	public void setConnection (Connection connection);
-	
-	/**
-	 * @return
-	 */
-	public Connection getConnection();
-	
-	/**
-	 * @return
-	 */
-	public Clabject getNavigationValue();
-	
-		
+public interface NavigationAttribute extends Attribute {
 
-	
+  /**
+   * @param clabject
+   */
+  public void setClabject(Clabject clabject);
+
+  /**
+   * @param clabject
+   */
+  public void setNavigationValue(Clabject clabject);
+
+  /**
+   * @param single
+   */
+  public void setSingle(boolean single);
+
+  /**
+   * @return
+   */
+  public boolean isSingle();
+
+  /**
+   * @param connection
+   */
+  public void setConnection(Connection connection);
+
+  /**
+   * @return
+   */
+  public Connection getConnection();
+
+  /**
+   * @return
+   */
+  public Clabject getNavigationValue();
+
 }

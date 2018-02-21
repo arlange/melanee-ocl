@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.melanee.ocl.service.console.consoleFactories;
 
-
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsoleFactory;
 import org.eclipse.ui.console.IConsoleManager;
@@ -18,23 +17,25 @@ import org.melanee.ocl.service.console.consoles.LMLOCLConsole;
 
 /**
  * The LMLOCLConsoltFactory class
+ * 
  * @author Dominik Kantner
  *
  */
 public class LMLOCLConsoleFactory implements IConsoleFactory {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.console.IConsoleFactory#openConsole()
-	 */
-	public void openConsole() {
-		LMLOCLConsole console = LMLOCLConsole.getInstance();
-		
-		IConsoleManager mgr = ConsolePlugin.getDefault().getConsoleManager();
-		
-		
-		// must do this twice due to a bug in the Console API
-		mgr.showConsoleView(console);
-		
-		mgr.showConsoleView(console);
-	
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ui.console.IConsoleFactory#openConsole()
+   */
+  public void openConsole() {
+    LMLOCLConsole console = LMLOCLConsole.getInstance();
+
+    IConsoleManager mgr = ConsolePlugin.getDefault().getConsoleManager();
+
+    // must do this twice due to a bug in the Console API
+    mgr.showConsoleView(console);
+
+    mgr.showConsoleView(console);
+
+  }
 }

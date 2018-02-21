@@ -50,221 +50,219 @@ import org.melanee.ocl.service.ocl.lml.util.DeepOCLStandardLibraryUtil;
  */
 @SuppressWarnings("restriction")
 public class DeepOCLAnalyzer extends
-		org.eclipse.ocl.parser.OCLAnalyzer<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> {
-	public DeepOCLAnalyzer(AbstractOCLParser parser) {
-		super(parser);
-	}
+    org.eclipse.ocl.parser.OCLAnalyzer<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> {
+  public DeepOCLAnalyzer(AbstractOCLParser parser) {
+    super(parser);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ocl.parser.AbstractOCLAnalyzer#simplePropertyName(org.eclipse
-	 * .ocl.cst.SimpleNameCS, org.eclipse.ocl.Environment,
-	 * org.eclipse.ocl.expressions.OCLExpression, java.lang.Object,
-	 * java.lang.String)
-	 */
-	@Override
-	protected org.eclipse.ocl.expressions.PropertyCallExp<EObject, EObject> simplePropertyName(
-			SimpleNameCS simpleNameCS,
-			Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> env,
-			OCLExpression<EObject> source, EObject owner, String simpleName) {
-		// TODO Auto-generated method stub
-		// workaround: add dollar at beginning of simpleName if it end with $,
-		// $dollar at beginning was removed by lexer/parser of OCLAnalyzer
-		if (simpleName.length() > 0 && simpleName.charAt(simpleName.length() - 1) == '$') {
-			simpleName = "$" + simpleName;
-		}
-		PropertyCallExp propCallExp = (PropertyCallExp) super.simplePropertyName(simpleNameCS, env, source, owner,
-				simpleName);
-		if (propCallExp != null) {
-			if (propCallExp.getReferredProperty() instanceof NavigationAttribute) {
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ocl.parser.AbstractOCLAnalyzer#simplePropertyName(org.eclipse
+   * .ocl.cst.SimpleNameCS, org.eclipse.ocl.Environment,
+   * org.eclipse.ocl.expressions.OCLExpression, java.lang.Object,
+   * java.lang.String)
+   */
+  @Override
+  protected org.eclipse.ocl.expressions.PropertyCallExp<EObject, EObject> simplePropertyName(
+      SimpleNameCS simpleNameCS,
+      Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> env,
+      OCLExpression<EObject> source, EObject owner, String simpleName) {
+    // TODO Auto-generated method stub
+    // workaround: add dollar at beginning of simpleName if it end with $,
+    // $dollar at beginning was removed by lexer/parser of OCLAnalyzer
+    if (simpleName.length() > 0 && simpleName.charAt(simpleName.length() - 1) == '$') {
+      simpleName = "$" + simpleName;
+    }
+    PropertyCallExp propCallExp = (PropertyCallExp) super.simplePropertyName(simpleNameCS, env,
+        source, owner, simpleName);
+    if (propCallExp != null) {
+      if (propCallExp.getReferredProperty() instanceof NavigationAttribute) {
 
-				NavigationAttribute navAttribute = (NavigationAttribute) propCallExp.getReferredProperty();
-				Clabject collType = navAttribute.getNavigationValue();
-				OCLExpression<EObject> expr = propCallExp.getSource();
-				if (expr instanceof PropertyCallExp) {
-					PropertyCallExp pc = (PropertyCallExp) expr;
-					// it's a bag if the previous property was of type
-					// collection, except the refered property is a
-					// NavigationAttribute with navigation Value to Connection
-					// ->then its a set
-					if (pc.getType() instanceof CollectionType) {
-						if (pc.getReferredProperty() instanceof NavigationAttribute
-								&& (((NavigationAttribute) pc.getReferredProperty())
-										.getNavigationValue()) instanceof Connection) {
-							org.eclipse.ocl.types.SetType<Clabject, Object> set = DeepOCLFactoryImpl.INSTANCE
-									.createSetType(collType);
-							propCallExp.setType(set);
-						} else {
-							org.eclipse.ocl.types.BagType<Clabject, Object> bag = DeepOCLFactoryImpl.INSTANCE
-									.createBagType(collType);
-							propCallExp.setType(bag);
-						}
-					} else if (pc.getReferredProperty() instanceof LevelCastAttribute) {
-						// if there was a level cast , it is a single element if
-						// issingle is true, otherwise a bag
-						if (navAttribute.isSingle()) {
-							propCallExp.setType(collType);
-						} else {
-							org.eclipse.ocl.types.BagType<Clabject, Object> bag = DeepOCLFactoryImpl.INSTANCE
-									.createBagType(collType);
-							propCallExp.setType(bag);
-						}
-					} else {
-						// if there was no level cast , it is a single
-						// element if issingle is true, otherwise a set
-						if (navAttribute.isSingle()) {
-							propCallExp.setType(collType);
-						} else {
-							org.eclipse.ocl.types.SetType<Clabject, Object> set = DeepOCLFactoryImpl.INSTANCE
-									.createSetType(collType);
-							propCallExp.setType(set);
-						}
-					}
-				} else {
-					if (expr.getType() instanceof CollectionType) {
-						// it's a bag if the previous expr was of type
-						// collection
-						org.eclipse.ocl.types.BagType<Clabject, Object> bag = DeepOCLFactoryImpl.INSTANCE
-								.createBagType(collType);
-						propCallExp.setType(bag);
-					} else {
-						if (navAttribute.isSingle()) {
-							propCallExp.setType(collType);
-						} else {
-							org.eclipse.ocl.types.SetType<Clabject, Object> set = DeepOCLFactoryImpl.INSTANCE
-									.createSetType(collType);
-							propCallExp.setType(set);
-						}
-					}
-				}
-			}
-		}
-		return propCallExp;
-	}
+        NavigationAttribute navAttribute = (NavigationAttribute) propCallExp.getReferredProperty();
+        Clabject collType = navAttribute.getNavigationValue();
+        OCLExpression<EObject> expr = propCallExp.getSource();
+        if (expr instanceof PropertyCallExp) {
+          PropertyCallExp pc = (PropertyCallExp) expr;
+          // it's a bag if the previous property was of type
+          // collection, except the refered property is a
+          // NavigationAttribute with navigation Value to Connection
+          // ->then its a set
+          if (pc.getType() instanceof CollectionType) {
+            if (pc.getReferredProperty() instanceof NavigationAttribute
+                && (((NavigationAttribute) pc.getReferredProperty())
+                    .getNavigationValue()) instanceof Connection) {
+              org.eclipse.ocl.types.SetType<Clabject, Object> set = DeepOCLFactoryImpl.INSTANCE
+                  .createSetType(collType);
+              propCallExp.setType(set);
+            } else {
+              org.eclipse.ocl.types.BagType<Clabject, Object> bag = DeepOCLFactoryImpl.INSTANCE
+                  .createBagType(collType);
+              propCallExp.setType(bag);
+            }
+          } else if (pc.getReferredProperty() instanceof LevelCastAttribute) {
+            // if there was a level cast , it is a single element if
+            // issingle is true, otherwise a bag
+            if (navAttribute.isSingle()) {
+              propCallExp.setType(collType);
+            } else {
+              org.eclipse.ocl.types.BagType<Clabject, Object> bag = DeepOCLFactoryImpl.INSTANCE
+                  .createBagType(collType);
+              propCallExp.setType(bag);
+            }
+          } else {
+            // if there was no level cast , it is a single
+            // element if issingle is true, otherwise a set
+            if (navAttribute.isSingle()) {
+              propCallExp.setType(collType);
+            } else {
+              org.eclipse.ocl.types.SetType<Clabject, Object> set = DeepOCLFactoryImpl.INSTANCE
+                  .createSetType(collType);
+              propCallExp.setType(set);
+            }
+          }
+        } else {
+          if (expr.getType() instanceof CollectionType) {
+            // it's a bag if the previous expr was of type
+            // collection
+            org.eclipse.ocl.types.BagType<Clabject, Object> bag = DeepOCLFactoryImpl.INSTANCE
+                .createBagType(collType);
+            propCallExp.setType(bag);
+          } else {
+            if (navAttribute.isSingle()) {
+              propCallExp.setType(collType);
+            } else {
+              org.eclipse.ocl.types.SetType<Clabject, Object> set = DeepOCLFactoryImpl.INSTANCE
+                  .createSetType(collType);
+              propCallExp.setType(set);
+            }
+          }
+        }
+      }
+    }
+    return propCallExp;
+  }
 
-	/**
-	 * @param rootEnvironment
-	 * @param input
-	 */
-	public DeepOCLAnalyzer(
-			Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> rootEnvironment,
-			String input) {
-		super(rootEnvironment, input);
-	}
+  /**
+   * @param rootEnvironment
+   * @param input
+   */
+  public DeepOCLAnalyzer(
+      Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> rootEnvironment,
+      String input) {
+    super(rootEnvironment, input);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ocl.parser.AbstractOCLAnalyzer#genOperationCallExp(org.
-	 * eclipse.ocl.Environment, org.eclipse.ocl.cst.OperationCallExpCS,
-	 * java.lang.String, java.lang.String,
-	 * org.eclipse.ocl.expressions.OCLExpression, java.lang.Object,
-	 * java.util.List)
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected OperationCallExp genOperationCallExp(
-			Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> env,
-			OperationCallExpCS operationCallExpCS, String rule, String operName, OCLExpression<EObject> source,
-			EObject ownerType, List<OCLExpression<EObject>> args) {
-		for (int i = 0; i < args.size(); i++) {
-			if ((ownerType instanceof EClass) && (args.get(i) instanceof Clabject)) {
-				ERROR(operationCallExpCS, rule, OCLMessages.BadArg_ERROR_);
-			}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.parser.AbstractOCLAnalyzer#genOperationCallExp(org.
+   * eclipse.ocl.Environment, org.eclipse.ocl.cst.OperationCallExpCS,
+   * java.lang.String, java.lang.String,
+   * org.eclipse.ocl.expressions.OCLExpression, java.lang.Object, java.util.List)
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected OperationCallExp genOperationCallExp(
+      Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> env,
+      OperationCallExpCS operationCallExpCS, String rule, String operName,
+      OCLExpression<EObject> source, EObject ownerType, List<OCLExpression<EObject>> args) {
+    for (int i = 0; i < args.size(); i++) {
+      if ((ownerType instanceof EClass) && (args.get(i) instanceof Clabject)) {
+        ERROR(operationCallExpCS, rule, OCLMessages.BadArg_ERROR_);
+      }
 
-			if ((ownerType instanceof Clabject) && (args.get(i) instanceof EClass)) {
-				ERROR(operationCallExpCS, rule, OCLMessages.BadArg_ERROR_);
-			}
+      if ((ownerType instanceof Clabject) && (args.get(i) instanceof EClass)) {
+        ERROR(operationCallExpCS, rule, OCLMessages.BadArg_ERROR_);
+      }
 
-		}
+    }
 
-		OperationCallExp operationCallExp = super.genOperationCallExp(env, operationCallExpCS, rule, operName, source,
-				ownerType, args);
+    OperationCallExp operationCallExp = super.genOperationCallExp(env, operationCallExpCS, rule,
+        operName, source, ownerType, args);
 
-		if (operationCallExp.getReferredOperation() instanceof EOperation) {
-			if (((EOperation) (operationCallExp.getReferredOperation()))
-					.getName() == PredefinedType.ALL_INSTANCES_NAME) {
-				if (operationCallExp.getType() instanceof SetType) {
-					if (operationCallExp.getSource() instanceof TypeExp) {
-						((SetType) operationCallExp.getType())
-								.setElementType(((TypeExp) operationCallExp.getSource()).getReferredType());
-						return operationCallExp;
-					}
-				}
-			}
-			if (((EOperation) (operationCallExp.getReferredOperation()))
-					.getName() == DeepOCLStandardLibraryUtil.OCL_AS_DEEP_TYPE_NAME) {
-				if (args.size() == 1 && args.get(0) instanceof TypeExp
-						&& ((TypeExp) args.get(0)).getReferredType() instanceof Clabject) {
-					operationCallExp.setType(((TypeExp) args.get(0)).getReferredType());
-				}
-			}
-		}
+    if (operationCallExp.getReferredOperation() instanceof EOperation) {
+      if (((EOperation) (operationCallExp.getReferredOperation()))
+          .getName() == PredefinedType.ALL_INSTANCES_NAME) {
+        if (operationCallExp.getType() instanceof SetType) {
+          if (operationCallExp.getSource() instanceof TypeExp) {
+            ((SetType) operationCallExp.getType())
+                .setElementType(((TypeExp) operationCallExp.getSource()).getReferredType());
+            return operationCallExp;
+          }
+        }
+      }
+      if (((EOperation) (operationCallExp.getReferredOperation()))
+          .getName() == DeepOCLStandardLibraryUtil.OCL_AS_DEEP_TYPE_NAME) {
+        if (args.size() == 1 && args.get(0) instanceof TypeExp
+            && ((TypeExp) args.get(0)).getReferredType() instanceof Clabject) {
+          operationCallExp.setType(((TypeExp) args.get(0)).getReferredType());
+        }
+      }
+    }
 
-		if (operationCallExp.getType() instanceof CollectionType
-				&& operationCallExp.getSource().getType() instanceof CollectionType) {
-			((CollectionType) operationCallExp.getType())
-					.setElementType(((CollectionType) operationCallExp.getSource().getType()).getElementType());
-			return operationCallExp;
-		}
+    if (operationCallExp.getType() instanceof CollectionType
+        && operationCallExp.getSource().getType() instanceof CollectionType) {
+      ((CollectionType) operationCallExp.getType()).setElementType(
+          ((CollectionType) operationCallExp.getSource().getType()).getElementType());
+      return operationCallExp;
+    }
 
-		return operationCallExp;
-	}
+    return operationCallExp;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ocl.parser.AbstractOCLAnalyzer#ifExpCS(org.eclipse.ocl.cst.
-	 * IfExpCS, org.eclipse.ocl.Environment)
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected IfExp ifExpCS(IfExpCS ifExpCS,
-			Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> env) {
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.ocl.parser.AbstractOCLAnalyzer#ifExpCS(org.eclipse.ocl.cst.
+   * IfExpCS, org.eclipse.ocl.Environment)
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected IfExp ifExpCS(IfExpCS ifExpCS,
+      Environment<EPackage, EObject, EObject, EObject, Enumeration, EObject, EObject, CallOperationAction, SendSignalAction, Constraint, EObject, EObject> env) {
 
-		OCLExpression condition = oclExpressionCS(ifExpCS.getCondition(), env);
+    OCLExpression condition = oclExpressionCS(ifExpCS.getCondition(), env);
 
-		OCLExpression thenExpression = oclExpressionCS(ifExpCS.getThenExpression(), env);
-		OCLExpression elseExpression = oclExpressionCS(ifExpCS.getElseExpression(), env);
+    OCLExpression thenExpression = oclExpressionCS(ifExpCS.getThenExpression(), env);
+    OCLExpression elseExpression = oclExpressionCS(ifExpCS.getElseExpression(), env);
 
-		TRACE("ifExpCS", " "); //$NON-NLS-2$//$NON-NLS-1$
+    TRACE("ifExpCS", " "); //$NON-NLS-2$//$NON-NLS-1$
 
-		IfExp astNode = oclFactory.createIfExp();
+    IfExp astNode = oclFactory.createIfExp();
 
-		if (isErrorNode(condition)) {
-			// don't validate the condition type
-		} else if (condition.getType() != getBoolean() && !(condition.getType() instanceof PrimitiveType
-				&& ((PrimitiveType) condition.getType()).getName() == "Boolean")) {
-			ERROR(ifExpCS.getCondition(), "ifExpCS", OCLMessages.bind( //$NON-NLS-1$
-					OCLMessages.BooleanForIf_ERROR_, computeInputString(ifExpCS.getCondition())));
-		}
+    if (isErrorNode(condition)) {
+      // don't validate the condition type
+    } else if (condition.getType() != getBoolean() && !(condition.getType() instanceof PrimitiveType
+        && ((PrimitiveType) condition.getType()).getName() == "Boolean")) {
+      ERROR(ifExpCS.getCondition(), "ifExpCS", OCLMessages.bind( //$NON-NLS-1$
+          OCLMessages.BooleanForIf_ERROR_, computeInputString(ifExpCS.getCondition())));
+    }
 
-		initASTMapping(env, astNode, ifExpCS);
-		astNode.setCondition(condition);
-		astNode.setThenExpression(thenExpression);
-		astNode.setElseExpression(elseExpression);
+    initASTMapping(env, astNode, ifExpCS);
+    astNode.setCondition(condition);
+    astNode.setThenExpression(thenExpression);
+    astNode.setElseExpression(elseExpression);
 
-		if ((thenExpression != null) && (elseExpression != null)) {
+    if ((thenExpression != null) && (elseExpression != null)) {
 
-			astNode.setType(thenExpression.getType()); // other than in
-														// superclass
+      astNode.setType(thenExpression.getType()); // other than in
+      // superclass
 
-			if (isErrorNode(thenExpression)) {
-				// propagate error stigma to the if expression
-				markAsErrorNode(astNode);
-			}
-			if (isErrorNode(elseExpression)) {
-				// propagate error stigma to the if expression
-				markAsErrorNode(astNode);
-			}
-		} else {
-			astNode.setType(getOclVoid());
-		}
+      if (isErrorNode(thenExpression)) {
+        // propagate error stigma to the if expression
+        markAsErrorNode(astNode);
+      }
+      if (isErrorNode(elseExpression)) {
+        // propagate error stigma to the if expression
+        markAsErrorNode(astNode);
+      }
+    } else {
+      astNode.setType(getOclVoid());
+    }
 
-		initStartEndPositions(astNode, ifExpCS);
+    initStartEndPositions(astNode, ifExpCS);
 
-		return astNode;
-	}
+    return astNode;
+  }
 
 }

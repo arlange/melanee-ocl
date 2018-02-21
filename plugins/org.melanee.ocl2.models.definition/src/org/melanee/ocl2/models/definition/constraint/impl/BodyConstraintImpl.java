@@ -17,30 +17,29 @@ import org.melanee.ocl2.models.definition.constraint.BodyConstraint;
 import org.melanee.ocl2.models.definition.constraint.ConstraintPackage;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Body Constraint</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '<em><b>Body
+ * Constraint</b></em>'. <!-- end-user-doc -->
  *
  * @generated
  */
 public class BodyConstraintImpl extends ConstraintImpl implements BodyConstraint {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected BodyConstraintImpl() {
-		super();
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  protected BodyConstraintImpl() {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return ConstraintPackage.Literals.BODY_CONSTRAINT;
-	}
+  /**
+   * <!-- begin-user-doc --> <!-- end-user-doc -->
+   * 
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass() {
+    return ConstraintPackage.Literals.BODY_CONSTRAINT;
+  }
 
-} //BodyConstraintImpl
+} // BodyConstraintImpl

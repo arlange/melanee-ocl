@@ -15,6 +15,7 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * The deep OCL PrimitiveType interface
+ * 
  * @author Dominik Kantner
  *
  */

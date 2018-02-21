@@ -14,25 +14,27 @@ import org.eclipse.jface.text.rules.IWhitespaceDetector;
 
 /**
  * The LMLOCLWhitespaceDetector class
+ * 
  * @author Dominik Kantner
  *
  */
-public class LMLOCLWhitespaceDetector    implements IWhitespaceDetector {
+public class LMLOCLWhitespaceDetector implements IWhitespaceDetector {
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.rules.IWhitespaceDetector#isWhitespace(char)
-     */
-    public boolean isWhitespace(char c) {
-        switch (c) {
-            case ' ':
-            case '\t':
-            case '\n':
-            case '\r':
-                return true;
-            default:
-                return false;
-        }
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.jface.text.rules.IWhitespaceDetector#isWhitespace(char)
+   */
+  public boolean isWhitespace(char c) {
+    switch (c) {
+    case ' ':
+    case '\t':
+    case '\n':
+    case '\r':
+      return true;
+    default:
+      return false;
     }
+  }
 
 }
-

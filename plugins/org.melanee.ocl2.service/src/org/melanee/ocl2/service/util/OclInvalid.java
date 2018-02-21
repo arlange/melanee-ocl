@@ -18,13 +18,13 @@ package org.melanee.ocl2.service.util;
  */
 public class OclInvalid {
 
-	private String value;
+  private String value;
 
-	public OclInvalid() {
-		this.value = "oclInvalid";
-	}
+  public OclInvalid() {
+    this.value = "oclInvalid";
+  }
 
-	public String getValue() {
-		return this.value;
-	}
+  public String getValue() {
+    return this.value;
+  }
 }

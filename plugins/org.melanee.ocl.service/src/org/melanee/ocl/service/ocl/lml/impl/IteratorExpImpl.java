@@ -19,58 +19,74 @@ import org.melanee.ocl.service.ocl.lml.IteratorExp;
 
 /**
  * The IteratorExpImpl class
+ * 
  * @author Dominik Kantner
  *
  */
 public class IteratorExpImpl extends LoopExpImpl implements IteratorExp {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.IteratorExp#checkBooleanType(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
-	 */
-	@Override
-	public boolean checkBooleanType(DiagnosticChain diagnostics,
-			Map<Object, Object> context) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ocl.expressions.IteratorExp#checkBooleanType(org.eclipse.emf.
+   * common.util.DiagnosticChain, java.util.Map)
+   */
+  @Override
+  public boolean checkBooleanType(DiagnosticChain diagnostics, Map<Object, Object> context) {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.IteratorExp#checkCollectType(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
-	 */
-	@Override
-	public boolean checkCollectType(DiagnosticChain diagnostics,
-			Map<Object, Object> context) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ocl.expressions.IteratorExp#checkCollectType(org.eclipse.emf.
+   * common.util.DiagnosticChain, java.util.Map)
+   */
+  @Override
+  public boolean checkCollectType(DiagnosticChain diagnostics, Map<Object, Object> context) {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.IteratorExp#checkSelectRejectType(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
-	 */
-	@Override
-	public boolean checkSelectRejectType(DiagnosticChain diagnostics,
-			Map<Object, Object> context) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ocl.expressions.IteratorExp#checkSelectRejectType(org.eclipse.emf
+   * .common.util.DiagnosticChain, java.util.Map)
+   */
+  @Override
+  public boolean checkSelectRejectType(DiagnosticChain diagnostics, Map<Object, Object> context) {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ocl.expressions.IteratorExp#checkBooleanBodyType(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
-	 */
-	@Override
-	public boolean checkBooleanBodyType(DiagnosticChain diagnostics,
-			Map<Object, Object> context) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.melanee.ocl.service.OCLExpressionImpl#accept(org.eclipse.ocl.utilities.Visitor)
-	 */
-	@SuppressWarnings("unchecked")
-	public <T, U extends Visitor<T, ?, ?, ?, ?, ?, ?, ?, ?, ?>> T accept(U v) {
-		return ((Visitor<T, EObject, ?, ?, ?, EObject, ?, ?, ?, ?>) v)
-			.visitIteratorExp(this);
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ocl.expressions.IteratorExp#checkBooleanBodyType(org.eclipse.emf.
+   * common.util.DiagnosticChain, java.util.Map)
+   */
+  @Override
+  public boolean checkBooleanBodyType(DiagnosticChain diagnostics, Map<Object, Object> context) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.melanee.ocl.service.OCLExpressionImpl#accept(org.eclipse.ocl.utilities.
+   * Visitor)
+   */
+  @SuppressWarnings("unchecked")
+  public <T, U extends Visitor<T, ?, ?, ?, ?, ?, ?, ?, ?, ?>> T accept(U v) {
+    return ((Visitor<T, EObject, ?, ?, ?, EObject, ?, ?, ?, ?>) v).visitIteratorExp(this);
+  }
 
 }
