@@ -850,14 +850,12 @@ public class DeepOCLTreeVisitorTest {
     this.c.getFeature().add(attr);
 
     DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("context A \ninv test: self.#potency#"));
+        new ANTLRInputStream("context A \ninv test: self.#getPotency# = 1"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.contextDeclCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
     Object returnValue = visitor.visit(tree);
-    Collection<Element> attrsa = ((Collection<Element>) returnValue);
-    Attribute a = (Attribute) attrsa.toArray()[0];
-    assertEquals(1, Integer.parseInt(a.getValue()));
+    assertEquals(true, returnValue);
   }
 
   @Test
@@ -993,9 +991,9 @@ public class DeepOCLTreeVisitorTest {
     this.l.getContent().add(connect9);
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "context DeepModel \ninv test: self.#getConnections()#.#getParticipants()#"));
+        "self.#getConnections()#.#getParticipants()#"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
-    ParseTree tree = parser.contextDeclCS();
+    ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(car);
     Object returnValue = visitor.visit(tree);
     Collection<Object> result = (Collection<Object>) returnValue;

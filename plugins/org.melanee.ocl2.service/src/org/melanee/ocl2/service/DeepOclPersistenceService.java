@@ -222,26 +222,28 @@ public class DeepOclPersistenceService {
    * 
    * @param context
    */
-  private void updateContext(Clabject context) {
-    this.attributes = context.getFeature();
-    this.connections = context.getConnections();
-    this.allClabjectNames.clear();
-    this.attributeNames.clear();
-    this.connectionNames.clear();
-    this.enumerationNames.clear();
-    for (Clabject clabject : allLevelClabjects) {
-      this.allClabjectNames.add(clabject.getName());
+  private void updateContext(Element context) {
+    if (context instanceof Clabject) {
+      Clabject clabjContext = (Clabject) context;
+      this.attributes = clabjContext.getFeature();
+      this.connections = clabjContext.getConnections();
+      this.allClabjectNames.clear();
+      this.attributeNames.clear();
+      this.connectionNames.clear();
+      this.enumerationNames.clear();
+      for (Clabject clabject : allLevelClabjects) {
+        this.allClabjectNames.add(clabject.getName());
+      }
+      for (Feature feature : attributes) {
+        this.attributeNames.add(feature.getName());
+      }
+      for (Connection connection : connections) {
+        this.connectionNames.add(connection.getName());
+      }
+      for (Enumeration enumeration : enumerations) {
+        this.enumerationNames.add(enumeration.getName());
+      }
     }
-    for (Feature feature : attributes) {
-      this.attributeNames.add(feature.getName());
-    }
-    for (Connection connection : connections) {
-      this.connectionNames.add(connection.getName());
-    }
-    for (Enumeration enumeration : enumerations) {
-      this.enumerationNames.add(enumeration.getName());
-    }
-
   }
 
   private void saveLine(String string) {
@@ -252,7 +254,7 @@ public class DeepOclPersistenceService {
     } else if (this.context instanceof Level) {
       throw new UnsupportedOperationException("not yet implemented");
     } else if (this.context instanceof DeepModel) {
-      throw new UnsupportedOperationException("not yet implemented");
+      saveLine(string, this.context);
     }
   }
 
@@ -261,10 +263,11 @@ public class DeepOclPersistenceService {
    * brackets.
    * 
    * @param string
+   *          as the constraint
    */
-  private void saveLine(String string, Clabject context) {
+  private void saveLine(String string, Element context) {
     this.dividedStrings.clear();
-    Clabject newContext = context;
+    Element newContext = context;
     updateContext(context);
     divideString(string);
     this.dividedStrings.add("\n");
@@ -275,7 +278,7 @@ public class DeepOclPersistenceService {
         word = word.replace(".", "");
         point = true;
       }
-      if (word.equals("self") && this.context instanceof Clabject) {
+      if (word.equals("self") && this.context instanceof Element) {
         context = (Clabject) this.context;
         updateContext(context);
         newContext = context;
@@ -286,7 +289,10 @@ public class DeepOclPersistenceService {
       }
       String tempword = word.trim();
       if (attributeNames.contains(tempword)) {
-        createPointer(context.getFeatureForName(tempword));
+        if (context instanceof Clabject) {
+          Clabject clabContext = (Clabject) context;
+          createPointer(clabContext.getFeatureForName(tempword));
+        }
         if (word.contains(" ")) {
           createText(" ");
         }
@@ -429,9 +435,7 @@ public class DeepOclPersistenceService {
    */
   public AbstractConstraint getConstraint(String constraintName) {
     for (AbstractConstraint constraint : this.context.getConstraint()) {
-      if (constraint.getName().equals(constraintName)) {
-        return constraint;
-      }
+      if (constraint.getName().equals(constraintName)) { return constraint; }
     }
     return null;
   }

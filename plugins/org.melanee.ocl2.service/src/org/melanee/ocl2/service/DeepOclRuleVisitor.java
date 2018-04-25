@@ -727,15 +727,15 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
           Iterator<Element> it = wrapper.getCurrentCollectionIterator();
           while (it.hasNext()) {
-            Clabject clab = (Clabject) it.next();
-            DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
+            Element element = it.next();
+            DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(element);
             this.wrapper = newWrapper;
             Object result = visit(ctx.arg);
             if (result != null) {
               try {
                 boolean r = Boolean.parseBoolean(result.toString());
                 if (r == true) {
-                  list.add(clab);
+                  list.add(element);
                 }
               } catch (Exception e) {
                 oldWrapper.getNavigationStack()
@@ -750,7 +750,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           this.wrapper = oldWrapper;
           if (list.size() > 0) {
             this.tempCollection = list;
-            return null;
+            return list;
           } else {
             return null;
           }

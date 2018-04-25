@@ -241,9 +241,9 @@ primaryExpCS
 :
 	letExpCS
 	| ifExpCS
+	| primitiveLiteralExpCS
 	| navigatingExpCS
 	| selfExpCS
-	| primitiveLiteralExpCS
 	| tupleLiteralExpCS
 	| collectionLiteralExpCS
 	| typeLiteralExpCS
@@ -566,13 +566,12 @@ ONESPACE
 ;
 
 STRING
-:
-	'"'
-	(
-		~[\r\n"]
-		| '""'
-	)* '"'
-;
+  : UnterminatedStringLiteral '"'
+  ;
+
+UnterminatedStringLiteral
+  : '"' (~["\\\r\n] | '\\' (. | EOF))*
+  ;
 
 COMMENT
 :

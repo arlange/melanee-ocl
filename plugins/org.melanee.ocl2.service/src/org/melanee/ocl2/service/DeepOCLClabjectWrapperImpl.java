@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.melanee.ocl2.service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -264,9 +266,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       return allInstances(arg);
     } else if (operation.equals("instanceOf")) {
       return instanceOf(arg);
-    } else if (operation.equals("including")) {
-      return including(arg);
-    }
+    } else if (operation.equals("including")) { return including(arg); }
     return null;
   }
   /*
@@ -288,9 +288,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     List<Element> returnList = new ArrayList<>();
     Collection<Element> currentNavigation = this.navigationStack.peek().getSecond();
     for (Element element : currentNavigation) {
-      if (element instanceof Attribute && navigationStack.size() == 1) {
-        throw new NavigationException("something wrong here.", new Throwable(target));
-      }
+      if (element instanceof Attribute
+          && navigationStack.size() == 1) { throw new NavigationException("something wrong here.",
+              new Throwable(target)); }
       if (element instanceof Clabject) {
         for (Feature feature : ((Clabject) element).getFeature()) {
           if (feature instanceof Attribute) {
@@ -404,6 +404,34 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
           }
         }
+      } else if (element instanceof DeepModel) {
+        if (target.equals("Clabject")) {
+          DeepModel deepModel = (DeepModel) element;
+          List<Element> clabList = new ArrayList<Element>();
+          for (Level level : deepModel.getContent()) {
+            clabList.addAll(level.getClabjects());
+            Iterator<Element> iter = clabList.iterator();
+            while (iter.hasNext()) {
+              Element clab = iter.next();
+              if (clab instanceof Connection || clab instanceof ConnectionEnd) iter.remove();
+            }
+            this.navigationStack
+                .push(new Tuple<String, Collection<Element>>("Clabjects", clabList));
+          }
+        } else if (target.equals("Level")) {
+          List<Element> levelList = new ArrayList<Element>();
+          levelList.addAll(((DeepModel) element).getContent());
+          this.navigationStack.push(new Tuple<String, Collection<Element>>("Levels", levelList));
+          return ((DeepModel) element).getContent();
+        } else if (target.equals("Connection")) {
+          List<Element> connectionList = new ArrayList<Element>();
+          for (Level level : ((DeepModel) element).getContent()) {
+            connectionList.addAll(level.getConnections());
+          }
+          this.navigationStack
+              .push(new Tuple<String, Collection<Element>>("Connections", connectionList));
+          return connectionList;
+        }
       }
     }
     return returnList.size() == 0 ? null : returnList;
@@ -505,9 +533,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         clazz = Class.forName("org.melanee.core.models.plm.PLM." + target);
       }
       for (Element e : this.navigationStack.peek().getSecond()) {
-        if (e.getClass().isInstance(clazz)) {
-          return e.getClass().cast(clazz);
-        }
+        if (e.getClass().isInstance(clazz)) { return e.getClass().cast(clazz); }
       }
     } catch (Exception e1) {
       e1.printStackTrace();
@@ -543,9 +569,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     List<Clabject> resultList = new ArrayList<>();
     resultList = DeepOCL2Util.traverseClassifications(context, resultList);
     for (Clabject clab : resultList) {
-      if (clab.getName().equals(text)) {
-        return true;
-      }
+      if (clab.getName().equals(text)) { return true; }
     }
     return false;
   }
@@ -553,9 +577,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   public Boolean isDirectInstanceOf(String text) {
     Clabject context = (Clabject) this.context;
     for (Element type : context.getDirectTypes()) {
-      if (type.getName().equals(text)) {
-        return true;
-      }
+      if (type.getName().equals(text)) { return true; }
     }
     return false;
   }
@@ -563,9 +585,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   public Boolean isDeepInstanceOf(String text) {
     Clabject context = (Clabject) this.context;
     for (Element type : context.getClassificationTreeAsInstance()) {
-      if (type.getName().equals(text)) {
-        return true;
-      }
+      if (type.getName().equals(text)) { return true; }
     }
     return false;
   }
@@ -791,9 +811,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       Attribute attr = (Attribute) c.getFeatureForName(expressionMap.get("left"));
       if (compare(attr.getValue(), expressionMap.get("right"), expressionMap.get("operator"))) {
         returnCollection.add(c);
-        if (returnCollection.size() > 1) {
-          return false;
-        }
+        if (returnCollection.size() > 1) { return false; }
       }
     }
     return true;
@@ -880,10 +898,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     Iterator<?> it = collection.iterator();
     while (it.hasNext()) {
       Clabject clabject = (Clabject) it.next();
-      if (!set.add(
-          ((Attribute) clabject.getFeatureForName(expressionMap.get("attribute"))).getValue())) {
-        return false;
-      }
+      if (!set.add(((Attribute) clabject.getFeatureForName(expressionMap.get("attribute")))
+          .getValue())) { return false; }
     }
     return true;
   }
@@ -892,7 +908,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    * arg[0] has to be a collection and arg[1] has to be an expression.
    * 
    * @param collection
+   *          collection to check
    * @param expression
+   *          expression to check the collection for
    * @return
    */
   private Boolean exists(Object[] arg) {
@@ -902,9 +920,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     while (it.hasNext()) {
       Clabject c = (Clabject) it.next();
       Attribute a = (Attribute) c.getFeatureForName(expressionMap.get("left"));
-      if (castAndCompare(a, expressionMap)) {
-        return true;
-      }
+      if (castAndCompare(a, expressionMap)) { return true; }
     }
     return false;
   }
@@ -1071,20 +1087,44 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     EList<Object> argList = new BasicEList<Object>();
     Object result = null;
     for (Element e : this.navigationStack.peek().getSecond()) {
-      if (e instanceof Connection) {
-        Connection connect = (Connection) e;
-        for (EOperation operation : connect.eClass().getEAllOperations()) {
+      if (e instanceof Clabject) {
+        Clabject clab = (Clabject) e;
+        Method method;
+        primitiveType: try {
+          method = clab.getClass().getMethod(text, null);
+          Attribute attr = PLMFactory.eINSTANCE.createAttribute();
+          if (method.getReturnType().toString().equals("int")) {
+            attr.setDatatype("Integer");
+          } else if (method.getReturnType().toString().equals("long")) {
+            attr.setDatatype("Real");
+          } else if (method.getReturnType().toString().equals("class java.lang.String")) {
+            attr.setDatatype("String");
+          } else if (method.getReturnType().toString().equals("double")) {
+            attr.setDatatype("Real");
+          } else if (method.getReturnType().toString().equals("boolean")) {
+            attr.setDatatype("Boolean");
+          } else {
+            break primitiveType;
+          }
+          attr.setValue(method.invoke(clab, null).toString());
+          this.navigationStack
+              .push(new Tuple<String, Collection<Element>>(text, Arrays.asList((Element) attr)));
+          return method.invoke(clab, null);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException
+            | IllegalArgumentException | InvocationTargetException e1) {
+          // TODO Auto-generated catch block
+          e1.printStackTrace();
+        }
+        oldLoop: for (EOperation operation : clab.eClass().getEAllOperations()) {
           if (operation.getName().equals(text)) {
             EList parameterTypes = operation.getETypeParameters();
             int index = 0;
             for (ETypeParameter parameter : operation.getETypeParameters()) {
-              if (!parameter.getName().equals(argList.get(index))) {
-                return new OclInvalid();
-              }
+              if (!parameter.getName().equals(argList.get(index))) { return new OclInvalid(); }
               index++;
             }
             try {
-              result = ((Connection) e).eInvoke(operation, argList);
+              result = ((Clabject) e).eInvoke(operation, argList);
               if (result instanceof Collection<?>) {
                 this.navigationStack.push(
                     new Tuple<String, Collection<Element>>(text, (Collection<Element>) result));
@@ -1099,20 +1139,18 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             }
           }
         }
-      } else if (e instanceof Clabject) {
-        Clabject clab = (Clabject) e;
-        for (EOperation operation : clab.eClass().getEAllOperations()) {
+      } else if (e instanceof Connection) {
+        Connection connect = (Connection) e;
+        for (EOperation operation : connect.eClass().getEAllOperations()) {
           if (operation.getName().equals(text)) {
             EList parameterTypes = operation.getETypeParameters();
             int index = 0;
             for (ETypeParameter parameter : operation.getETypeParameters()) {
-              if (!parameter.getName().equals(argList.get(index))) {
-                return new OclInvalid();
-              }
+              if (!parameter.getName().equals(argList.get(index))) { return new OclInvalid(); }
               index++;
             }
             try {
-              result = ((Clabject) e).eInvoke(operation, argList);
+              result = ((Connection) e).eInvoke(operation, argList);
               if (result instanceof Collection<?>) {
                 this.navigationStack.push(
                     new Tuple<String, Collection<Element>>(text, (Collection<Element>) result));
@@ -1133,9 +1171,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             EList parameterTypes = operation.getETypeParameters();
             int index = 0;
             for (ETypeParameter parameter : operation.getETypeParameters()) {
-              if (!parameter.getName().equals(argList.get(index))) {
-                return new OclInvalid();
-              }
+              if (!parameter.getName().equals(argList.get(index))) { return new OclInvalid(); }
               index++;
             }
             try {
@@ -1154,16 +1190,17 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             }
           }
         }
-      } else if (e instanceof DeepModel) {
+      }
+      // if the context is the deepModel then it is assumed that the constraint is to
+      // be reflective
+      else if (e instanceof DeepModel) {
         DeepModel deepModel = (DeepModel) e;
         for (EOperation operation : deepModel.eClass().getEAllOperations()) {
           if (operation.getName().equals(text)) {
             EList parameterTypes = operation.getETypeParameters();
             int index = 0;
             for (ETypeParameter parameter : operation.getETypeParameters()) {
-              if (!parameter.getName().equals(argList.get(index))) {
-                return new OclInvalid();
-              }
+              if (!parameter.getName().equals(argList.get(index))) { return new OclInvalid(); }
               index++;
             }
             try {
@@ -1189,9 +1226,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             EList parameterTypes = operation.getETypeParameters();
             int index = 0;
             for (ETypeParameter parameter : operation.getETypeParameters()) {
-              if (!parameter.getName().equals(argList.get(index))) {
-                return new OclInvalid();
-              }
+              if (!parameter.getName().equals(argList.get(index))) { return new OclInvalid(); }
               index++;
             }
             try {
@@ -1288,8 +1323,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         double second = Double.parseDouble(expressionMap.get("right"));
         return compare(first, second, expressionMap.get("operator"));
       } else if (a.getDatatype().equals("String")) {
-        String first = a.getValue();
-        String second = expressionMap.get("right");
+        String first = a.getValue().replaceAll("\"", "");
+        String second = expressionMap.get("right").replaceAll("\"", "");
         return compare(first, second, expressionMap.get("operator"));
       }
     } catch (Exception e) {
@@ -1397,12 +1432,12 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    */
   private Boolean compare(String first, String second, String operation) {
     switch (operation) {
-    case "=":
-      return first.equals(second);
-    case "<>":
-      return !first.equals(second);
-    default:
-      return null;
+      case "=":
+        return first.equals(second);
+      case "<>":
+        return !first.equals(second);
+      default:
+        return null;
     }
   }
 
@@ -1416,12 +1451,12 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    */
   private Boolean compare(Object object, Object object1, String operator) {
     switch (operator) {
-    case "=":
-      return object == object1;
-    case "<>":
-      return object != object1;
-    default:
-      return null;
+      case "=":
+        return object == object1;
+      case "<>":
+        return object != object1;
+      default:
+        return null;
     }
   }
 
@@ -1503,9 +1538,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   public boolean operationExist(String text) {
-    if (this.operationList.contains(text)) {
-      return true;
-    }
+    if (this.operationList.contains(text)) { return true; }
     return false;
   }
 

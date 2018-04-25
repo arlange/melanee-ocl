@@ -101,7 +101,7 @@ public class OCL2Service implements IConstraintLanguageService {
 
   /**
    * gets the defined constraints for the current selected element in the
-   * graphical model
+   * graphical model.
    */
   @Override
   public String[] getDefinedConstraintsFor(Element definitionContext) {
@@ -197,13 +197,11 @@ public class OCL2Service implements IConstraintLanguageService {
     // for Method we want body pre post
     if (definitionContext instanceof Method) {
       return new String[] { CONSTRAINT_KIND_BODY, CONSTRAINT_KIND_PRE, CONSTRAINT_KIND_POST };
-    }
-    // for attributes we want init derive
-    else if (definitionContext instanceof Attribute) {
+    } else if (definitionContext instanceof Attribute) {
+      // for attributes we want init and derive constraints
       return new String[] { CONSTRAINT_KIND_INIT, CONSTRAINT_KIND_DERIVE };
-    }
-    // for anything else we want inv and def
-    else {
+    } else {
+      // for anything else we want inv and def constraints
       String[] strings = { CONSTRAINT_KIND_INVARIANT, CONSTRAINT_KIND_DEF };
       return strings;
     }
@@ -222,8 +220,12 @@ public class OCL2Service implements IConstraintLanguageService {
    * have the same name.
    * 
    * @param definitionContext
+   *          definition context --> Clabject
    * @param constraintName
+   *          name of the constraint
    * @throws UnsupportedOperationException
+   *           if not supported by the deep ocl 2 language this exception will be
+   *           thrown
    */
   @Override
   public void deleteConstraint(Element definitionContext, String constraintName) {
@@ -257,134 +259,137 @@ public class OCL2Service implements IConstraintLanguageService {
     }
     Level constraintLevel = ConstraintFactory.eINSTANCE.createLevel();
     switch (constraintKind) {
-    case ("inv"):
-      int invCounter = 0;
-      // TODO what if the type is not Clabject? Level or DeepModel are allowed to have
-      // constraints too!
-      for (AbstractConstraint constr : ((Clabject) definitionContext).getConstraint()) {
-        if (constr instanceof InvariantConstraint) {
-          invCounter++;
-        }
-      }
-      InvariantConstraint inv = ConstraintFactory.eINSTANCE.createInvariantConstraint();
-      command = AddCommand.create(editingDomain, definitionContext,
-          PLMPackage.eINSTANCE.getElement_Constraint(), inv);
-      String name = DeepOCL2Util.createConstraintName(getDefinedConstraintsFor(definitionContext),
-          "inv", invCounter);
-      inv.setName(name);
-      constraintLevel.setEndLevel(endLevel);
-      constraintLevel.setStartLevel(startLevel);
-      inv.setLevel(constraintLevel);
-      editingDomain.getCommandStack().execute(command);
-      return (AbstractConstraint) inv;
-    case ("init"):
-      CompoundCommand compoundCommand = new CompoundCommand();
-      for (AbstractConstraint constrt : definitionContext.getConstraint()) {
-        // only one init constraint is allowed on an attribute
-        if (constrt instanceof InitConstraint) {
-          boolean result = MessageDialog.openConfirm(
-              PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Confirm",
-              "Only one constraint of this type is permitted to exist in this element. Do you wish to remove the existing constraint and create a new one?");
-          if (result) {
-            compoundCommand.append(RemoveCommand.create(editingDomain, definitionContext,
-                PLMPackage.eINSTANCE.getElement_Constraint(), constrt));
-          } else {
-            return null;
+      case ("inv"):
+        int invCounter = 0;
+        // TODO what if the type is not Clabject? Level or DeepModel are allowed to have
+        // constraints too!
+        for (AbstractConstraint constr : ((Clabject) definitionContext).getConstraint()) {
+          if (constr instanceof InvariantConstraint) {
+            invCounter++;
           }
         }
-      }
-      Constraint init = ConstraintFactory.eINSTANCE.createInitConstraint();
-      compoundCommand.append(AddCommand.create(editingDomain, definitionContext,
-          PLMPackage.eINSTANCE.getElement_Constraint(), init));
-      init.setName("init" + 0);
-      constraintLevel.setEndLevel(endLevel);
-      constraintLevel.setStartLevel(startLevel);
-      init.setLevel(constraintLevel);
-      editingDomain.getCommandStack().execute(compoundCommand);
-      return (AbstractConstraint) init;
-    case ("def"):
-      Constraint def = ConstraintFactory.eINSTANCE.createDefinitionConstraint();
-      def.setName("def" + 0);
-      constraintLevel.setEndLevel(startLevel);
-      constraintLevel.setStartLevel(startLevel);
-      def.setLevel(constraintLevel);
-      command = AddCommand.create(editingDomain, definitionContext,
-          PLMPackage.eINSTANCE.getElement_Constraint(), def);
-      editingDomain.getCommandStack().execute(command);
-      return (AbstractConstraint) def;
-    case ("body"):
-      for (AbstractConstraint constrt : definitionContext.getConstraint()) {
-        if (constrt instanceof BodyConstraint) {
-          // only one body constraint is allowed
-          boolean result = MessageDialog.openConfirm(
-              PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Confirm",
-              "Only one constraint of this type is permitted to exist in this element. Do you wish to remove the existing constraint and create a new one?");
-          if (result) {
-            Command removeCommand = RemoveCommand.create(editingDomain, definitionContext,
-                PLMPackage.eINSTANCE.getElement_Constraint(), constrt);
-            editingDomain.getCommandStack().execute(removeCommand);
-          } else {
-            return null;
+        InvariantConstraint inv = ConstraintFactory.eINSTANCE.createInvariantConstraint();
+        command = AddCommand.create(editingDomain, definitionContext,
+            PLMPackage.eINSTANCE.getElement_Constraint(), inv);
+        String name = DeepOCL2Util.createConstraintName(getDefinedConstraintsFor(definitionContext),
+            "inv", invCounter);
+        inv.setName(name);
+        constraintLevel.setEndLevel(endLevel);
+        constraintLevel.setStartLevel(startLevel);
+        inv.setLevel(constraintLevel);
+        editingDomain.getCommandStack().execute(command);
+        return (AbstractConstraint) inv;
+      case ("init"):
+        CompoundCommand compoundCommand = new CompoundCommand();
+        for (AbstractConstraint constrt : definitionContext.getConstraint()) {
+          // only one init constraint is allowed on an attribute
+          if (constrt instanceof InitConstraint) {
+            boolean result = MessageDialog.openConfirm(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Confirm",
+                "Only one constraint of this type is permitted to exist in this element. "
+                    + "Do you wish to remove the existing constraint and create a new one?");
+            if (result) {
+              compoundCommand.append(RemoveCommand.create(editingDomain, definitionContext,
+                  PLMPackage.eINSTANCE.getElement_Constraint(), constrt));
+            } else {
+              return null;
+            }
           }
         }
-      }
-      Constraint body = ConstraintFactory.eINSTANCE.createBodyConstraint();
-      body.setName("body" + 0);
-      constraintLevel.setEndLevel(startLevel);
-      constraintLevel.setStartLevel(startLevel);
-      body.setLevel(constraintLevel);
-      command = AddCommand.create(editingDomain, definitionContext,
-          PLMPackage.eINSTANCE.getElement_Constraint(), body);
-      editingDomain.getCommandStack().execute(command);
-      return (AbstractConstraint) body;
-    case ("post"):
-      Constraint post = ConstraintFactory.eINSTANCE.createPostConstraint();
-      post.setName("post" + 0);
-      constraintLevel.setEndLevel(startLevel);
-      constraintLevel.setStartLevel(startLevel);
-      post.setLevel(constraintLevel);
-      command = AddCommand.create(editingDomain, definitionContext,
-          PLMPackage.eINSTANCE.getElement_Constraint(), post);
-      editingDomain.getCommandStack().execute(command);
-      return (AbstractConstraint) post;
-    case ("pre"):
-      Constraint pre = ConstraintFactory.eINSTANCE.createPreConstraint();
-      pre.setName("pre" + 0);
-      constraintLevel.setEndLevel(startLevel);
-      constraintLevel.setStartLevel(startLevel);
-      pre.setLevel(constraintLevel);
-      command = AddCommand.create(editingDomain, definitionContext,
-          PLMPackage.eINSTANCE.getElement_Constraint(), pre);
-      editingDomain.getCommandStack().execute(command);
-      return (AbstractConstraint) pre;
-    case ("derive"):
-      for (AbstractConstraint constrt : definitionContext.getConstraint()) {
-        if (constrt instanceof DeriveConstraint) {
-          // only one derive constraint is allowed, either remove the
-          // current and define a new one or keep the old one
-          boolean result = MessageDialog.openConfirm(
-              PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Confirm",
-              "Only one constraint of this type is permitted to exist in this element. Do you wish to remove the existing constraint and create a new one?");
-          if (result) {
-            Command removeCommand = RemoveCommand.create(editingDomain, definitionContext,
-                PLMPackage.eINSTANCE.getElement_Constraint(), constrt);
-            editingDomain.getCommandStack().execute(removeCommand);
-          } else {
-            return null;
+        Constraint init = ConstraintFactory.eINSTANCE.createInitConstraint();
+        compoundCommand.append(AddCommand.create(editingDomain, definitionContext,
+            PLMPackage.eINSTANCE.getElement_Constraint(), init));
+        init.setName("init" + 0);
+        constraintLevel.setEndLevel(endLevel);
+        constraintLevel.setStartLevel(startLevel);
+        init.setLevel(constraintLevel);
+        editingDomain.getCommandStack().execute(compoundCommand);
+        return (AbstractConstraint) init;
+      case ("def"):
+        Constraint def = ConstraintFactory.eINSTANCE.createDefinitionConstraint();
+        def.setName("def" + 0);
+        constraintLevel.setEndLevel(startLevel);
+        constraintLevel.setStartLevel(startLevel);
+        def.setLevel(constraintLevel);
+        command = AddCommand.create(editingDomain, definitionContext,
+            PLMPackage.eINSTANCE.getElement_Constraint(), def);
+        editingDomain.getCommandStack().execute(command);
+        return (AbstractConstraint) def;
+      case ("body"):
+        for (AbstractConstraint constrt : definitionContext.getConstraint()) {
+          if (constrt instanceof BodyConstraint) {
+            // only one body constraint is allowed
+            boolean result = MessageDialog.openConfirm(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Confirm",
+                "Only one constraint of this type is permitted to exist in this element. "
+                    + "Do you wish to remove the existing constraint and create a new one?");
+            if (result) {
+              Command removeCommand = RemoveCommand.create(editingDomain, definitionContext,
+                  PLMPackage.eINSTANCE.getElement_Constraint(), constrt);
+              editingDomain.getCommandStack().execute(removeCommand);
+            } else {
+              return null;
+            }
           }
         }
-      }
-      Constraint derive = ConstraintFactory.eINSTANCE.createDeriveConstraint();
-      derive.setName("derive" + 0);
-      constraintLevel.setEndLevel(endLevel);
-      constraintLevel.setStartLevel(startLevel);
-      derive.setLevel(constraintLevel);
-      command = AddCommand.create(editingDomain, definitionContext,
-          PLMPackage.eINSTANCE.getElement_Constraint(), derive);
-      editingDomain.getCommandStack().execute(command);
-      return (AbstractConstraint) derive;
-    default:
-      return null;
+        Constraint body = ConstraintFactory.eINSTANCE.createBodyConstraint();
+        body.setName("body" + 0);
+        constraintLevel.setEndLevel(startLevel);
+        constraintLevel.setStartLevel(startLevel);
+        body.setLevel(constraintLevel);
+        command = AddCommand.create(editingDomain, definitionContext,
+            PLMPackage.eINSTANCE.getElement_Constraint(), body);
+        editingDomain.getCommandStack().execute(command);
+        return (AbstractConstraint) body;
+      case ("post"):
+        Constraint post = ConstraintFactory.eINSTANCE.createPostConstraint();
+        post.setName("post" + 0);
+        constraintLevel.setEndLevel(startLevel);
+        constraintLevel.setStartLevel(startLevel);
+        post.setLevel(constraintLevel);
+        command = AddCommand.create(editingDomain, definitionContext,
+            PLMPackage.eINSTANCE.getElement_Constraint(), post);
+        editingDomain.getCommandStack().execute(command);
+        return (AbstractConstraint) post;
+      case ("pre"):
+        Constraint pre = ConstraintFactory.eINSTANCE.createPreConstraint();
+        pre.setName("pre" + 0);
+        constraintLevel.setEndLevel(startLevel);
+        constraintLevel.setStartLevel(startLevel);
+        pre.setLevel(constraintLevel);
+        command = AddCommand.create(editingDomain, definitionContext,
+            PLMPackage.eINSTANCE.getElement_Constraint(), pre);
+        editingDomain.getCommandStack().execute(command);
+        return (AbstractConstraint) pre;
+      case ("derive"):
+        for (AbstractConstraint constrt : definitionContext.getConstraint()) {
+          if (constrt instanceof DeriveConstraint) {
+            // only one derive constraint is allowed, either remove the
+            // current and define a new one or keep the old one
+            boolean result = MessageDialog.openConfirm(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Confirm",
+                "Only one constraint of this type is permitted to exist in this element. "
+                    + "Do you wish to remove the existing constraint and create a new one?");
+            if (result) {
+              Command removeCommand = RemoveCommand.create(editingDomain, definitionContext,
+                  PLMPackage.eINSTANCE.getElement_Constraint(), constrt);
+              editingDomain.getCommandStack().execute(removeCommand);
+            } else {
+              return null;
+            }
+          }
+        }
+        Constraint derive = ConstraintFactory.eINSTANCE.createDeriveConstraint();
+        derive.setName("derive" + 0);
+        constraintLevel.setEndLevel(endLevel);
+        constraintLevel.setStartLevel(startLevel);
+        derive.setLevel(constraintLevel);
+        command = AddCommand.create(editingDomain, definitionContext,
+            PLMPackage.eINSTANCE.getElement_Constraint(), derive);
+        editingDomain.getCommandStack().execute(command);
+        return (AbstractConstraint) derive;
+      default:
+        return null;
     }
   }
 
@@ -447,9 +452,10 @@ public class OCL2Service implements IConstraintLanguageService {
       } else if (persistenceService.getDefinitionContext() instanceof Method) {
         this.dm = ((Method) persistenceService.getDefinitionContext()).getClabject().getDeepModel();
       }
+
       /**
        * this is for initializing the editor layout that is then returned to the
-       * custom propertySheet (parent)
+       * custom propertySheet (parent).
        */
 
       GridLayout gridLayout = new GridLayout(6, true);
@@ -461,8 +467,6 @@ public class OCL2Service implements IConstraintLanguageService {
 
       CLabel startLevelLabel = widgetFacotry.createCLabel(this, "Start Level");
       GridData gridDataStart = new GridData(SWT.FILL, SWT.FILL, true, false);
-      GridData gridDataEnd = new GridData(SWT.FILL, SWT.FILL, true, false);
-      GridData gridDataName = new GridData(SWT.FILL, SWT.FILL, true, false);
 
       this.startLevelText = widgetFacotry.createText(this, startLevel.toString(), SWT.SINGLE);
       this.startLevelText.setSize(this.startLevelText.getBorderWidth() + 10,
@@ -476,6 +480,7 @@ public class OCL2Service implements IConstraintLanguageService {
       } else {
         this.endLevelText = widgetFacotry.createText(this, endLevel.toString(), SWT.SINGLE);
       }
+      GridData gridDataEnd = new GridData(SWT.FILL, SWT.FILL, true, false);
       this.endLevelText.setLayoutData(gridDataEnd);
 
       // tooltips
@@ -491,10 +496,11 @@ public class OCL2Service implements IConstraintLanguageService {
         }
       }
 
-      CLabel nameLabel = widgetFacotry.createCLabel(this, "Name");
+      widgetFacotry.createCLabel(this, "Name");
       this.nameText = widgetFacotry.createText(this, constraint.getName(), SWT.SINGLE);
+      GridData gridDataName = new GridData(SWT.FILL, SWT.FILL, true, false);
       this.nameText.setLayoutData(gridDataName);
-      CLabel messageLabel = widgetFacotry.createCLabel(this, "Message");
+      widgetFacotry.createCLabel(this, "Message");
       GridData gridDateMessage = new GridData(SWT.FILL, SWT.FILL, true, true);
       gridDateMessage.horizontalSpan = 3;
       gridDateMessage.horizontalAlignment = SWT.FILL;
@@ -534,7 +540,7 @@ public class OCL2Service implements IConstraintLanguageService {
       this.message = widgetFacotry.createText(this, ((Constraint) constraint).getMessage(),
           SWT.SINGLE);
       this.message.setLayoutData(gridDateMessage);
-      CLabel severityLabel = widgetFacotry.createCLabel(this, "Severity");
+      widgetFacotry.createCLabel(this, "Severity");
       this.severityCombo = widgetFacotry.createCCombo(this);
       int index = 0;
       String[] items = new String[ConstraintPackage.eINSTANCE.getSeverity().getELiterals().size()];
@@ -546,7 +552,7 @@ public class OCL2Service implements IConstraintLanguageService {
       if (((Constraint) constraint).getSeverity().getName() != null) {
         this.severityCombo.setText(((Constraint) constraint).getSeverity().getName());
       }
-      CLabel constraintLabel = widgetFacotry.createCLabel(this, constraintType, SWT.RIGHT);
+      widgetFacotry.createCLabel(this, constraintType, SWT.RIGHT);
       constraintBox = widgetFacotry.createText(this, ((Constraint) constraint).getText(),
           SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
       gridData.heightHint = 4 * constraintBox.getLineHeight();
@@ -677,10 +683,12 @@ public class OCL2Service implements IConstraintLanguageService {
         this.message.setText(((Constraint) constraint).getMessage());
       }
       if (!startLevelText.isDisposed() && !endLevelText.isDisposed()) {
-        startLevelText.setEditable(true);
-        endLevelText.setEditable(true);
-        startLevelText.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-        endLevelText.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        startLevelText.setEditable(false);
+        endLevelText.setEditable(false);
+        startLevelText
+            .setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+        endLevelText
+            .setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
       }
       constraintBox.setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
       message.setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
@@ -789,7 +797,7 @@ public class OCL2Service implements IConstraintLanguageService {
   }
 
   /**
-   * Wrapper class for failed invariant validations
+   * Wrapper class for failed invariant validations.
    *
    */
   private class ValidationResult implements IValidationResult {
