@@ -157,6 +157,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     operationList.add("isDeepDirectInstanceOf");
     operationList.add("isIndirectInstanceOf");
     operationList.add("isDeepIndirectInstanceOf");
+    operationList.add("isDeepKindOf");
   }
 
   public List<String> getOperationList() {
@@ -291,7 +292,20 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       if (element instanceof Attribute
           && navigationStack.size() == 1) { throw new NavigationException("something wrong here.",
               new Throwable(target)); }
-      if (element instanceof Clabject) {
+      if (element instanceof Connection) {
+        List<Element> resultList = new ArrayList<Element>();
+        Connection connection = (Connection) element;
+        for (ConnectionEnd connectionEnd : connection.getConnectionEnd()) {
+          if (connectionEnd.getMoniker().equals(target)) {
+            resultList.add(connectionEnd.getDestination());
+          } else if (connectionEnd.getDestination().getName().equals(target)) {
+            resultList.add(connectionEnd.getDestination());
+          }
+        }
+        this.navigationStack.push(new Tuple<String, Collection<Element>>(target, resultList));
+        return resultList;
+      }
+      else if (element instanceof Clabject) {
         for (Feature feature : ((Clabject) element).getFeature()) {
           if (feature instanceof Attribute) {
             Attribute attr = (Attribute) feature;
@@ -432,7 +446,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
               .push(new Tuple<String, Collection<Element>>("Connections", connectionList));
           return connectionList;
         }
-      }
+      } 
     }
     return returnList.size() == 0 ? null : returnList;
   }
@@ -607,15 +621,49 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return result;
   }
 
+  /**
+   * 
+   * @param text
+   *          Clabject
+   * @return
+   */
+  public Object isDeepKindOf(String text) {
+    Boolean result = false;
+    try {
+      Clabject context = (Clabject) this.context;
+      for (Element type : context.getDirectTypes()) {
+        Clabject clab = (Clabject) type;
+        if (clab.getName().equals(text)) {
+          result = true;
+        }
+      }
+      if (!result) {
+        for (Element type : context.getDirectTypes()) {
+          Clabject clab = (Clabject) type;
+          for (Clabject supertype : clab.getSupertypes()) {
+            if (supertype.getName().equals(text)) {
+              result = true;
+            }
+          }
+        }
+      }
+    } catch (ClassCastException e) {
+      // not castable to Clabject, which is necessary
+      return null;
+    }
+    return result;
+  }
+
   private Boolean instanceOf(Object[] arg) {
     return ((Clabject) this.context).isInstanceOf((Clabject) arg[0]);
   }
 
   /**
    * arg[0] has to the collection to insert at arg[1] has to the object to insert
-   * into the collection arg[2] has to the index
+   * into the collection arg[2] has to the index.
    * 
    * @param arg
+   *          Object[]
    * @return
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -1290,9 +1338,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * ===================================================================== |
-   * helper operations section |
-   * =====================================================================
+   * |=====================================================================|
+   * |helper operations section |
+   * |=====================================================================|
    */
 
   /**

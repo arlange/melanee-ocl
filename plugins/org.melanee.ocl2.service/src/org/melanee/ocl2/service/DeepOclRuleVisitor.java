@@ -103,6 +103,7 @@ import org.melanee.ocl2.service.util.Tuple;
 
 /**
  * This class extends a class from the antlr4 generated parseTreeVisitor.
+ * 
  * @author Arne Lange
  *
  */
@@ -1071,7 +1072,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
       return this.wrapper.isDirectInstanceOf(ctx.arg.getText());
     } else if (ctx.opName.getText().equals("isDeepDirectInstanceOf")) {
       return this.wrapper.isDeepDirectInstanceOf(ctx.arg.getText());
-    }
+    } else if (ctx.opName.getText()
+        .equals("isDeepKindOf")) { return this.wrapper.isDeepKindOf(ctx.arg.getText()); }
     if (this.wrapper.operationExist(ctx.opName.getText())) {
       if (ctx.arg.getText() != null && ctx.arg.getText() != "") {
         Object[] arg = {};
@@ -1198,12 +1200,12 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     Object right = visit(ctx.left);
     Double dRight = Double.parseDouble(right.toString());
     switch (ctx.op.getText()) {
-    case "*":
-      return (dLeft * dRight);
-    case "/":
-      return (dLeft / dRight);
-    default:
-      break;
+      case "*":
+        return (dLeft * dRight);
+      case "/":
+        return (dLeft / dRight);
+      default:
+        break;
     }
     return visitChildren(ctx);
   }
@@ -1215,12 +1217,12 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     Object right = visit(ctx.left);
     Double dRight = Double.parseDouble(right.toString());
     switch (ctx.op.getText()) {
-    case "+":
-      return (dLeft + dRight);
-    case "-":
-      return (dLeft - dRight);
-    default:
-      break;
+      case "+":
+        return (dLeft + dRight);
+      case "-":
+        return (dLeft - dRight);
+      default:
+        break;
     }
     return visitChildren(ctx);
   }
@@ -1232,14 +1234,14 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     Object right = visit(ctx.right);
     Boolean bRight = Boolean.parseBoolean(right.toString());
     switch (ctx.op.getText()) {
-    case "and":
-      return bLeft && bRight;
-    case "or":
-      return bLeft || bRight;
-    case "xor":
-      return (bLeft || bRight) && !(bLeft && bRight);
-    default:
-      break;
+      case "and":
+        return bLeft && bRight;
+      case "or":
+        return bLeft || bRight;
+      case "xor":
+        return (bLeft || bRight) && !(bLeft && bRight);
+      default:
+        break;
     }
     return visitChildren(ctx);
   }
