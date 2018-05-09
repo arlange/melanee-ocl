@@ -37,6 +37,7 @@ public class BPMN2Tests {
   Clabject EndEvent;
   Clabject hungryForPizza;
   Clabject hungerSatisfied;
+  Clabject MessageStartEvent;
   Connection connection1;
 
   @Before
@@ -45,6 +46,8 @@ public class BPMN2Tests {
     this.InteractionNode.setName("InteractionNode");
     this.ThrowEvent = PLMFactory.eINSTANCE.createEntity();
     this.ThrowEvent.setName("ThrowEvent");
+    this.MessageStartEvent = PLMFactory.eINSTANCE.createEntity();
+    this.MessageStartEvent.setName("MessageStartEvent");
     this.CatchEvent = PLMFactory.eINSTANCE.createEntity();
     this.CatchEvent.setName("CatchEvent");
     this.StartEvent = PLMFactory.eINSTANCE.createEntity();
@@ -64,6 +67,7 @@ public class BPMN2Tests {
     this.level0.getContent().add(InteractionNode);
     this.level0.getContent().add(StartEvent);
     this.level0.getContent().add(EndEvent);
+    this.level0.getContent().add(MessageStartEvent);
 
     // Connection Interaction Node
     connection1 = PLMFactory.eINSTANCE.createConnection();
@@ -120,6 +124,16 @@ public class BPMN2Tests {
     superCatch.setSupertype(CatchEvent);
     level0.getContent().add(catchStart);
 
+    // SuperSubTypes StartEvent -> MessageStartEvent
+    Subtype messageStart = PLMFactory.eINSTANCE.createSubtype();
+    Supertype startEventSup = PLMFactory.eINSTANCE.createSupertype();
+    Inheritance startMessage = PLMFactory.eINSTANCE.createInheritance();
+    startMessage.getSubtype().add(messageStart);
+    startMessage.getSupertype().add(startEventSup);
+    messageStart.setSubtype(MessageStartEvent);
+    startEventSup.setSupertype(StartEvent);
+    level0.getContent().add(startMessage);
+    
     // level 1
     this.hungryForPizza = PLMFactory.eINSTANCE.createEntity();
     this.hungerSatisfied = PLMFactory.eINSTANCE.createEntity();
@@ -132,7 +146,7 @@ public class BPMN2Tests {
 
     Classification startEvent = PLMFactory.eINSTANCE.createClassification();
     startEvent.setInstance(hungryForPizza);
-    startEvent.setType(StartEvent);
+    startEvent.setType(MessageStartEvent);
     level1.getContent().add(startEvent);
 
     Classification endEvent = PLMFactory.eINSTANCE.createClassification();
@@ -286,7 +300,7 @@ public class BPMN2Tests {
     this.level1.getContent().add(startToEnd);
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.receive.isDeepKindOf(CatchEvent) and self.isDeepKindOf(ThrowEvent)"));
+        "self.receive.isDeepKindOf(CatchEvent) and self.send.isDeepKindOf(ThrowEvent)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(connection1);

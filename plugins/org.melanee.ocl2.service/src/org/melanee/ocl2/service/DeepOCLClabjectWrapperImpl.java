@@ -633,8 +633,13 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       Clabject context = (Clabject) this.context;
       for (Element type : context.getDirectTypes()) {
         Clabject clab = (Clabject) type;
-        if (clab.getName().equals(text)) {
-          result = true;
+        // is there is no name of the clabject a NullPointer will be thrown. Like connection without a name
+        try {
+          if (clab.getName().equals(text)) {
+            result = true;
+          }  
+        } catch (Exception e) {
+          // TODO: handle exception
         }
       }
       if (!result) {
