@@ -186,10 +186,9 @@ public class BPMN2Tests {
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(connection1);
     Object returnValue = visitor.visit(tree);
-    System.out.println(returnValue.toString());
     assertEquals(false, Boolean.parseBoolean(returnValue.toString()));
-
   }
+
   @Test
   public void MessageFlowConstraintTest1() {
     Connection startToEnd = PLMFactory.eINSTANCE.createConnection();
@@ -219,7 +218,6 @@ public class BPMN2Tests {
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(connection1);
     Object returnValue = visitor.visit(tree);
-    System.out.println(returnValue.toString());
     assertEquals(true, Boolean.parseBoolean(returnValue.toString()));
 
   }
@@ -253,6 +251,7 @@ public class BPMN2Tests {
     Object returnValue = visitor.visit(tree);
     assertEquals(true, Boolean.parseBoolean(returnValue.toString()));
   }
+
   @Test
   public void isDeepKindOfTest4() {
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("self.isDeepKindOf(CatchEvent)"));
@@ -260,6 +259,39 @@ public class BPMN2Tests {
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.hungerSatisfied);
     Object returnValue = visitor.visit(tree);
+    assertEquals(false, Boolean.parseBoolean(returnValue.toString()));
+  }
+  
+  @Test
+  public void MessageFlowConstraintTestForInstances() {
+    Connection startToEnd = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd start = PLMFactory.eINSTANCE.createConnectionEnd();
+    ConnectionEnd end = PLMFactory.eINSTANCE.createConnectionEnd();
+    start.setMoniker("send");
+    end.setMoniker("receive");
+    startToEnd.setName("startToEnd");
+
+    start.setConnection(startToEnd);
+    end.setConnection(startToEnd);
+    start.setDestination(this.hungryForPizza);
+    end.setDestination(this.hungerSatisfied);
+    end.setNavigable(true);
+    start.setNavigable(false);
+
+    Classification interactionConnection = PLMFactory.eINSTANCE.createClassification();
+    interactionConnection.setInstance(startToEnd);
+    interactionConnection.setType(connection1);
+    this.level1.getContent().add(interactionConnection);
+
+    this.level1.getContent().add(startToEnd);
+
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "self.receive.isDeepKindOf(CatchEvent) and self.isDeepKindOf(ThrowEvent)"));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(connection1);
+    Object returnValue = visitor.visit(tree);
+    System.out.println(returnValue.toString());
     assertEquals(false, Boolean.parseBoolean(returnValue.toString()));
   }
 }

@@ -714,39 +714,41 @@ public class OCL2Service implements IConstraintLanguageService {
     DeepOclRuleVisitor visitor;
     if (element instanceof DeepModel) {
       for (org.melanee.core.models.plm.PLM.Level level : ((DeepModel) element).getContent()) {
-        for (Clabject clabject : level.getClabjects()) {
+        for (Element clab : level.getContent()) {
           // convert the list into a set, we do not want to evaluate
           // the constraint a million times.
-          Set<AbstractConstraint> constraintSet = new HashSet<AbstractConstraint>(
-              searchAlgo.search(clabject, Arrays.asList(InvariantConstraintImpl.class)));
-          check: for (AbstractConstraint constraint : constraintSet) {
-            Constraint con = (Constraint) constraint;
-            String exp = "inv " + con.getName() + ": " + con.getText();
+          if (clab instanceof Clabject) {
+            Clabject clabject = (Clabject) clab;
+            Set<AbstractConstraint> constraintSet = new HashSet<AbstractConstraint>(
+                searchAlgo.search(clabject, Arrays.asList(InvariantConstraintImpl.class)));
+            check: for (AbstractConstraint constraint : constraintSet) {
+              Constraint con = (Constraint) constraint;
+              String exp = "inv " + con.getName() + ": " + con.getText();
 
-            // begin parsing and interpreting process for invariant
-            // constraints. result has to be of type boolean, else
-            // OclInvalid is returned
-            ocl2Lexer = new DeepOclLexer(new ANTLRInputStream(exp));
-            parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
-            tree = parser.invCS();
-            visitor = new DeepOclRuleVisitor(clabject);
-            try {
-              Object result = visitor.visit(tree).toString();
-              if (result instanceof OclInvalid || result == null) {
-                validationResult.add(new ValidationResult(con.getSeverity(),
-                    "OclInvalid " + con.getMessage(), clabject));
+              // begin parsing and interpreting process for invariant
+              // constraints. result has to be of type boolean, else
+              // OclInvalid is returned
+              ocl2Lexer = new DeepOclLexer(new ANTLRInputStream(exp));
+              parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
+              tree = parser.invCS();
+              visitor = new DeepOclRuleVisitor(clabject);
+              try {
+                Object result = visitor.visit(tree).toString();
+                if (result instanceof OclInvalid || result == null) {
+                  validationResult.add(new ValidationResult(con.getSeverity(),
+                      "OclInvalid " + con.getMessage(), clabject));
+                }
+                Boolean booleanResult = Boolean.parseBoolean(result.toString());
+                if (booleanResult.equals(false)) {
+                  validationResult
+                      .add(new ValidationResult(con.getSeverity(), con.getMessage(), clabject));
+                }
+              } catch (NullPointerException e) {
+                System.out.println("result was null, check your constraint!");
+                e.printStackTrace();
+                continue check;
               }
-              Boolean booleanResult = Boolean.parseBoolean(result.toString());
-              if (booleanResult.equals(false)) {
-                validationResult
-                    .add(new ValidationResult(con.getSeverity(), con.getMessage(), clabject));
-              }
-            } catch (NullPointerException e) {
-              System.out.println("result was null, check your constraint!");
-              e.printStackTrace();
-              continue check;
             }
-
           }
         }
       }
