@@ -293,17 +293,16 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
           && navigationStack.size() == 1) { throw new NavigationException("something wrong here.",
               new Throwable(target)); }
       if (element instanceof Connection) {
-        List<Element> resultList = new ArrayList<Element>();
         Connection connection = (Connection) element;
         for (ConnectionEnd connectionEnd : connection.getConnectionEnd()) {
           if (connectionEnd.getMoniker().equals(target)) {
-            resultList.add(connectionEnd.getDestination());
+            returnList.add(connectionEnd.getDestination());
           } else if (connectionEnd.getDestination().getName().equals(target)) {
-            resultList.add(connectionEnd.getDestination());
+            returnList.add(connectionEnd.getDestination());
           }
         }
-        this.navigationStack.push(new Tuple<String, Collection<Element>>(target, resultList));
-        return resultList;
+        this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
+        return returnList;
       }
       else if (element instanceof Clabject) {
         for (Feature feature : ((Clabject) element).getFeature()) {

@@ -315,12 +315,21 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
 
   @Override
   public Object visitPrefixedExpCS(PrefixedExpCSContext ctx) {
-    return visitChildren(ctx);
+    if (ctx.not != null) {
+      try {
+        Object result = visit(ctx.exp);
+        return !Boolean.parseBoolean(result.toString());
+      } catch (Exception e) {
+        return null;
+      }
+    } else {
+      return visitChildren(ctx);
+    }
   }
 
   @Override
   public Object visitNestedExpCS(NestedExpCSContext ctx) {
-    return visitChildren(ctx);
+    return visit(ctx.exp);
 
   }
 

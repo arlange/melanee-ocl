@@ -712,6 +712,7 @@ public class OCL2Service implements IConstraintLanguageService {
     DeepOclParser parser;
     ParseTree tree;
     DeepOclRuleVisitor visitor;
+    Set<Clabject> clabSet = new HashSet<>();
     if (element instanceof DeepModel) {
       for (org.melanee.core.models.plm.PLM.Level level : ((DeepModel) element).getContent()) {
         for (Element clab : level.getContent()) {
@@ -719,45 +720,44 @@ public class OCL2Service implements IConstraintLanguageService {
           // the constraint a million times.
           if (clab instanceof Clabject) {
             Clabject clabject = (Clabject) clab;
-            Set<Clabject> clabSet = new HashSet<>();
             clabSet.add(clabject);
             for (Element elm : clabject.getContent()) {
               if (elm instanceof Clabject) {
                 clabSet.add((Clabject) elm);
               }
             }
-            for (Clabject claabject : clabSet) {
-              Set<AbstractConstraint> constraintSet = new HashSet<AbstractConstraint>(
-                  searchAlgo.search(claabject, Arrays.asList(InvariantConstraintImpl.class)));
-              check: for (AbstractConstraint constraint : constraintSet) {
-                Constraint con = (Constraint) constraint;
-                String exp = "inv " + con.getName() + ": " + con.getText();
 
-                // begin parsing and interpreting process for invariant
-                // constraints. result has to be of type boolean, else
-                // OclInvalid is returned
-                ocl2Lexer = new DeepOclLexer(new ANTLRInputStream(exp));
-                parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
-                tree = parser.invCS();
-                visitor = new DeepOclRuleVisitor(claabject);
-                try {
-                  Object result = visitor.visit(tree).toString();
-                  if (result instanceof OclInvalid || result == null) {
-                    validationResult.add(new ValidationResult(con.getSeverity(),
-                        "OclInvalid " + con.getMessage(), claabject));
-                  }
-                  Boolean booleanResult = Boolean.parseBoolean(result.toString());
-                  if (booleanResult.equals(false)) {
-                    validationResult
-                        .add(new ValidationResult(con.getSeverity(), con.getMessage(), claabject));
-                  }
-                } catch (NullPointerException e) {
-                  System.out.println("check threw a null pointer exception, check your constraint!");
-                  e.printStackTrace();
-                  continue check;
-                }
-              }
+          }
+        }
+      }
+      for (Clabject claabject : clabSet) {
+        Set<AbstractConstraint> constraintSet = new HashSet<AbstractConstraint>(
+            searchAlgo.search(claabject, Arrays.asList(InvariantConstraintImpl.class)));
+        check: for (AbstractConstraint constraint : constraintSet) {
+          Constraint con = (Constraint) constraint;
+          String exp = "inv " + con.getName() + ": " + con.getText();
+          // begin parsing and interpreting process for invariant
+          // constraints. result has to be of type boolean, else
+          // OclInvalid is returned
+          ocl2Lexer = new DeepOclLexer(new ANTLRInputStream(exp));
+          parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
+          tree = parser.invCS();
+          visitor = new DeepOclRuleVisitor(claabject);
+          try {
+            Object result = visitor.visit(tree).toString();
+            if (result instanceof OclInvalid || result == null) {
+              validationResult.add(new ValidationResult(con.getSeverity(),
+                  "OclInvalid " + con.getMessage(), claabject));
             }
+            Boolean booleanResult = Boolean.parseBoolean(result.toString());
+            if (booleanResult.equals(false)) {
+              validationResult
+                  .add(new ValidationResult(con.getSeverity(), con.getMessage(), claabject));
+            }
+          } catch (NullPointerException e) {
+            System.out.println("check threw a null pointer exception, check your constraint!");
+            e.printStackTrace();
+            continue check;
           }
         }
       }

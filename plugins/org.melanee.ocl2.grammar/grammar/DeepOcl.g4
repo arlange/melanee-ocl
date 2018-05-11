@@ -9,571 +9,582 @@
  *    Ralph Gerbig - initial API and implementation and initial documentation
  *    Arne Lange - ocl2 implementation
  *******************************************************************************/
-grammar DeepOcl;
+ grammar DeepOcl;
 
-contextDeclCS
-:
-	(
-		propertyContextDeclCS
-		| classifierContextCS
-		| operationContextCS
-	)+
-;
-
-operationContextCS
-:
-	CONTEXT levelSpecificationCS?
-	(
-		ID ':'
-	)?
-	(
-		ID '::'
-		(
-			ID '::'
-		)* ID
-		| ID
-	) '('
-	(
-		parameterCS
-		(
-			',' parameterCS
-		)*
-	)? ')'
-	(
-		':' typeExpCS
-	)?
-	(
-		preCS
-		| postCS
-		| bodyCS
-	)*
-;
-
-levelSpecificationCS
-:
-	'(' NumberLiteralExpCS
-	(
-		','
-		(
-			'_'
-			| NumberLiteralExpCS
-		)
-	)? ')'
-;
-
-CONTEXT
-:
-	'context'
-;
-
-bodyCS
-:
-	'body' ID? ':' specificationCS
-;
-
-postCS
-:
-	'post' ID? ':' specificationCS
-;
-
-preCS
-:
-	'pre' ID? ':' specificationCS
-;
-
-defCS
-:
-	'def' ID? ':' ID
-	(
-		(
-			'(' parameterCS?
-			(
-				',' parameterCS
-			)* ')'
-		)? ':' typeExpCS? '=' specificationCS
-	)
-;
-
-typeExpCS
-:
-	typeNameExpCS
-	| typeLiteralCS
-;
-
-typeLiteralCS
-:
-	primitiveTypeCS
-	| collectionTypeCS
-	| tupleTypeCS
-;
-
-tupleTypeCS
-:
-	'Tuple'
-	(
-		'(' tuplePartCS
-		(
-			',' tuplePartCS
-		)* ')'
-		| '<' tuplePartCS
-		(
-			',' tuplePartCS
-		)* '>'
-	)?
-;
-
-tuplePartCS
-:
-	ID ':' typeExpCS
-;
-
-collectionTypeCS
-:
-	collectionTypeIDentifier
-	(
-		'(' typeExpCS ')'
-		| '<' typeExpCS '>'
-	)?
-;
-
-collectionTypeIDentifier
-:
-	'Collection'
-	| 'Bag'
-	| 'OrderedSet'
-	| 'Sequence'
-	| 'Set'
-;
-
-primitiveTypeCS
-:
-	'Boolean'
-	| 'Integer'
-	| 'Real'
-	| 'ID'
-	| 'UnlimitedNatural'
-	| 'OclAny'
-	| 'OclInvalID'
-	| 'OclVoID'
-;
-
-typeNameExpCS
-:
-	ID '::'
-	(
-		ID '::'
-	)* ID
-	| ID
-;
-
-specificationCS
-:
-	infixedExpCS*
-;
-
-expCS
-:
-	infixedExpCS
-;
-
-infixedExpCS
+ contextDeclCS
  :
- 	prefixedExpCS # prefixedExp
- 	| iteratorBarExpCS # iteratorBar
- 	| left = infixedExpCS op =
- 	(
- 		'/'
- 		| '*'
- 	) right = infixedExpCS # timesDivide
- 	| left = infixedExpCS op =
- 	(
- 		'+'
- 		| '-'
- 	) right = infixedExpCS # plusMinus
- 	| left = infixedExpCS op =
- 	(
- 		'<='
- 		| '>='
- 		| '<>'
- 		| '<'
- 		| '>'
- 		| '='
- 	) right = infixedExpCS # equalOperations
- 	| left = infixedExpCS op = '^' right = infixedExpCS # Message
- 	| left = infixedExpCS op =
- 	(
- 		'and'
- 		| 'or'
- 		| 'xor'
- 	) right = infixedExpCS # andOrXor
- 	| left = infixedExpCS op = 'implies' right = infixedExpCS # implies
+     (
+         propertyContextDeclCS
+         | classifierContextCS
+         | operationContextCS
+     )+
  ;
 
+ operationContextCS
+ :
+     CONTEXT levelSpecificationCS?
+     (
+         ID ':'
+     )?
+     (
+         ID '::'
+         (
+             ID '::'
+         )* ID
+         | ID
+     ) '('
+     (
+         parameterCS
+         (
+             ',' parameterCS
+         )*
+     )? ')'
+     (
+         ':' typeExpCS
+     )?
+     (
+         preCS
+         | postCS
+         | bodyCS
+     )*
+ ;
 
-iteratorBarExpCS
-:
-	'|'
-;
+ levelSpecificationCS
+ :
+     '(' NumberLiteralExpCS
+     (
+         ','
+         (
+             '_'
+             | NumberLiteralExpCS
+         )
+     )? ')'
+ ;
 
-navigationOperatorCS
-:
-	'.' # dot
-	| '->' # arrow
-;
+ CONTEXT
+ :
+     'context'
+ ;
 
-prefixedExpCS
-:
-	UnaryOperatorCS+ primaryExpCS
-	| primaryExpCS
-	(
-		navigationOperatorCS primaryExpCS
-	)*
-	| primaryExpCS
-;
+ bodyCS
+ :
+     'body' ID? ':' specificationCS
+ ;
 
-UnaryOperatorCS
-:
-	'-'
-	| 'not'
-;
+ postCS
+ :
+     'post' ID? ':' specificationCS
+ ;
 
-primaryExpCS
-:
-	letExpCS
-	| ifExpCS
-	| primitiveLiteralExpCS
-	| navigatingExpCS
-	| selfExpCS
-	| tupleLiteralExpCS
-	| collectionLiteralExpCS
-	| typeLiteralExpCS
-	| nestedExpCS
-;
+ preCS
+ :
+     'pre' ID? ':' specificationCS
+ ;
 
-nestedExpCS
-:
-	'(' expCS+ ')'
-;
+ defCS
+ :
+     'def' ID? ':' ID
+     (
+         (
+             '(' parameterCS?
+             (
+                 ',' parameterCS
+             )* ')'
+         )? ':' typeExpCS? '=' specificationCS
+     )
+ ;
 
-ifExpCS
-:
-	'if' ifexp = expCS+ 'then' thenexp = expCS+ 'else' elseexp = expCS+ 'endif'
-;
+ typeExpCS
+ :
+     typeNameExpCS
+     | typeLiteralCS
+ ;
 
-letExpCS
-:
-	'let' letVariableCS
-	(
-		',' letVariableCS
-	)* 'in' in = expCS+
-;
+ typeLiteralCS
+ :
+     primitiveTypeCS
+     | collectionTypeCS
+     | tupleTypeCS
+ ;
 
-letVariableCS
-:
-	name = ID ':' type = typeExpCS '=' exp = expCS+
-;
+ tupleTypeCS
+ :
+     'Tuple'
+     (
+         '(' tuplePartCS
+         (
+             ',' tuplePartCS
+         )* ')'
+         | '<' tuplePartCS
+         (
+             ',' tuplePartCS
+         )* '>'
+     )?
+ ;
 
-typeLiteralExpCS
-:
-	typeLiteralCS
-;
+ tuplePartCS
+ :
+     ID ':' typeExpCS
+ ;
 
-collectionLiteralExpCS
-:
-	collectionTypeCS '{'
-	(
-		collectionLiteralPartCS
-		(
-			',' collectionLiteralPartCS
-		)*
-	)? '}'
-;
+ collectionTypeCS
+ :
+     collectionTypeIDentifier
+     (
+         '(' typeExpCS ')'
+         | '<' typeExpCS '>'
+     )?
+ ;
 
-collectionLiteralPartCS
-:
-	expCS
-	(
-		'..' expCS
-	)?
-;
+ collectionTypeIDentifier
+ :
+     'Collection'
+     | 'Bag'
+     | 'OrderedSet'
+     | 'Sequence'
+     | 'Set'
+ ;
 
-tupleLiteralExpCS
-:
-	'Tuple' '{' tupleLiteralPartCS
-	(
-		',' tupleLiteralPartCS
-	)* '}'
-;
+ primitiveTypeCS
+ :
+     'Boolean'
+     | 'Integer'
+     | 'Real'
+     | 'ID'
+     | 'UnlimitedNatural'
+     | 'OclAny'
+     | 'OclInvalID'
+     | 'OclVoID'
+ ;
 
-tupleLiteralPartCS
-:
-	ID
-	(
-		':' typeExpCS
-	)? '=' expCS
-;
+ typeNameExpCS
+ :
+     ID '::'
+     (
+         ID '::'
+     )* ID
+     | ID
+ ;
 
-selfExpCS
-:
-	'self'
-;
+ specificationCS
+ :
+     infixedExpCS*
+ ;
 
-primitiveLiteralExpCS
-:
-	NumberLiteralExpCS # number
-	| STRING # string
-	| BooleanLiteralExpCS # boolean
-	| InvalIDLiteralExpCS # invalid
-	| NullLiteralExpCS # null
-;
+ expCS
+ :
+     infixedExpCS
+ ;
 
-InvalIDLiteralExpCS
-:
-	'invalid'
-;
+ infixedExpCS
+ :
+     prefixedExpCS # prefixedExp
+     | iteratorBarExpCS # iteratorBar
+     | left = infixedExpCS op =
+     (
+         '/'
+         | '*'
+     ) right = infixedExpCS # timesDivide
+     | left = infixedExpCS op =
+     (
+         '+'
+         | '-'
+     ) right = infixedExpCS # plusMinus
+     | left = infixedExpCS op =
+     (
+         '<='
+         | '>='
+         | '<>'
+         | '<'
+         | '>'
+         | '='
+     ) right = infixedExpCS # equalOperations
+     | left = infixedExpCS op = '^' right = infixedExpCS # Message
+     | left = infixedExpCS op =
+     (
+         'and'
+         | 'or'
+         | 'xor'
+     ) right = infixedExpCS # andOrXor
+     | left = infixedExpCS op = 'implies' right = infixedExpCS # implies
+ ;
 
-NumberLiteralExpCS
-:
-	INT
-	(
-		'.' INT
-	)?
-	(
-		(
-			'e'
-			| 'E'
-		)
-		(
-			'+'
-			| '-'
-		)? INT
-	)?
-;
+ iteratorBarExpCS
+ :
+     '|'
+ ;
 
-fragment
-DIGIT
-:
-	[0-9]
-;
+ navigationOperatorCS
+ :
+     '.' # dot
+     | '->' # arrow
+ ;
 
-INT
-:
-	DIGIT+
-;
+ prefixedExpCS
+ :
+     not = UnaryOperatorCS+ exp = primaryExpCS 
+     | primaryExpCS
+     (
+         navigationOperatorCS primaryExpCS
+     )*
+     | primaryExpCS
+ ;
 
-BooleanLiteralExpCS
-:
-	'true'
-	| 'false'
-;
+ UnaryOperatorCS
+ :
+     '-'
+     | 'not'
+ ;
 
-NullLiteralExpCS
-:
-	'null'
-;
+ primaryExpCS
+ :
+     letExpCS
+     | ifExpCS
+     | primitiveLiteralExpCS
+     | navigatingExpCS
+     | selfExpCS
+     | tupleLiteralExpCS
+     | collectionLiteralExpCS
+     | typeLiteralExpCS
+     | nestedExpCS
+ ;
 
-navigatingExpCS
-:
-	opName = indexExpCS
-	(
-		'@' 'pre'
-	)?
-	(
-		'(' '"'? onespace? arg = navigatingArgCS* commaArg = navigatingCommaArgCS*
-		semiArg = navigatingSemiAgrsCS* barArg = navigatingBarAgrsCS*  '"'? ')'
-	)*
-;
+ nestedExpCS
+ :
+     ('(' exp=expCS+ ')')+
+ ;
 
-navigatingSemiAgrsCS
-:
-	';' var = navigatingArgExpCS
-	(
-		':' typeName = typeExpCS
-	)?
-	(
-		'=' exp = expCS
-	)?
-;
+ ifExpCS
+ :
+     'if' ifexp = expCS+ 'then' thenexp = expCS+ 'else' elseexp = expCS+
+     'endif'
+ ;
 
-navigatingCommaArgCS
-:
-	',' navigatingArgExpCS
-	(
-		':' typeExpCS
-	)?
-	(
-		'=' expCS+
-	)?
-;
+ letExpCS
+ :
+     'let' letVariableCS
+     (
+         ',' letVariableCS
+     )* 'in' in = expCS+
+ ;
 
-navigatingArgExpCS
-:
-	iteratorVariable = infixedExpCS iteratorBarExpCS name = nameExpCS
-	navigationOperatorCS body = infixedExpCS*
-	| infixedExpCS+
-;
+ letVariableCS
+ :
+     name = ID ':' type = typeExpCS '=' exp = expCS+
+ ;
 
-navigatingBarAgrsCS
-:
-	'|' var =navigatingArgExpCS
-	(
-		':' type = typeExpCS
-	)?
-	(
-		'=' expCS+
-	)?
-;
+ typeLiteralExpCS
+ :
+     typeLiteralCS
+ ;
 
-navigatingArgCS
-:
-	navigatingArgExpCS
-	(
-		':' typeExpCS
-	)?
-	(
-		'=' expCS+
-	)?
-;
+ collectionLiteralExpCS
+ :
+     collectionTypeCS '{'
+     (
+         collectionLiteralPartCS
+         (
+             ',' collectionLiteralPartCS
+         )*
+     )? '}'
+ ;
 
-indexExpCS
-:
-	nameExpCS
-	(
-		'[' expCS
-		(
-			',' expCS
-		)* ']'
-	)?
-;
+ collectionLiteralPartCS
+ :
+     expCS
+     (
+         '..' expCS
+     )?
+ ;
 
-nameExpCS
-:
-	(
-		(
-			ID '::'
-			(
-				ID '::'
-			)* ID
-		)
-		| variableName = ID
-		| STRING
-	) # name
-	| '$' clab = ID '$' # ontologicalName
-	| '#' aspect = ID
-	(
-		'('
-		(
-			NumberLiteralExpCS
-			| ID
-		)?
-		(
-			','
-			(
-				NumberLiteralExpCS
-				| ID
-			)
-		)* ')'
-	)? '#' # linguisticalName
-;
+ tupleLiteralExpCS
+ :
+     'Tuple' '{' tupleLiteralPartCS
+     (
+         ',' tupleLiteralPartCS
+     )* '}'
+ ;
 
-parameterCS
-:
-	(
-		ID ':'
-	)? typeExpCS
-;
+ tupleLiteralPartCS
+ :
+     ID
+     (
+         ':' typeExpCS
+     )? '=' expCS
+ ;
 
-invCS
-:
-	'inv'
-	(
-		ID
-		(
-			'(' specificationCS ')'
-		)?
-	)? ':' specificationCS
-;
+ selfExpCS
+ :
+     'self'
+ ;
 
-classifierContextCS
-:
-	CONTEXT levelSpecificationCS?
-	(
-		ID ':'
-	)?
-	(
-		(
-			ID '::'
-			(
-				ID '::'
-			)* ID
-		)
-		| ID
-	)
-	(
-		invCS
-		| defCS
-	)*
-;
+ primitiveLiteralExpCS
+ :
+     NumberLiteralExpCS # number
+     | STRING # string
+     | BooleanLiteralExpCS # boolean
+     | InvalIDLiteralExpCS # invalid
+     | NullLiteralExpCS # null
+ ;
 
-propertyContextDeclCS
-:
-	CONTEXT levelSpecificationCS?
-	(
-		(
-			ID '::'
-			(
-				ID '::'
-			)* ID
-		)
-		| ID
-	) ':' typeExpCS
-	(
-		(
-			initCS derCS?
-		)?
-		| derCS initCS?
-	)
-;
+ InvalIDLiteralExpCS
+ :
+     'invalid'
+ ;
 
-derCS
-:
-	'derive' ':' specificationCS
-;
+ NumberLiteralExpCS
+ :
+     INT
+     (
+         '.' INT
+     )?
+     (
+         (
+             'e'
+             | 'E'
+         )
+         (
+             '+'
+             | '-'
+         )? INT
+     )?
+ ;
 
-initCS
-:
-	'init' ':' specificationCS
-;
+ fragment
+ DIGIT
+ :
+     [0-9]
+ ;
 
-ID
-:
-	[a-zA-Z] [a-zA-Z0-9]*
-;
+ INT
+ :
+     DIGIT+
+ ;
 
-WS
-:
-	[ \t\n\r]+ -> skip
-;
+ BooleanLiteralExpCS
+ :
+     'true'
+     | 'false'
+ ;
 
-onespace
-:
-	ONESPACE
-;
+ NullLiteralExpCS
+ :
+     'null'
+ ;
 
-ONESPACE
-:
-	' '
-;
+ navigatingExpCS
+ :
+     opName = indexExpCS
+     (
+         '@' 'pre'
+     )?
+     (
+         '(' '"'? onespace? arg = navigatingArgCS* commaArg =
+         navigatingCommaArgCS* semiArg = navigatingSemiAgrsCS* barArg =
+         navigatingBarAgrsCS* '"'? ')'
+     )*
+ ;
 
-STRING
-  : UnterminatedStringLiteral '"'
-  ;
+ navigatingSemiAgrsCS
+ :
+     ';' var = navigatingArgExpCS
+     (
+         ':' typeName = typeExpCS
+     )?
+     (
+         '=' exp = expCS
+     )?
+ ;
 
-UnterminatedStringLiteral
-  : '"' (~["\\\r\n] | '\\' (. | EOF))*
-  ;
+ navigatingCommaArgCS
+ :
+     ',' navigatingArgExpCS
+     (
+         ':' typeExpCS
+     )?
+     (
+         '=' expCS+
+     )?
+ ;
 
-COMMENT
-:
-	'--' .*? '\n' -> skip
-;
+ navigatingArgExpCS
+ :
+     iteratorVariable = infixedExpCS iteratorBarExpCS name = nameExpCS
+     navigationOperatorCS body = infixedExpCS*
+     | infixedExpCS+
+ ;
+
+ navigatingBarAgrsCS
+ :
+     '|' var = navigatingArgExpCS
+     (
+         ':' type = typeExpCS
+     )?
+     (
+         '=' expCS+
+     )?
+ ;
+
+ navigatingArgCS
+ :
+     navigatingArgExpCS
+     (
+         ':' typeExpCS
+     )?
+     (
+         '=' expCS+
+     )?
+ ;
+
+ indexExpCS
+ :
+     nameExpCS
+     (
+         '[' expCS
+         (
+             ',' expCS
+         )* ']'
+     )?
+ ;
+
+ nameExpCS
+ :
+     (
+         (
+             ID '::'
+             (
+                 ID '::'
+             )* ID
+         )
+         | variableName = ID
+         | STRING
+     ) # name
+     | '$' clab = ID '$' # ontologicalName
+     | '#' aspect = ID
+     (
+         '('
+         (
+             NumberLiteralExpCS
+             | ID
+         )?
+         (
+             ','
+             (
+                 NumberLiteralExpCS
+                 | ID
+             )
+         )* ')'
+     )? '#' # linguisticalName
+ ;
+
+ parameterCS
+ :
+     (
+         ID ':'
+     )? typeExpCS
+ ;
+
+ invCS
+ :
+     'inv'
+     (
+         ID
+         (
+             '(' specificationCS ')'
+         )?
+     )? ':' specificationCS
+ ;
+
+ classifierContextCS
+ :
+     CONTEXT levelSpecificationCS?
+     (
+         ID ':'
+     )?
+     (
+         (
+             ID '::'
+             (
+                 ID '::'
+             )* ID
+         )
+         | ID
+     )
+     (
+         invCS
+         | defCS
+     )*
+ ;
+
+ propertyContextDeclCS
+ :
+     CONTEXT levelSpecificationCS?
+     (
+         (
+             ID '::'
+             (
+                 ID '::'
+             )* ID
+         )
+         | ID
+     ) ':' typeExpCS
+     (
+         (
+             initCS derCS?
+         )?
+         | derCS initCS?
+     )
+ ;
+
+ derCS
+ :
+     'derive' ':' specificationCS
+ ;
+
+ initCS
+ :
+     'init' ':' specificationCS
+ ;
+
+ ID
+ :
+     [a-zA-Z] [a-zA-Z0-9]*
+ ;
+
+ WS
+ :
+     [ \t\n\r]+ -> skip
+ ;
+
+ onespace
+ :
+     ONESPACE
+ ;
+
+ ONESPACE
+ :
+     ' '
+ ;
+
+ STRING
+ :
+     UnterminatedStringLiteral '"'
+ ;
+
+ UnterminatedStringLiteral
+ :
+     '"'
+     (
+         ~["\\\r\n]
+         | '\\'
+         (
+             .
+             | EOF
+         )
+     )*
+ ;
+
+ COMMENT
+ :
+     '--' .*? '\n' -> skip
+ ;
