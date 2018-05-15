@@ -30,20 +30,13 @@ import org.melanee.core.models.plm.PLM.Enumeration;
 import org.melanee.core.models.plm.PLM.Feature;
 import org.melanee.core.models.plm.PLM.Level;
 import org.melanee.core.models.plm.PLM.PLMPackage;
-import org.melanee.ocl2.models.definition.constraint.BodyConstraint;
 import org.melanee.ocl2.models.definition.constraint.Constraint;
 import org.melanee.ocl2.models.definition.constraint.ConstraintFactory;
 import org.melanee.ocl2.models.definition.constraint.ConstraintPackage;
-import org.melanee.ocl2.models.definition.constraint.DefinitionConstraint;
-import org.melanee.ocl2.models.definition.constraint.DeriveConstraint;
 import org.melanee.ocl2.models.definition.constraint.Expression;
-import org.melanee.ocl2.models.definition.constraint.InitConstraint;
 import org.melanee.ocl2.models.definition.constraint.InvariantConstraint;
 import org.melanee.ocl2.models.definition.constraint.Pointer;
-import org.melanee.ocl2.models.definition.constraint.PostConstraint;
-import org.melanee.ocl2.models.definition.constraint.PreConstraint;
 import org.melanee.ocl2.models.definition.constraint.Text;
-import org.omg.CORBA._PolicyStub;
 
 public class DeepOclPersistenceService {
 

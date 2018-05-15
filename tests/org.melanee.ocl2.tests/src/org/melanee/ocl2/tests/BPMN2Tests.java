@@ -1,9 +1,6 @@
 package org.melanee.ocl2.tests;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
+import static org.junit.Assert.assertEquals;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -30,39 +27,42 @@ public class BPMN2Tests {
   Level level0;
   Level level1;
   Level level2;
-  Clabject InteractionNode;
-  Clabject ThrowEvent;
-  Clabject CatchEvent;
-  Clabject StartEvent;
-  Clabject EndEvent;
+  Clabject interactionNode;
+  Clabject throwEvent;
+  Clabject catchEvent;
+  Clabject startEvent;
+  Clabject endEvent;
   Clabject hungryForPizza;
   Clabject hungerSatisfied;
-  Clabject MessageStartEvent;
-  Clabject Activity;
-  Clabject Task;
-  Clabject OrderPizza;
+  Clabject messageStartEvent;
+  Clabject activity;
+  Clabject task;
+  Clabject orderPizza;
   Connection connection1;
 
+  /**
+   * set up tests.
+   */
   @Before
   public void setUp() {
-    this.InteractionNode = PLMFactory.eINSTANCE.createEntity();
-    this.InteractionNode.setName("InteractionNode");
-    this.ThrowEvent = PLMFactory.eINSTANCE.createEntity();
-    this.ThrowEvent.setName("ThrowEvent");
-    this.MessageStartEvent = PLMFactory.eINSTANCE.createEntity();
-    this.MessageStartEvent.setName("MessageStartEvent");
-    this.CatchEvent = PLMFactory.eINSTANCE.createEntity();
-    this.CatchEvent.setName("CatchEvent");
-    this.StartEvent = PLMFactory.eINSTANCE.createEntity();
-    this.StartEvent.setName("StartEvent");
-    this.EndEvent = PLMFactory.eINSTANCE.createEntity();
-    this.EndEvent.setName("EndEvent");
-    this.Task = PLMFactory.eINSTANCE.createEntity();
-    this.Task.setName("Task");
-    this.Activity = PLMFactory.eINSTANCE.createEntity();
-    this.Activity.setName("Activity");
-    this.OrderPizza = PLMFactory.eINSTANCE.createEntity();
-    this.OrderPizza.setName("OrderPizza");
+    this.interactionNode = PLMFactory.eINSTANCE.createEntity();
+    this.interactionNode.setName("InteractionNode");
+    this.throwEvent = PLMFactory.eINSTANCE.createEntity();
+    this.throwEvent.setName("ThrowEvent");
+    this.messageStartEvent = PLMFactory.eINSTANCE.createEntity();
+    this.messageStartEvent.setName("MessageStartEvent");
+    this.catchEvent = PLMFactory.eINSTANCE.createEntity();
+    this.catchEvent.setName("CatchEvent");
+    this.startEvent = PLMFactory.eINSTANCE.createEntity();
+    this.startEvent.setName("StartEvent");
+    this.endEvent = PLMFactory.eINSTANCE.createEntity();
+    this.endEvent.setName("EndEvent");
+    this.task = PLMFactory.eINSTANCE.createEntity();
+    this.task.setName("Task");
+    this.activity = PLMFactory.eINSTANCE.createEntity();
+    this.activity.setName("Activity");
+    this.orderPizza = PLMFactory.eINSTANCE.createEntity();
+    this.orderPizza.setName("OrderPizza");
     this.dm = PLMFactory.eINSTANCE.createDeepModel();
     this.level0 = PLMFactory.eINSTANCE.createLevel();
     this.level1 = PLMFactory.eINSTANCE.createLevel();
@@ -71,14 +71,14 @@ public class BPMN2Tests {
     this.dm.getContent().add(this.level0);
     this.dm.getContent().add(this.level1);
 
-    this.level0.getContent().add(this.CatchEvent);
-    this.level0.getContent().add(this.ThrowEvent);
-    this.level0.getContent().add(this.InteractionNode);
-    this.level0.getContent().add(this.StartEvent);
-    this.level0.getContent().add(this.EndEvent);
-    this.level0.getContent().add(this.MessageStartEvent);
-    this.level0.getContent().add(this.Activity);
-    this.level0.getContent().add(this.Task);
+    this.level0.getContent().add(this.catchEvent);
+    this.level0.getContent().add(this.throwEvent);
+    this.level0.getContent().add(this.interactionNode);
+    this.level0.getContent().add(this.startEvent);
+    this.level0.getContent().add(this.endEvent);
+    this.level0.getContent().add(this.messageStartEvent);
+    this.level0.getContent().add(this.activity);
+    this.level0.getContent().add(this.task);
 
     // Connection Interaction Node
     this.connection1 = PLMFactory.eINSTANCE.createConnection();
@@ -88,8 +88,8 @@ public class BPMN2Tests {
     ConnectionEnd send = PLMFactory.eINSTANCE.createConnectionEnd();
     receive.setMoniker("receive");
     send.setMoniker("send");
-    receive.setDestination(this.InteractionNode);
-    send.setDestination(this.InteractionNode);
+    receive.setDestination(this.interactionNode);
+    send.setDestination(this.interactionNode);
     receive.setNavigable(true);
     send.setNavigable(false);
     send.setConnection(this.connection1);
@@ -101,16 +101,16 @@ public class BPMN2Tests {
     Subtype subActivity = PLMFactory.eINSTANCE.createSubtype();
     Subtype subCatch = PLMFactory.eINSTANCE.createSubtype();
     Supertype sup = PLMFactory.eINSTANCE.createSupertype();
-    Inheritance InteractionThrowCatch = PLMFactory.eINSTANCE.createInheritance();
-    InteractionThrowCatch.getSubtype().add(subThrow);
-    InteractionThrowCatch.getSubtype().add(subActivity);
-    InteractionThrowCatch.getSubtype().add(subCatch);
-    InteractionThrowCatch.getSupertype().add(sup);
-    subThrow.setSubtype(this.ThrowEvent);
-    subActivity.setSubtype(this.Activity);
-    subCatch.setSubtype(this.CatchEvent);
-    sup.setSupertype(this.InteractionNode);
-    this.level0.getContent().add(InteractionThrowCatch);
+    Inheritance interactionThrowCatch = PLMFactory.eINSTANCE.createInheritance();
+    interactionThrowCatch.getSubtype().add(subThrow);
+    interactionThrowCatch.getSubtype().add(subActivity);
+    interactionThrowCatch.getSubtype().add(subCatch);
+    interactionThrowCatch.getSupertype().add(sup);
+    subThrow.setSubtype(this.throwEvent);
+    subActivity.setSubtype(this.activity);
+    subCatch.setSubtype(this.catchEvent);
+    sup.setSupertype(this.interactionNode);
+    this.level0.getContent().add(interactionThrowCatch);
 
     // SuperSubTypes ThrowEvent -> EndEvent
     Subtype subEnd = PLMFactory.eINSTANCE.createSubtype();
@@ -118,8 +118,8 @@ public class BPMN2Tests {
     Inheritance throwEnd = PLMFactory.eINSTANCE.createInheritance();
     throwEnd.getSubtype().add(subEnd);
     throwEnd.getSupertype().add(superThrow);
-    subEnd.setSubtype(this.EndEvent);
-    superThrow.setSupertype(this.ThrowEvent);
+    subEnd.setSubtype(this.endEvent);
+    superThrow.setSupertype(this.throwEvent);
     this.level0.getContent().add(throwEnd);
 
     // SuperSubTypes CatchEvent -> StartEvent
@@ -128,8 +128,8 @@ public class BPMN2Tests {
     Inheritance catchStart = PLMFactory.eINSTANCE.createInheritance();
     catchStart.getSubtype().add(subStart);
     catchStart.getSupertype().add(superCatch);
-    subStart.setSubtype(this.StartEvent);
-    superCatch.setSupertype(this.CatchEvent);
+    subStart.setSubtype(this.startEvent);
+    superCatch.setSupertype(this.catchEvent);
     this.level0.getContent().add(catchStart);
 
     // SuperSubTypes StartEvent -> MessageStartEvent
@@ -138,8 +138,8 @@ public class BPMN2Tests {
     Inheritance startMessage = PLMFactory.eINSTANCE.createInheritance();
     startMessage.getSubtype().add(messageStart);
     startMessage.getSupertype().add(startEventSup);
-    messageStart.setSubtype(this.MessageStartEvent);
-    startEventSup.setSupertype(this.StartEvent);
+    messageStart.setSubtype(this.messageStartEvent);
+    startEventSup.setSupertype(this.startEvent);
     this.level0.getContent().add(startMessage);
 
     // SuperSubTypes Activity -> Task
@@ -148,8 +148,8 @@ public class BPMN2Tests {
     Inheritance activityTask = PLMFactory.eINSTANCE.createInheritance();
     activityTask.getSubtype().add(subTask);
     activityTask.getSupertype().add(supActivity);
-    subTask.setSubtype(this.Task);
-    supActivity.setSupertype(this.Activity);
+    subTask.setSubtype(this.task);
+    supActivity.setSupertype(this.activity);
     this.level0.getContent().add(activityTask);
 
     // level 1
@@ -161,45 +161,48 @@ public class BPMN2Tests {
 
     this.level1.getContent().add(this.hungerSatisfied);
     this.level1.getContent().add(this.hungryForPizza);
-    this.level1.getContent().add(this.OrderPizza);
+    this.level1.getContent().add(this.orderPizza);
 
     Classification startEvent = PLMFactory.eINSTANCE.createClassification();
     startEvent.setInstance(this.hungryForPizza);
-    startEvent.setType(this.MessageStartEvent);
+    startEvent.setType(this.messageStartEvent);
     this.level1.getContent().add(startEvent);
 
     Classification endEvent = PLMFactory.eINSTANCE.createClassification();
     endEvent.setInstance(this.hungerSatisfied);
-    endEvent.setType(this.EndEvent);
+    endEvent.setType(this.endEvent);
     this.level1.getContent().add(endEvent);
 
     Classification taskOrder = PLMFactory.eINSTANCE.createClassification();
-    taskOrder.setInstance(this.OrderPizza);
-    taskOrder.setType(this.Task);
+    taskOrder.setInstance(this.orderPizza);
+    taskOrder.setType(this.task);
     this.level1.getContent().add(taskOrder);
 
   }
 
+  /**
+   * destroy all elements after tests.
+   */
   @After
   public void destroy() {
-    this.InteractionNode = null;
-    this.ThrowEvent = null;
-    this.CatchEvent = null;
-    this.StartEvent = null;
-    this.EndEvent = null;
+    this.interactionNode = null;
+    this.throwEvent = null;
+    this.catchEvent = null;
+    this.startEvent = null;
+    this.endEvent = null;
     this.dm = null;
     this.level0 = null;
     this.level2 = null;
     this.level1 = null;
     this.hungerSatisfied = null;
     this.hungryForPizza = null;
-    this.Activity = null;
+    this.activity = null;
     this.connection1 = null;
-    this.MessageStartEvent = null;
+    this.messageStartEvent = null;
   }
 
   @Test
-  public void MessageFlowConstraintTest() {
+  public void messageFlowConstraintTest() {
     Connection startToEnd = PLMFactory.eINSTANCE.createConnection();
     ConnectionEnd start = PLMFactory.eINSTANCE.createConnectionEnd();
     ConnectionEnd end = PLMFactory.eINSTANCE.createConnectionEnd();
@@ -216,7 +219,7 @@ public class BPMN2Tests {
 
     Classification interactionConnection = PLMFactory.eINSTANCE.createClassification();
     interactionConnection.setInstance(startToEnd);
-    interactionConnection.setType(connection1);
+    interactionConnection.setType(this.connection1);
     this.level1.getContent().add(interactionConnection);
 
     this.level1.getContent().add(startToEnd);
@@ -231,7 +234,7 @@ public class BPMN2Tests {
   }
 
   @Test
-  public void MessageFlowConstraintTest1() {
+  public void messageFlowConstraintTest1() {
     Connection startToEnd = PLMFactory.eINSTANCE.createConnection();
     ConnectionEnd start = PLMFactory.eINSTANCE.createConnectionEnd();
     ConnectionEnd end = PLMFactory.eINSTANCE.createConnectionEnd();
@@ -308,7 +311,7 @@ public class BPMN2Tests {
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("self.isDeepKindOf(Activity)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.OrderPizza);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.orderPizza);
     Object returnValue = visitor.visit(tree);
     assertEquals(true, Boolean.parseBoolean(returnValue.toString()));
   }
@@ -318,7 +321,7 @@ public class BPMN2Tests {
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("self.isDeepKindOf(Task)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.OrderPizza);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.orderPizza);
     Object returnValue = visitor.visit(tree);
     assertEquals(true, Boolean.parseBoolean(returnValue.toString()));
   }
@@ -329,13 +332,13 @@ public class BPMN2Tests {
         new ANTLRInputStream("self.isDeepKindOf(ThrowWEvent)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.OrderPizza);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.orderPizza);
     Object returnValue = visitor.visit(tree);
     assertEquals(false, Boolean.parseBoolean(returnValue.toString()));
   }
 
   @Test
-  public void MessageFlowConstraintTaskToStartTrue() {
+  public void messageFlowConstraintTaskToStartTrue() {
     Connection startToEnd = PLMFactory.eINSTANCE.createConnection();
     ConnectionEnd start = PLMFactory.eINSTANCE.createConnectionEnd();
     ConnectionEnd end = PLMFactory.eINSTANCE.createConnectionEnd();
@@ -345,7 +348,7 @@ public class BPMN2Tests {
 
     start.setConnection(startToEnd);
     end.setConnection(startToEnd);
-    end.setDestination(this.OrderPizza);
+    end.setDestination(this.orderPizza);
     start.setDestination(this.hungryForPizza);
     end.setNavigable(true);
     start.setNavigable(false);
@@ -365,9 +368,9 @@ public class BPMN2Tests {
     Object returnValue = visitor.visit(tree);
     assertEquals(true, Boolean.parseBoolean(returnValue.toString()));
   }
-  
+
   @Test
-  public void MessageFlowConstraintSendFromStartFalse() {
+  public void messageFlowConstraintSendFromStartFalse() {
     Connection startToEnd = PLMFactory.eINSTANCE.createConnection();
     ConnectionEnd start = PLMFactory.eINSTANCE.createConnectionEnd();
     ConnectionEnd end = PLMFactory.eINSTANCE.createConnectionEnd();
@@ -377,7 +380,7 @@ public class BPMN2Tests {
 
     start.setConnection(startToEnd);
     end.setConnection(startToEnd);
-    end.setDestination(this.OrderPizza);
+    end.setDestination(this.orderPizza);
     start.setDestination(this.hungryForPizza);
     end.setNavigable(true);
     start.setNavigable(false);
@@ -389,8 +392,8 @@ public class BPMN2Tests {
 
     this.level1.getContent().add(startToEnd);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "not(self.send -> forAll(r|r.isDeepKindOf(CatchEvent)))"));
+    DeepOclLexer oclLexer = new DeepOclLexer(
+        new ANTLRInputStream("not(self.send -> forAll(r|r.isDeepKindOf(CatchEvent)))"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(startToEnd);
