@@ -162,7 +162,7 @@ public class OCLService implements IConstraintLanguageService {
   }
 
   @Override
-  public Command initAttrbute(Attribute attribute) {
+  public Command initAttribute(Attribute attribute) {
     return null;
   }
 

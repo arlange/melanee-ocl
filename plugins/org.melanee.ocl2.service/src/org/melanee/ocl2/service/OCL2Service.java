@@ -14,6 +14,7 @@ package org.melanee.ocl2.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -89,14 +90,29 @@ public class OCL2Service implements IConstraintLanguageService {
   @Override
   public Object evaluate(Object context, String expression) throws Exception {
     // TODO Auto-generated method stub
-    return null;
+    return evaluate(context, context, expression);
   }
 
   @Override
   public Object evaluate(Object definitionContext, Object context, String expression)
       throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    Clabject clabject;
+    if (context instanceof Clabject) {
+      clabject = (Clabject) context;
+      DeepOclLexer ocl2Lexer = new DeepOclLexer(new ANTLRInputStream(expression));
+      DeepOclParser parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
+      ParseTree tree = parser.specificationCS();
+      DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+      try {
+        Object result = visitor.visit(tree).toString();
+        Boolean booleanResult = Boolean.parseBoolean(result.toString());
+        return booleanResult;
+      } catch (Exception e) {
+        return new OclInvalid();
+      }
+    } else {
+      return new OclInvalid();
+    }
   }
 
   /**
@@ -847,7 +863,7 @@ public class OCL2Service implements IConstraintLanguageService {
   }
 
   @Override
-  public Command initAttrbute(Attribute attribute) {
+  public Command initAttribute(Attribute attribute) {
     // new instance of the SearchAlgorithmClass
     ConstraintSearchAlgorithm searchAlgo = new ConstraintSearchAlgorithm();
     // get EditingDomain
@@ -891,8 +907,15 @@ public class OCL2Service implements IConstraintLanguageService {
                 DeepOclLexer ocl2Lexer = new DeepOclLexer(new ANTLRInputStream(oclExpression));
                 DeepOclParser parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
                 ParseTree tree = parser.derCS();
-                DeepOclRuleVisitor visitor = new DeepOclRuleVisitor((Attribute) attr);
+                DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(
+                    ((Attribute) attr).getClabject());
                 Object result = visitor.visit(tree);
+                if (result instanceof Collection) {
+                  result = ((Collection) result).toArray()[0];
+                }
+                if (result instanceof Attribute) {
+                  result = ((Attribute) result).getValue();
+                }
                 Attribute toChange = (Attribute) attr;
                 editingDomain = TransactionUtil.getEditingDomain(toChange);
                 cmd.append(DeepOCL2Util.createSetCommandForValue(editingDomain, toChange, result));

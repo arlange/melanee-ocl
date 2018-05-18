@@ -303,8 +303,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         }
         this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
         return returnList;
-      }
-      else if (element instanceof Clabject) {
+      } else if (element instanceof Clabject) {
         for (Feature feature : ((Clabject) element).getFeature()) {
           if (feature instanceof Attribute) {
             Attribute attr = (Attribute) feature;
@@ -373,6 +372,10 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
                 }
               }
             }
+          } else if (connection.getName() != null && connection.getName().equals(target)) {
+            returnList.add(connection);
+            this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
+            return returnList;
           }
         }
         // if the list is empty, let's try to find a navigation on the
@@ -445,7 +448,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
               .push(new Tuple<String, Collection<Element>>("Connections", connectionList));
           return connectionList;
         }
-      } 
+      }
     }
     return returnList.size() == 0 ? null : returnList;
   }
@@ -537,7 +540,6 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   public Object oclAsType(String target) {
-    Boolean isTypeOf = true;
     try {
       Class<?> clazz;
       if (target.equals("Clabject")) {
@@ -552,7 +554,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       e1.printStackTrace();
       return new OclInvalid();
     }
-    return isTypeOf;
+    return true;
   }
 
   @Override
@@ -632,11 +634,12 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       Clabject context = (Clabject) this.context;
       for (Element type : context.getDirectTypes()) {
         Clabject clab = (Clabject) type;
-        // is there is no name of the clabject a NullPointer will be thrown. Like connection without a name
+        // is there is no name of the clabject a NullPointer will be thrown. Like
+        // connection without a name
         try {
           if (clab.getName().equals(text)) {
             result = true;
-          }  
+          }
         } catch (Exception e) {
           // TODO: handle exception
         }
@@ -797,8 +800,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return ((Collection<?>) arg[0]).size();
   }
 
-  private Integer sum(Object[] arg) {
-    return (Integer) CollectionUtil.sum((Collection<?>) arg[0]);
+  private Number sum(Object[] arg) {
+    return (Number) CollectionUtil.sum((Collection<?>) arg[0]);
   }
 
   /**
@@ -922,6 +925,55 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     }
   }
 
+  public Boolean eval(Object right, String operator) throws InterpreterException {
+    if (right instanceof Collection) {
+      right = ((Collection) right).toArray()[0];
+    }
+    if (right instanceof Attribute) {
+      Attribute attribute = (Attribute) right;
+      if (this.navigationStack.peek().getSecond() != null
+          && this.navigationStack.peek().getSecond().size() == 1) {
+        Map<String, String> expressionMap = new HashMap<>();
+        expressionMap.put("right", attribute.getValue());
+        expressionMap.put("operator", operator);
+        return castAndCompare((Attribute) this.navigationStack.peek().getSecond().toArray()[0],
+            expressionMap);
+      } else {
+        throw new InterpreterException("tried to access an attribute from a collection?");
+      }
+    } else if (right instanceof String) {
+      return eval((String) right, operator);
+    } else if (right instanceof Number) {
+      return eval(right.toString(), operator);
+    } else {
+      throw new InterpreterException("did not work");
+    }
+  }
+
+  public Boolean eval(Object left, Object right, String operator) throws InterpreterException {
+    if (right instanceof Collection) {
+      right = ((Collection) right).toArray()[0];
+    }
+    if (left instanceof Collection) {
+      left = ((Collection) left).toArray()[0];
+    }
+    if (right instanceof Attribute && left instanceof Attribute) {
+      Attribute attributeRight = (Attribute) right;
+      Attribute attributeLeft = (Attribute) left;
+      Map<String, String> expressionMap = new HashMap<>();
+      expressionMap.put("right", attributeRight.getValue());
+      expressionMap.put("operator", operator);
+      return castAndCompare(attributeLeft, expressionMap);
+
+    } else if (right instanceof String) {
+      return eval((String) right, operator);
+    } else if (right instanceof Number) {
+      return eval(right.toString(), operator);
+    } else {
+      throw new InterpreterException("did not work");
+    }
+  }
+
   public Boolean eval(String left, String right, String operator) throws InterpreterException {
     if (operator.contains("<") || operator.contains(">") || operator.contains(">=")
         || operator.contains("<=") || operator.contains("=")) {
@@ -988,59 +1040,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    * @return
    */
   private Collection<?> collect(Object[] arg) {
-    Collection<?> collection = (Collection<?>) arg[0];
-    String expression = (String) arg[1];
-    Collection<?> returnCollection = new ArrayList<>();
-    if (!collection.isEmpty()) {
-      Clabject clabject = (Clabject) collection.toArray()[0];
-      Attribute a = (Attribute) clabject.getFeatureForName(expression);
-      if (a.getDatatype().equals("Integer")) {
-        List<Integer> integerCollection = new ArrayList<>();
-        Iterator<?> it = collection.iterator();
-        while (it.hasNext()) {
-          Clabject c = (Clabject) it.next();
-          integerCollection
-              .add(Integer.parseInt(((Attribute) c.getFeatureForName(expression)).getValue()));
-        }
-        return integerCollection;
-      } else if (a.getDatatype().equals("Real")) {
-        List<Double> doubleCollection = new ArrayList<>();
-        Iterator<?> it = collection.iterator();
-        while (it.hasNext()) {
-          Clabject c = (Clabject) it.next();
-          doubleCollection
-              .add(Double.parseDouble(((Attribute) c.getFeatureForName(expression)).getValue()));
-        }
-        return doubleCollection;
-      } else if (a.getDatatype().equals("Natural")) {
-        List<Integer> integerCollection = new ArrayList<>();
-        Iterator<?> it = collection.iterator();
-        while (it.hasNext()) {
-          Clabject c = (Clabject) it.next();
-          integerCollection
-              .add(Integer.parseInt(((Attribute) c.getFeatureForName(expression)).getValue()));
-        }
-        return integerCollection;
-      } else if (a.getDatatype().equals("String")) {
-        List<String> stringCollection = new ArrayList<>();
-        Iterator<?> it = collection.iterator();
-        while (it.hasNext()) {
-          Clabject c = (Clabject) it.next();
-          stringCollection.add(((Attribute) c.getFeatureForName(expression)).getValue());
-        }
-        return stringCollection;
-      } else if (a.getDatatype().equals("Boolean")) {
-        List<Boolean> booleanCollection = new ArrayList<>();
-        Iterator<?> it = collection.iterator();
-        while (it.hasNext()) {
-          Clabject c = (Clabject) it.next();
-          booleanCollection
-              .add(Boolean.parseBoolean(((Attribute) c.getFeatureForName(expression)).getValue()));
-        }
-        return booleanCollection;
-      }
-    }
-    return returnCollection;
+    return null;
   }
 
   /**

@@ -297,36 +297,27 @@ public class DeepOclClabjectWrapperTest {
 
   }
 
-  @Test
-  public void collectTest() {
-    Clabject transaction = PLMFactory.eINSTANCE.createEntity();
-    transaction.setName("Transaction");
-    Attribute points = PLMFactory.eINSTANCE.createAttribute();
-    points.setName("points");
-    points.setDatatype("Integer");
-    points.setValue("103");
-    transaction.getFeature().add(points);
-
-    Attribute points1 = PLMFactory.eINSTANCE.createAttribute();
-    points1.setName("points");
-    points1.setDatatype("Integer");
-    points1.setValue("99");
-    this.clabject.getFeature().add(points1);
-
-    List<Clabject> collection = new ArrayList<>();
-    collection.add(transaction);
-    collection.add(this.clabject);
-    this.args = new Object[2];
-    this.args[0] = collection;
-    this.args[1] = "points";
-    try {
-      assertEquals(((Collection<?>) this.wrapper.invoke("collect", args)).size(), 2);
-      assertEquals(((Collection<?>) this.wrapper.invoke("collect", args)).toArray()[0], 103);
-    } catch (Exception e) {
-      fail("something went wrong in the try/catch block");
-      e.printStackTrace();
-    }
-  }
+  /**
+   * @Test public void collectTest() { Clabject transaction =
+   *       PLMFactory.eINSTANCE.createEntity();
+   *       transaction.setName("Transaction"); Attribute points =
+   *       PLMFactory.eINSTANCE.createAttribute(); points.setName("points");
+   *       points.setDatatype("Integer"); points.setValue("103");
+   *       transaction.getFeature().add(points);
+   * 
+   *       Attribute points1 = PLMFactory.eINSTANCE.createAttribute();
+   *       points1.setName("points"); points1.setDatatype("Integer");
+   *       points1.setValue("99"); this.clabject.getFeature().add(points1);
+   * 
+   *       List<Clabject> collection = new ArrayList<>();
+   *       collection.add(transaction); collection.add(this.clabject); this.args =
+   *       new Object[2]; this.args[0] = collection; this.args[1] = "points"; try
+   *       { assertEquals(((Collection<?>) this.wrapper.invoke("collect",
+   *       args)).size(), 2); assertEquals(((Collection<?>)
+   *       this.wrapper.invoke("collect", args)).toArray()[0], 103); } catch
+   *       (Exception e) { fail("something went wrong in the try/catch block");
+   *       e.printStackTrace(); } }
+   */
 
   @Test
   public void anyTest() {

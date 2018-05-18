@@ -119,7 +119,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   private boolean isDerive;
   private boolean isDef;
   private boolean isInit;
-  private Collection<Element> tempCollection;
+  private Collection<?> tempCollection;
   private String tempString;
   private Collection<?> parameters;
   private Integer startLevel;
@@ -484,7 +484,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
 
           }
         }
-
         // last
         else if (ctx.opName.getText().equals("last")) {
           if (this.tempCollection != null && this.tempCollection.size() > 0) {
@@ -505,7 +504,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         // is Empty
         else if (ctx.opName.getText().equals("isEmpty")) {
           if (this.tempCollection != null) {
-            Collection<Element> list = this.tempCollection;
+            Collection<Element> list = (Collection<Element>) this.tempCollection;
             this.tempCollection = null;
             return list.isEmpty();
           } else if (this.wrapper.getNavigationStack().peek().getSecond() != null) {
@@ -517,7 +516,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         // notEmpty
         else if (ctx.opName.getText().equals("notEmpty")) {
           if (this.tempCollection != null) {
-            Collection<Element> list = this.tempCollection;
+            Collection<Element> list = (Collection<Element>) this.tempCollection;
             this.tempCollection = null;
             return !list.isEmpty();
           } else if (this.wrapper.getNavigationStack().peek().getSecond() != null) {
@@ -526,12 +525,71 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             return new OclInvalid();
           }
         }
+        // collect
+        else if (ctx.opName.getText().equals("collect")) {
+          Collection<?> collection = this.wrapper.getNavigationStack().peek().getSecond();
+          String expression = ctx.arg.getText();
+          Collection<?> returnCollection = new ArrayList<>();
+          if (!collection.isEmpty()) {
+            Clabject clabject = (Clabject) collection.toArray()[0];
+            Attribute a = (Attribute) clabject.getFeatureForName(expression);
+            if (a.getDatatype().equals("Integer")) {
+              List<Integer> integerCollection = new ArrayList<>();
+              Iterator<?> it = collection.iterator();
+              while (it.hasNext()) {
+                Clabject c = (Clabject) it.next();
+                integerCollection.add(
+                    Integer.parseInt(((Attribute) c.getFeatureForName(expression)).getValue()));
+              }
+              this.tempCollection = integerCollection;
+              return this.tempCollection;
+            } else if (a.getDatatype().equals("Real")) {
+              List<Double> doubleCollection = new ArrayList<>();
+              Iterator<?> it = collection.iterator();
+              while (it.hasNext()) {
+                Clabject c = (Clabject) it.next();
+                doubleCollection.add(
+                    Double.parseDouble(((Attribute) c.getFeatureForName(expression)).getValue()));
+              }
+              this.tempCollection = doubleCollection;
+              return this.tempCollection;
+            } else if (a.getDatatype().equals("Natural")) {
+              List<Integer> integerCollection = new ArrayList<>();
+              Iterator<?> it = collection.iterator();
+              while (it.hasNext()) {
+                Clabject c = (Clabject) it.next();
+                integerCollection.add(
+                    Integer.parseInt(((Attribute) c.getFeatureForName(expression)).getValue()));
+              }
+              this.tempCollection = integerCollection;
+              return this.tempCollection;
+            } else if (a.getDatatype().equals("String")) {
+              List<String> stringCollection = new ArrayList<>();
+              Iterator<?> it = collection.iterator();
+              while (it.hasNext()) {
+                Clabject c = (Clabject) it.next();
+                stringCollection.add(((Attribute) c.getFeatureForName(expression)).getValue());
+              }
+              return stringCollection;
+            } else if (a.getDatatype().equals("Boolean")) {
+              List<Boolean> booleanCollection = new ArrayList<>();
+              Iterator<?> it = collection.iterator();
+              while (it.hasNext()) {
+                Clabject c = (Clabject) it.next();
+                booleanCollection.add(
+                    Boolean.parseBoolean(((Attribute) c.getFeatureForName(expression)).getValue()));
+              }
+              this.tempCollection = booleanCollection;
+              return this.tempCollection;
+            }
+          }
+        }
         // sum
         else if (ctx.opName.getText().equals("sum")) {
           Object[] arg = new Object[1];
           Attribute attr = PLMFactory.eINSTANCE.createAttribute();
           if (this.tempCollection != null && this.tempCollection.size() > 0) {
-            Collection<Element> list = tempCollection;
+            Collection<Element> list = (Collection<Element>) tempCollection;
             tempCollection = null;
             arg[0] = list;
           } else if (this.wrapper.getNavigationStack().peek().getSecond() != null) {
@@ -539,14 +597,23 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             arg[0] = list;
           }
           try {
-            Integer result = Integer.parseInt(this.wrapper.invoke("sum", arg).toString());
-            attr.setValue(result.toString());
-            attr.setDatatype("Integer");
-            this.wrapper.getNavigationStack()
-                .push(new Tuple<String, Collection<Element>>("sum", Arrays.asList(attr)));
+            Number result = (Number) this.wrapper.invoke("sum", arg);
+            if (result instanceof Integer) {
+              attr.setValue(result.toString());
+              attr.setDatatype("Integer");
+              this.wrapper.getNavigationStack()
+                  .push(new Tuple<String, Collection<Element>>("sum", Arrays.asList(attr)));
+            } else if (result instanceof Double || result instanceof Float) {
+              attr.setValue(result.toString());
+              attr.setDatatype("Real");
+              this.wrapper.getNavigationStack()
+                  .push(new Tuple<String, Collection<Element>>("sum", Arrays.asList(attr)));
+            }
+
           } catch (Exception e) {
             return new OclInvalid();
           }
+          return Arrays.asList(attr);
         }
         // one operation
         else if (ctx.opName.getText().equals("one")) {
@@ -598,7 +665,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         else if (ctx.opName.getText().equals("includesAll")) {
           visit(ctx.arg);
           if (this.tempCollection != null && this.tempCollection.size() > 0) {
-            Collection<Element> list = tempCollection;
+            Collection<Element> list = (Collection<Element>) tempCollection;
             tempCollection = null;
             Object[] args = new Object[2];
             args[0] = list;
@@ -625,7 +692,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         else if (ctx.opName.getText().equals("excludesAll")) {
           visit(ctx.arg);
           if (this.tempCollection != null && this.tempCollection.size() > 0) {
-            Collection<Element> list = tempCollection;
+            Collection<Element> list = (Collection<Element>) tempCollection;
             tempCollection = null;
             Object[] args = new Object[2];
             args[0] = list;
@@ -656,7 +723,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             }
             // else
             element = null;
-            Collection<Element> list = tempCollection;
+            Collection<Element> list = (Collection<Element>) tempCollection;
             tempCollection = null;
             Object[] args = new Object[2];
             args[0] = list;
@@ -698,7 +765,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             } else {
               element = null;
             }
-            Collection<Element> list = tempCollection;
+            Collection<Element> list = (Collection<Element>) tempCollection;
             tempCollection = null;
             Object[] args = new Object[2];
             args[0] = list;
@@ -1084,10 +1151,10 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     } else if (ctx.opName.getText()
         .equals("isDeepKindOf")) { return this.wrapper.isDeepKindOf(ctx.arg.getText()); }
     if (this.wrapper.operationExist(ctx.opName.getText())) {
-      if (ctx.arg.getText() != null && ctx.arg.getText() != "") {
-        Object[] arg = {};
+      if (ctx.arg != null && ctx.arg.getText() != "") {
+        Object[] arg = { this.wrapper.getNavigationStack().peek().getSecond(), ctx.arg.getText() };
         try {
-          this.wrapper.invoke(ctx.opName.getText(), arg);
+          return this.wrapper.invoke(ctx.opName.getText(), arg);
         } catch (Exception e) {
           return new OclInvalid();
         }
@@ -1205,8 +1272,20 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   @Override
   public Object visitTimesDivide(TimesDivideContext ctx) {
     Object left = visit(ctx.left);
+    if (left instanceof Collection) {
+      left = ((Collection) left).toArray()[0];
+      if (left instanceof Attribute) {
+        left = ((Attribute) left).getValue();
+      }
+    }
     Double dLeft = Double.parseDouble(left.toString());
-    Object right = visit(ctx.left);
+    Object right = visit(ctx.right);
+    if (right instanceof Collection) {
+      right = ((Collection) right).toArray()[0];
+      if (right instanceof Attribute) {
+        right = ((Attribute) right).getValue();
+      }
+    }
     Double dRight = Double.parseDouble(right.toString());
     switch (ctx.op.getText()) {
       case "*":
@@ -1222,8 +1301,20 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   @Override
   public Object visitPlusMinus(PlusMinusContext ctx) {
     Object left = visit(ctx.left);
+    if (left instanceof Collection) {
+      left = ((Collection) left).toArray()[0];
+      if (left instanceof Attribute) {
+        left = ((Attribute) left).getValue();
+      }
+    }
     Double dLeft = Double.parseDouble(left.toString());
     Object right = visit(ctx.left);
+    if (right instanceof Collection) {
+      right = ((Collection) right).toArray()[0];
+      if (right instanceof Attribute) {
+        right = ((Attribute) right).getValue();
+      }
+    }
     Double dRight = Double.parseDouble(right.toString());
     switch (ctx.op.getText()) {
       case "+":
@@ -1264,8 +1355,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   public Object visitEqualOperations(EqualOperationsContext ctx) {
     if (!this.assign) {
       try {
-        visit(ctx.left);
-        return this.wrapper.eval(visit(ctx.right).toString(), ctx.op.getText());
+        Object left = visit(ctx.left);
+        return this.wrapper.eval(left, visit(ctx.right), ctx.op.getText());
       } catch (InterpreterException e) {
         this.wrapper.getNavigationStack().clear();
         return new OclInvalid();

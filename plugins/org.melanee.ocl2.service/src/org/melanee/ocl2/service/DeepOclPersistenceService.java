@@ -22,6 +22,7 @@ import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.melanee.core.models.plm.PLM.AbstractConstraint;
+import org.melanee.core.models.plm.PLM.Attribute;
 import org.melanee.core.models.plm.PLM.Clabject;
 import org.melanee.core.models.plm.PLM.Connection;
 import org.melanee.core.models.plm.PLM.DeepModel;
@@ -272,7 +273,11 @@ public class DeepOclPersistenceService {
         point = true;
       }
       if (word.equals("self") && this.context instanceof Element) {
-        context = (Clabject) this.context;
+        if (this.context instanceof Attribute) {
+          context = ((Attribute) this.context).getClabject();
+        } else {
+          context = (Clabject) this.context;
+        }
         updateContext(context);
         newContext = context;
       }
