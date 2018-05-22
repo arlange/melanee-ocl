@@ -150,6 +150,7 @@
      'Boolean'
      | 'Integer'
      | 'Real'
+     | 'String'
      | 'ID'
      | 'UnlimitedNatural'
      | 'OclAny'

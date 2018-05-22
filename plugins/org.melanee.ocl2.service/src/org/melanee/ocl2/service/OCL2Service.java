@@ -104,9 +104,7 @@ public class OCL2Service implements IConstraintLanguageService {
       ParseTree tree = parser.specificationCS();
       DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
       try {
-        Object result = visitor.visit(tree).toString();
-        Boolean booleanResult = Boolean.parseBoolean(result.toString());
-        return booleanResult;
+        return visitor.visit(tree).toString().replaceAll("\"", "");
       } catch (Exception e) {
         return new OclInvalid();
       }
@@ -273,13 +271,23 @@ public class OCL2Service implements IConstraintLanguageService {
       startLevel = c.getLevelIndex();
       endLevel = c.getDeepModel().getContent().size() - 1;
     }
+    if(definitionContext instanceof DeepModel) {
+      DeepModel dm = (DeepModel)definitionContext;
+      startLevel = 0;
+      endLevel = dm.getContent().size();
+    }
+    if(definitionContext instanceof org.melanee.core.models.plm.PLM.Level) {
+      org.melanee.core.models.plm.PLM.Level level = (org.melanee.core.models.plm.PLM.Level)definitionContext;
+      startLevel = level.getLevel();
+      endLevel = level.getDeepModel().getContent().size();
+    }
     Level constraintLevel = ConstraintFactory.eINSTANCE.createLevel();
     switch (constraintKind) {
       case ("inv"):
         int invCounter = 0;
         // TODO what if the type is not Clabject? Level or DeepModel are allowed to have
         // constraints too!
-        for (AbstractConstraint constr : ((Clabject) definitionContext).getConstraint()) {
+        for (AbstractConstraint constr : definitionContext.getConstraint()) {
           if (constr instanceof InvariantConstraint) {
             invCounter++;
           }

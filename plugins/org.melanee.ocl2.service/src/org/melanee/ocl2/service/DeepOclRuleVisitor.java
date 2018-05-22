@@ -358,7 +358,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   @Override
   public Object visitLetVariableCS(LetVariableCSContext ctx) {
     try {
-      System.out.println(ctx.name.getText());
       Object type = visit(ctx.type);
       Object exp = visit(ctx.exp);
       Object value = null;
@@ -368,6 +367,9 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             value = ((Attribute) o).getValue();
           }
         }
+      }
+      if (value == null) {
+        value = visit(ctx.exp);
       }
       this.wrapper.createLetVariable(ctx.name.getText(), type.toString(), value.toString());
     } catch (InterpreterException e) {

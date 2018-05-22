@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.melanee.core.models.plm.PLM.Attribute;
 import org.melanee.core.models.plm.PLM.Clabject;
 import org.melanee.core.models.plm.PLM.Classification;
 import org.melanee.core.models.plm.PLM.Connection;
@@ -401,4 +402,20 @@ public class BPMN2Tests {
     assertEquals(false, Boolean.parseBoolean(returnValue.toString()));
   }
 
+  @Test
+  public void checkForEmptyString() {
+    Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
+    attribute.setDatatype("String");
+    attribute.setName("leer");
+
+    this.hungerSatisfied.getFeature().add(attribute);
+
+    DeepOclLexer oclLexer = new DeepOclLexer(
+        new ANTLRInputStream("leer <> \"\""));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.hungerSatisfied);
+    Object returnValue = visitor.visit(tree);
+    assertEquals(true, Boolean.parseBoolean(returnValue.toString()));
+  }
 }

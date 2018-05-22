@@ -1379,12 +1379,19 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         String second = expressionMap.get("right").replaceAll("\"", "");
         return compare(first, second, expressionMap.get("operator"));
       }
-    } catch (Exception e) {
+    } catch (NullPointerException e) {
       System.out
           .println("Could not access Attribute " + a + " or get Value from this Attribute. \n");
-      e.printStackTrace();
+      // if the attribute has no value as a String or otherwise then this check will
+      // be made for safety.
+      String second = expressionMap.get("right").replaceAll("\"", "");
+      if (expressionMap.get("operator").equals("<>") && second.isEmpty()) {
+        return true;
+      } else {
+        e.printStackTrace();
+        return null;
+      }
     }
-    System.out.println("nothing of value was returned");
     return null;
   }
 
