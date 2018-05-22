@@ -964,7 +964,12 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       expressionMap.put("right", attributeRight.getValue());
       expressionMap.put("operator", operator);
       return castAndCompare(attributeLeft, expressionMap);
-
+    } else if (right instanceof Boolean && left instanceof Attribute) {
+      Attribute attributeLeft = (Attribute) left;
+      Map<String, String> expressionMap = new HashMap<>();
+      expressionMap.put("right", right.toString());
+      expressionMap.put("operator", operator);
+      return castAndCompare(attributeLeft, expressionMap);
     } else if (right instanceof String) {
       return eval((String) right, operator);
     } else if (right instanceof Number) {
@@ -1377,6 +1382,10 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       } else if (a.getDatatype().equals("String")) {
         String first = a.getValue().replaceAll("\"", "");
         String second = expressionMap.get("right").replaceAll("\"", "");
+        return compare(first, second, expressionMap.get("operator"));
+      } else if (a.getDatatype().equals("Boolean")) {
+        Boolean first = Boolean.parseBoolean(a.getValue());
+        Boolean second = Boolean.parseBoolean(expressionMap.get("right"));
         return compare(first, second, expressionMap.get("operator"));
       }
     } catch (NullPointerException e) {

@@ -463,8 +463,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         else if (ctx.opName.getText().equals("at")) {
           Integer index;
           try {
-            index = (Integer) visit(ctx.arg);
-            System.out.println("atIndex: " + index);
+            Double d = Double.parseDouble(visit(ctx.arg).toString());
+            index = d.intValue();
           } catch (Exception e) {
             System.out.println("Could not find index in the parameter");
             return new OclInvalid();
@@ -827,6 +827,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             }
           }
           this.wrapper = oldWrapper;
+          this.wrapper.getNavigationStack()
+              .push(new Tuple<String, Collection<Element>>("select", list));
           if (list.size() > 0) {
             this.tempCollection = list;
             return list;
@@ -906,6 +908,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             }
           }
           this.wrapper = oldWrapper;
+          this.wrapper.getNavigationStack()
+              .push(new Tuple<String, Collection<Element>>("reject", list));
           if (list.size() > 0) {
             this.tempCollection = list;
             return this.tempCollection;

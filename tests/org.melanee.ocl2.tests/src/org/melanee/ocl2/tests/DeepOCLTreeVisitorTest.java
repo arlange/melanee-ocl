@@ -250,168 +250,168 @@ public class DeepOCLTreeVisitorTest {
     assertEquals("true", returnValue.toString());
   }
 
-  @Test
-  public void nestedSelectTestWithClassificationOclInvalid() {
-    Attribute attr = PLMFactory.eINSTANCE.createAttribute();
-    // first level
-    this.c.setName("Company");
-    Clabject customer = PLMFactory.eINSTANCE.createEntity();
-    customer.setName("Customer");
-    Clabject transaction = PLMFactory.eINSTANCE.createEntity();
-    transaction.setName("Transaction");
-    // second level
-    Clabject company = PLMFactory.eINSTANCE.createEntity();
-    company.setName("IBM");
-    Clabject customer1 = PLMFactory.eINSTANCE.createEntity();
-    customer1.setName("Hans Jörg");
-    Clabject customer2 = PLMFactory.eINSTANCE.createEntity();
-    customer2.setName("Detlef");
-    Clabject transaction1 = PLMFactory.eINSTANCE.createEntity();
-    transaction1.setName("HAJO kauft CD");
-    Clabject transaction2 = PLMFactory.eINSTANCE.createEntity();
-    transaction2.setName("Dette kauft ein");
-
-    dm.getContent().add(l);
-    Level l1 = PLMFactory.eINSTANCE.createLevel();
-    dm.getContent().add(l1);
-    l.getContent().add(this.c);
-    l.getContent().add(customer);
-    l.getContent().add(transaction);
-    l1.getContent().add(company);
-    l1.getContent().add(customer1);
-    l1.getContent().add(transaction1);
-    l1.getContent().add(customer2);
-    l1.getContent().add(transaction2);
-
-    // company classification
-    Classification classi9 = PLMFactory.eINSTANCE.createClassification();
-    classi9.setInstance(this.c);
-    classi9.setType(company);
-    l1.getContent().add(classi9);
-    // customer classification
-    Classification classi = PLMFactory.eINSTANCE.createClassification();
-    classi.setInstance(customer1);
-    classi.setType(customer);
-    l1.getContent().add(classi);
-    Classification classi1 = PLMFactory.eINSTANCE.createClassification();
-    classi1.setInstance(customer2);
-    classi1.setType(customer);
-    l1.getContent().add(classi1);
-    // transaction classification
-    Classification classi2 = PLMFactory.eINSTANCE.createClassification();
-    classi2.setInstance(transaction1);
-    classi2.setType(transaction);
-    l1.getContent().add(classi2);
-    Classification classi3 = PLMFactory.eINSTANCE.createClassification();
-    classi3.setInstance(transaction2);
-    classi3.setType(transaction);
-    l1.getContent().add(classi3);
-
-    // Connection setUp company -> customer
-    Connection connect = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
-    parti2.setMoniker("customer");
-    parti.setConnection(connect);
-    parti.setDestination(this.c);
-    parti2.setDestination(customer);
-    parti2.setNavigable(true);
-    parti2.setConnection(connect);
-
-    // Connection setUp customer -> transaction
-    Connection connect2 = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti5 = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti6 = PLMFactory.eINSTANCE.createConnectionEnd();
-    parti5.setConnection(connect2);
-    parti5.setDestination(customer);
-    parti6.setDestination(transaction);
-    parti6.setMoniker("transaction");
-    parti6.setNavigable(true);
-    parti6.setConnection(connect2);
-
-    l.getContent().add(connect);
-    l.getContent().add(connect2);
-
-    Connection connect10 = PLMFactory.eINSTANCE.createConnection();
-    Classification classi10 = PLMFactory.eINSTANCE.createClassification();
-    classi10.setInstance(connect10);
-    classi10.setType(connect);
-    ConnectionEnd parti18 = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti19 = PLMFactory.eINSTANCE.createConnectionEnd();
-    parti18.setDestination(company);
-    parti19.setDestination(customer1);
-    parti19.setNavigable(true);
-    parti18.setConnection(connect10);
-    parti19.setConnection(connect10);
-
-    Connection connect11 = PLMFactory.eINSTANCE.createConnection();
-    Classification classi11 = PLMFactory.eINSTANCE.createClassification();
-    classi11.setInstance(connect11);
-    classi11.setType(connect2);
-    ConnectionEnd parti20 = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti21 = PLMFactory.eINSTANCE.createConnectionEnd();
-    parti20.setDestination(company);
-    parti21.setDestination(customer2);
-    parti21.setNavigable(true);
-    parti20.setConnection(connect11);
-    parti21.setConnection(connect11);
-
-    Connection connect3 = PLMFactory.eINSTANCE.createConnection();
-    Classification classi8 = PLMFactory.eINSTANCE.createClassification();
-    classi8.setInstance(connect3);
-    classi8.setType(connect2);
-    ConnectionEnd parti7 = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti8 = PLMFactory.eINSTANCE.createConnectionEnd();
-    parti7.setDestination(customer1);
-    parti8.setDestination(transaction1);
-    parti8.setNavigable(true);
-    parti7.setConnection(connect3);
-    parti8.setConnection(connect3);
-
-    Connection connect4 = PLMFactory.eINSTANCE.createConnection();
-    Classification classi7 = PLMFactory.eINSTANCE.createClassification();
-    classi7.setInstance(connect4);
-    classi7.setType(connect2);
-    ConnectionEnd parti9 = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti10 = PLMFactory.eINSTANCE.createConnectionEnd();
-    parti9.setDestination(customer2);
-    parti10.setDestination(transaction2);
-    parti10.setNavigable(true);
-    parti9.setConnection(connect4);
-    parti10.setConnection(connect4);
-
-    l1.getContent().add(connect3);
-    l1.getContent().add(connect4);
-
-    attr.setName("value");
-    attr.setValue("101");
-    attr.setDatatype("Integer");
-    Attribute attr1 = PLMFactory.eINSTANCE.createAttribute();
-    transaction1.getFeature().add(attr);
-    attr1.setName("value");
-    attr1.setValue("108");
-    attr1.setDatatype("Integer");
-    transaction2.getFeature().add(attr1);
-    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "context(1) Company \ninv test: customer -> select(c|c.transaction -> select(value>100))->size()=1"));
-    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
-
-    parser.addErrorListener(new BaseErrorListener() {
-      @Override
-      public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
-          int charPositionInLine, String msg, RecognitionException e) {
-        throw new IllegalStateException("failed to parse at line " + line + " due to " + msg, e);
-      }
-    });
-
-    ParseTree tree = parser.contextDeclCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
-    long startTime = System.currentTimeMillis();
-    Object returnValue = visitor.visit(tree);
-    long endTime = System.currentTimeMillis();
-    System.out.println(endTime - startTime + " ms");
-    assertTrue(returnValue instanceof OclInvalid);
-  }
+//  @Test
+//  public void nestedSelectTestWithClassificationOclInvalid() {
+//    Attribute attr = PLMFactory.eINSTANCE.createAttribute();
+//    // first level
+//    this.c.setName("Company");
+//    Clabject customer = PLMFactory.eINSTANCE.createEntity();
+//    customer.setName("Customer");
+//    Clabject transaction = PLMFactory.eINSTANCE.createEntity();
+//    transaction.setName("Transaction");
+//    // second level
+//    Clabject company = PLMFactory.eINSTANCE.createEntity();
+//    company.setName("IBM");
+//    Clabject customer1 = PLMFactory.eINSTANCE.createEntity();
+//    customer1.setName("Hans Jörg");
+//    Clabject customer2 = PLMFactory.eINSTANCE.createEntity();
+//    customer2.setName("Detlef");
+//    Clabject transaction1 = PLMFactory.eINSTANCE.createEntity();
+//    transaction1.setName("HAJO kauft CD");
+//    Clabject transaction2 = PLMFactory.eINSTANCE.createEntity();
+//    transaction2.setName("Dette kauft ein");
+//
+//    dm.getContent().add(l);
+//    Level l1 = PLMFactory.eINSTANCE.createLevel();
+//    dm.getContent().add(l1);
+//    l.getContent().add(this.c);
+//    l.getContent().add(customer);
+//    l.getContent().add(transaction);
+//    l1.getContent().add(company);
+//    l1.getContent().add(customer1);
+//    l1.getContent().add(transaction1);
+//    l1.getContent().add(customer2);
+//    l1.getContent().add(transaction2);
+//
+//    // company classification
+//    Classification classi9 = PLMFactory.eINSTANCE.createClassification();
+//    classi9.setInstance(this.c);
+//    classi9.setType(company);
+//    l1.getContent().add(classi9);
+//    // customer classification
+//    Classification classi = PLMFactory.eINSTANCE.createClassification();
+//    classi.setInstance(customer1);
+//    classi.setType(customer);
+//    l1.getContent().add(classi);
+//    Classification classi1 = PLMFactory.eINSTANCE.createClassification();
+//    classi1.setInstance(customer2);
+//    classi1.setType(customer);
+//    l1.getContent().add(classi1);
+//    // transaction classification
+//    Classification classi2 = PLMFactory.eINSTANCE.createClassification();
+//    classi2.setInstance(transaction1);
+//    classi2.setType(transaction);
+//    l1.getContent().add(classi2);
+//    Classification classi3 = PLMFactory.eINSTANCE.createClassification();
+//    classi3.setInstance(transaction2);
+//    classi3.setType(transaction);
+//    l1.getContent().add(classi3);
+//
+//    // Connection setUp company -> customer
+//    Connection connect = PLMFactory.eINSTANCE.createConnection();
+//    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
+//    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    parti2.setMoniker("customer");
+//    parti.setConnection(connect);
+//    parti.setDestination(this.c);
+//    parti2.setDestination(customer);
+//    parti2.setNavigable(true);
+//    parti2.setConnection(connect);
+//
+//    // Connection setUp customer -> transaction
+//    Connection connect2 = PLMFactory.eINSTANCE.createConnection();
+//    ConnectionEnd parti5 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    ConnectionEnd parti6 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    parti5.setConnection(connect2);
+//    parti5.setDestination(customer);
+//    parti6.setDestination(transaction);
+//    parti6.setMoniker("transaction");
+//    parti6.setNavigable(true);
+//    parti6.setConnection(connect2);
+//
+//    l.getContent().add(connect);
+//    l.getContent().add(connect2);
+//
+//    Connection connect10 = PLMFactory.eINSTANCE.createConnection();
+//    Classification classi10 = PLMFactory.eINSTANCE.createClassification();
+//    classi10.setInstance(connect10);
+//    classi10.setType(connect);
+//    ConnectionEnd parti18 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    ConnectionEnd parti19 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    parti18.setDestination(company);
+//    parti19.setDestination(customer1);
+//    parti19.setNavigable(true);
+//    parti18.setConnection(connect10);
+//    parti19.setConnection(connect10);
+//
+//    Connection connect11 = PLMFactory.eINSTANCE.createConnection();
+//    Classification classi11 = PLMFactory.eINSTANCE.createClassification();
+//    classi11.setInstance(connect11);
+//    classi11.setType(connect2);
+//    ConnectionEnd parti20 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    ConnectionEnd parti21 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    parti20.setDestination(company);
+//    parti21.setDestination(customer2);
+//    parti21.setNavigable(true);
+//    parti20.setConnection(connect11);
+//    parti21.setConnection(connect11);
+//
+//    Connection connect3 = PLMFactory.eINSTANCE.createConnection();
+//    Classification classi8 = PLMFactory.eINSTANCE.createClassification();
+//    classi8.setInstance(connect3);
+//    classi8.setType(connect2);
+//    ConnectionEnd parti7 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    ConnectionEnd parti8 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    parti7.setDestination(customer1);
+//    parti8.setDestination(transaction1);
+//    parti8.setNavigable(true);
+//    parti7.setConnection(connect3);
+//    parti8.setConnection(connect3);
+//
+//    Connection connect4 = PLMFactory.eINSTANCE.createConnection();
+//    Classification classi7 = PLMFactory.eINSTANCE.createClassification();
+//    classi7.setInstance(connect4);
+//    classi7.setType(connect2);
+//    ConnectionEnd parti9 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    ConnectionEnd parti10 = PLMFactory.eINSTANCE.createConnectionEnd();
+//    parti9.setDestination(customer2);
+//    parti10.setDestination(transaction2);
+//    parti10.setNavigable(true);
+//    parti9.setConnection(connect4);
+//    parti10.setConnection(connect4);
+//
+//    l1.getContent().add(connect3);
+//    l1.getContent().add(connect4);
+//
+//    attr.setName("value");
+//    attr.setValue("101");
+//    attr.setDatatype("Integer");
+//    Attribute attr1 = PLMFactory.eINSTANCE.createAttribute();
+//    transaction1.getFeature().add(attr);
+//    attr1.setName("value");
+//    attr1.setValue("108");
+//    attr1.setDatatype("Integer");
+//    transaction2.getFeature().add(attr1);
+//    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+//        "context(1) Company \ninv test: customer -> select(c|c.transaction -> select(value>100))->size()=1"));
+//    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+//
+//    parser.addErrorListener(new BaseErrorListener() {
+//      @Override
+//      public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
+//          int charPositionInLine, String msg, RecognitionException e) {
+//        throw new IllegalStateException("failed to parse at line " + line + " due to " + msg, e);
+//      }
+//    });
+//
+//    ParseTree tree = parser.contextDeclCS();
+//    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
+//    long startTime = System.currentTimeMillis();
+//    Object returnValue = visitor.visit(tree);
+//    long endTime = System.currentTimeMillis();
+//    System.out.println(endTime - startTime + " ms");
+//    assertTrue(returnValue instanceof OclInvalid);
+//  }
 
   @Test
   public void nestedRejectTest() {

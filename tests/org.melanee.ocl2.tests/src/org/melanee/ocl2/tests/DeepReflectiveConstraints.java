@@ -152,7 +152,7 @@ public class DeepReflectiveConstraints {
     this.level0.getContent().add(connection);
     connection.setName("connection");
     connection.setPotency(0);
-    
+
     Connection connection1 = PLMFactory.eINSTANCE.createConnection();
     this.level0.getContent().add(connection1);
     connection1.setName("connection");
@@ -210,6 +210,7 @@ public class DeepReflectiveConstraints {
     Object returnValue = visitor.visit(tree);
     assertEquals(Arrays.asList(connection), returnValue);
   }
+
   @Test
   public void testReflectiveDeepModelConstraintClabjectByName() {
     this.dm.getContent().add(level0);
@@ -230,4 +231,32 @@ public class DeepReflectiveConstraints {
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
     Object returnValue = visitor.visit(tree);
     assertEquals(Arrays.asList(this.Abstract), returnValue);
-  }}
+  }
+
+  @Test
+  public void testLevelConstraint() {
+    this.dm.getContent().add(level0);
+    this.dm.getContent().add(level1);
+    this.level0.getContent().add(Abstract);
+    this.Abstract.setPotency(1);
+    this.Abstract.setName("Start");
+    this.level1.getContent().add(NonAbstract);
+    this.NonAbstract.setPotency(1);
+    this.NonAbstract.setName("NonAbstract");
+    
+    Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
+    attribute.setDatatype("Boolean");
+    attribute.setName("isStart");
+    attribute.setValue("true");
+    
+    this.NonAbstract.getFeature().add(attribute);
+
+    DeepOclLexer oclLexer = new DeepOclLexer(
+        new ANTLRInputStream("Level -> at(1).#getClabjects()# -> select(c|c.isStart = true) -> size() > 0"));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
+    Object returnValue = visitor.visit(tree);
+    assertEquals(true, returnValue);
+  }
+}
