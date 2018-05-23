@@ -471,10 +471,16 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           }
           if (this.tempCollection != null && this.tempCollection.size() > 0) {
             Element e = (Element) tempCollection.toArray()[index];
-            tempCollection = null;
+            tempCollection = Arrays.asList(e);
+            this.wrapper.getNavigationStack()
+                .push(new Tuple<String, Collection<Element>>("at", Arrays.asList(e)));
             return e;
           } else {
-            return this.wrapper.getNavigationStack().peek().getSecond().toArray()[index];
+            Element e = (Element) this.wrapper.getNavigationStack().peek().getSecond()
+                .toArray()[index];
+            this.wrapper.getNavigationStack()
+                .push(new Tuple<String, Collection<Element>>("at", Arrays.asList(e)));
+            return e;
           }
         }
         // iterate
