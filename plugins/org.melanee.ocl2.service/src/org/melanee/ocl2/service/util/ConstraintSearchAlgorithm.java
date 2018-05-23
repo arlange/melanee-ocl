@@ -46,8 +46,7 @@ public class ConstraintSearchAlgorithm {
     constraints.addAll(getConstraintFromElement(e, e, constraintTypes));
 
     // search more abstract levels
-    if (!(e.eContainer() instanceof DeepModel))
-      return null;
+    if (!(e.eContainer() instanceof DeepModel)) return null;
 
     DeepModel deepModel = (DeepModel) e.eContainer();
     for (int i = deepModel.getContent().indexOf(e) - 1; i > 0; i--) {
@@ -110,12 +109,12 @@ public class ConstraintSearchAlgorithm {
    */
   public List<AbstractConstraint> search(Element e, List<Class> constraintTypes) {
 
-    if (e instanceof Level)
-      return search((Level) e, constraintTypes);
-    if (e instanceof Clabject)
-      return search((Clabject) e, null, constraintTypes);
-    if (e instanceof Attribute)
-      return search((Clabject) e.eContainer(), (Attribute) e, constraintTypes);
+    if (e instanceof Level) { return search((Level) e, constraintTypes); }
+    if (e instanceof Clabject) { return search((Clabject) e, null, constraintTypes); }
+    if (e instanceof Attribute) { return search((Clabject) e.eContainer(), (Attribute) e,
+        constraintTypes); }
+    if (e instanceof DeepModel) { return e.getConstraint(); }
+    if (e instanceof Level) { return e.getConstraint(); }
     return null;
   }
 

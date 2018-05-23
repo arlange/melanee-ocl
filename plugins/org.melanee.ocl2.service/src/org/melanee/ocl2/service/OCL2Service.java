@@ -271,13 +271,13 @@ public class OCL2Service implements IConstraintLanguageService {
       startLevel = c.getLevelIndex();
       endLevel = c.getDeepModel().getContent().size() - 1;
     }
-    if(definitionContext instanceof DeepModel) {
-      DeepModel dm = (DeepModel)definitionContext;
+    if (definitionContext instanceof DeepModel) {
+      DeepModel dm = (DeepModel) definitionContext;
       startLevel = 0;
       endLevel = dm.getContent().size();
     }
-    if(definitionContext instanceof org.melanee.core.models.plm.PLM.Level) {
-      org.melanee.core.models.plm.PLM.Level level = (org.melanee.core.models.plm.PLM.Level)definitionContext;
+    if (definitionContext instanceof org.melanee.core.models.plm.PLM.Level) {
+      org.melanee.core.models.plm.PLM.Level level = (org.melanee.core.models.plm.PLM.Level) definitionContext;
       startLevel = level.getLevel();
       endLevel = level.getDeepModel().getContent().size();
     }
@@ -736,9 +736,11 @@ public class OCL2Service implements IConstraintLanguageService {
     DeepOclParser parser;
     ParseTree tree;
     DeepOclRuleVisitor visitor;
-    Set<Clabject> clabSet = new HashSet<>();
+    Set<Element> clabSet = new HashSet<>();
     if (element instanceof DeepModel) {
+      clabSet.add(element);
       for (org.melanee.core.models.plm.PLM.Level level : ((DeepModel) element).getContent()) {
+        clabSet.add(level);
         for (Element clab : level.getContent()) {
           // convert the list into a set, we do not want to evaluate
           // the constraint a million times.
@@ -754,7 +756,7 @@ public class OCL2Service implements IConstraintLanguageService {
           }
         }
       }
-      for (Clabject claabject : clabSet) {
+      for (Element claabject : clabSet) {
         Set<AbstractConstraint> constraintSet = new HashSet<AbstractConstraint>(
             searchAlgo.search(claabject, Arrays.asList(InvariantConstraintImpl.class)));
         check: for (AbstractConstraint constraint : constraintSet) {
@@ -795,8 +797,16 @@ public class OCL2Service implements IConstraintLanguageService {
       e1.printStackTrace();
     }
     marker: for (IValidationResult result : validationResult) {
-      TreeIterator<EObject> iterator = ((Clabject) result.getObject()).getDeepModel().eResource()
-          .getContents().get(1).eAllContents();
+      TreeIterator<EObject> iterator;
+      if (result.getObject() instanceof DeepModel) {
+        iterator = result.getObject().eResource().getContents().get(1).eAllContents();
+      } else if (result.getObject() instanceof org.melanee.core.models.plm.PLM.Level) {
+        iterator = ((org.melanee.core.models.plm.PLM.Level) result.getObject()).getDeepModel()
+            .eResource().getContents().get(1).eAllContents();
+      } else {
+        iterator = ((Clabject) result.getObject()).getDeepModel().eResource().getContents().get(1)
+            .eAllContents();
+      }
       while (iterator.hasNext()) {
         EObject next = iterator.next();
         if (next instanceof View) {

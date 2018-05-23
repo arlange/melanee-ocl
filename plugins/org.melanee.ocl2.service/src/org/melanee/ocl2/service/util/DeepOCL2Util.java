@@ -27,6 +27,7 @@ import org.melanee.core.models.plm.PLM.Clabject;
 import org.melanee.core.models.plm.PLM.DeepModel;
 import org.melanee.core.models.plm.PLM.Element;
 import org.melanee.core.models.plm.PLM.Feature;
+import org.melanee.core.models.plm.PLM.Level;
 import org.melanee.core.models.plm.PLM.PLMPackage;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclLexer;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser;
@@ -60,6 +61,10 @@ public class DeepOCL2Util {
       return isInLevel((Clabject) element, constraint);
     } else if (element instanceof Feature) {
       return isInLevel((Feature) element, constraint);
+    } else if (element instanceof DeepModel) {
+      return true;
+    } else if (element instanceof Level) {
+      return true;
     } else {
       throw new UnsupportedOperationException("not here");
     }
@@ -154,9 +159,7 @@ public class DeepOCL2Util {
         try {
           // result has to be of boolean nature to be
           // valid
-          if (Boolean.parseBoolean(result.toString()) == false) {
-            return false;
-          }
+          if (Boolean.parseBoolean(result.toString()) == false) { return false; }
         } catch (Exception e) {
           return false;
         }

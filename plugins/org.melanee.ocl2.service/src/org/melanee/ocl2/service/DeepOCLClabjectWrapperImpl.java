@@ -297,7 +297,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         for (ConnectionEnd connectionEnd : connection.getConnectionEnd()) {
           if (connectionEnd.getMoniker().equals(target)) {
             returnList.add(connectionEnd.getDestination());
-          } else if (connectionEnd.getDestination().getName().equals(target)) {
+          } else if (connectionEnd.getDestination().getName() != null
+              && connectionEnd.getDestination().getName().equals(target)) {
             returnList.add(connectionEnd.getDestination());
           }
         }
@@ -954,7 +955,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     if (right instanceof Collection) {
       right = ((Collection) right).toArray()[0];
     }
-    if (left instanceof Collection) {
+    if (left instanceof Collection && !((Collection) left).isEmpty()) {
       left = ((Collection) left).toArray()[0];
     }
     if (right instanceof Attribute && left instanceof Attribute) {
