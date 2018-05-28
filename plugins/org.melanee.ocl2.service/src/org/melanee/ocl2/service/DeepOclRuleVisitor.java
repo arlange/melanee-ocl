@@ -1087,6 +1087,23 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           // return value for the intersection operation
           return this.tempCollection;
         }
+        // sortedBy
+        else if (ctx.opName.getText().equals("sortedBy")) {
+          Object[] arg = new Object[2];
+          if (tempCollection != null && tempCollection.size() > 0) {
+            arg[0] = tempCollection;
+          } else {
+            arg[0] = this.wrapper.getNavigationStack().peek().getSecond();
+          }
+          arg[1] = ctx.arg.getText();
+          try {
+            this.tempCollection = (Collection<Element>) this.wrapper.invoke("sortedBy", arg);
+          } catch (Exception e) {
+            e.printStackTrace();
+            return new OclInvalid();
+          }
+          return this.tempCollection;
+        }
         // insertAt
         else if (ctx.opName.getText().equals("insertAt")) {
           Object[] arg = new Object[3];

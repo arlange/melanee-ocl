@@ -16,6 +16,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -158,6 +160,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     operationList.add("isIndirectInstanceOf");
     operationList.add("isDeepIndirectInstanceOf");
     operationList.add("isDeepKindOf");
+    operationList.add("sortedBy");
+
   }
 
   public List<String> getOperationList() {
@@ -267,7 +271,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       return allInstances(arg);
     } else if (operation.equals("instanceOf")) {
       return instanceOf(arg);
-    } else if (operation.equals("including")) { return including(arg); }
+    } else if (operation.equals("including")) {
+      return including(arg);
+    } else if (operation.equals("sortedBy")) { return sortedBy(arg); }
     return null;
   }
   /*
@@ -822,9 +828,60 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    * @param expression
    * @return
    */
+  @SuppressWarnings("unchecked")
   private Collection<?> sortedBy(Object[] arg) {
-    // TODO sortedBy
-    return null;
+    List<Element> resultCollection = new ArrayList<>();
+    List<Attribute> tempCollection = new ArrayList<>();
+    String dataType = null;
+    if (arg[0] instanceof Collection) {
+      Collection<Element> sortCollection = (Collection<Element>) arg[0];
+      for (Element element : sortCollection) {
+        if (element instanceof Clabject) {
+          Clabject clabject = (Clabject) element;
+          for (Attribute feature : clabject.getAllAttributes()) {
+            if (feature.getName().equals(arg[1])) {
+              tempCollection.add(feature);
+              dataType = feature.getDatatype();
+            }
+          }
+        }
+      }
+    } else {
+      return null;
+    }
+    if (tempCollection.size() > 0) {
+      tempCollection = sort(tempCollection, dataType);
+      for (Attribute attr : tempCollection) {
+        resultCollection.add(attr.getClabject());
+      }
+    }
+    return resultCollection;
+  }
+
+  /**
+   * this sorts an array of Attributes.
+   * 
+   * @param collectionToSort
+   *          Collection that will be sorted from lowest to highest
+   * @param dataType
+   *          data type of the attributes.
+   * @return returns a sorted list of attributes
+   */
+  private List<Attribute> sort(List<Attribute> collectionToSort, String dataType) {
+    if (dataType.equals("Integer") || dataType.equals("Real") || dataType.equals("Natural")) {
+      Comparator<Attribute> comp = (Attribute a, Attribute b) -> {
+        Double c = Double.parseDouble(b.getValue());
+        Double d = Double.parseDouble(a.getValue());
+        return d.compareTo(c);
+      };
+      Collections.sort(collectionToSort, comp);
+    } else if (dataType.equals("String")) {
+      Comparator<Attribute> comp = (Attribute a, Attribute b) -> {
+        return a.getValue().compareTo(b.getValue());
+      };
+      Collections.sort(collectionToSort, comp);
+    }
+    return collectionToSort;
   }
 
   /**
