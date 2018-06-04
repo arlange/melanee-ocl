@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering All rights
+ * reserved. This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *    Ralph Gerbig - initial API and implementation and initial documentation
- *    Arne Lange - ocl2 implementation
+ * Contributors: Ralph Gerbig - initial API and implementation and initial documentation Arne Lange
+ * - ocl2 implementation
  *******************************************************************************/
 
 package org.melanee.ocl2.service;
@@ -18,7 +16,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -114,8 +111,7 @@ public class OCL2Service implements IConstraintLanguageService {
   }
 
   /**
-   * gets the defined constraints for the current selected element in the
-   * graphical model.
+   * gets the defined constraints for the current selected element in the graphical model.
    */
   @Override
   public String[] getDefinedConstraintsFor(Element definitionContext) {
@@ -210,13 +206,13 @@ public class OCL2Service implements IConstraintLanguageService {
   public String[] getPossibleConstraintKindsFor(Element definitionContext) {
     // for Method we want body pre post
     if (definitionContext instanceof Method) {
-      return new String[] { CONSTRAINT_KIND_BODY, CONSTRAINT_KIND_PRE, CONSTRAINT_KIND_POST };
+      return new String[] {CONSTRAINT_KIND_BODY, CONSTRAINT_KIND_PRE, CONSTRAINT_KIND_POST};
     } else if (definitionContext instanceof Attribute) {
       // for attributes we want init and derive constraints
-      return new String[] { CONSTRAINT_KIND_INIT, CONSTRAINT_KIND_DERIVE };
+      return new String[] {CONSTRAINT_KIND_INIT, CONSTRAINT_KIND_DERIVE};
     } else {
       // for anything else we want inv and def constraints
-      String[] strings = { CONSTRAINT_KIND_INVARIANT, CONSTRAINT_KIND_DEF };
+      String[] strings = {CONSTRAINT_KIND_INVARIANT, CONSTRAINT_KIND_DEF};
       return strings;
     }
   }
@@ -228,18 +224,14 @@ public class OCL2Service implements IConstraintLanguageService {
   }
 
   /**
-   * would be nice if the interface allows to hand over the kind of constraint as
-   * a string, now the remove constraint operation just checks the name of the
-   * constraint but not the type. It is possible that 2 different constraint types
-   * have the same name.
+   * would be nice if the interface allows to hand over the kind of constraint as a string, now the
+   * remove constraint operation just checks the name of the constraint but not the type. It is
+   * possible that 2 different constraint types have the same name.
    * 
-   * @param definitionContext
-   *          definition context --> Clabject
-   * @param constraintName
-   *          name of the constraint
-   * @throws UnsupportedOperationException
-   *           if not supported by the deep ocl 2 language this exception will be
-   *           thrown
+   * @param definitionContext definition context --> Clabject
+   * @param constraintName name of the constraint
+   * @throws UnsupportedOperationException if not supported by the deep ocl 2 language this
+   *         exception will be thrown
    */
   @Override
   public void deleteConstraint(Element definitionContext, String constraintName) {
@@ -249,8 +241,8 @@ public class OCL2Service implements IConstraintLanguageService {
   }
 
   /**
-   * adds a constraint to the model. need to use the emf.edit command framework,
-   * because at this point we do not have direct access to change the models
+   * adds a constraint to the model. need to use the emf.edit command framework, because at this
+   * point we do not have direct access to change the models
    */
   @Override
   public AbstractConstraint addConstraint(Element definitionContext, String constraintKind) {
@@ -277,7 +269,8 @@ public class OCL2Service implements IConstraintLanguageService {
       endLevel = dm.getContent().size();
     }
     if (definitionContext instanceof org.melanee.core.models.plm.PLM.Level) {
-      org.melanee.core.models.plm.PLM.Level level = (org.melanee.core.models.plm.PLM.Level) definitionContext;
+      org.melanee.core.models.plm.PLM.Level level =
+          (org.melanee.core.models.plm.PLM.Level) definitionContext;
       startLevel = level.getLevel();
       endLevel = level.getDeepModel().getContent().size();
     }
@@ -427,8 +420,8 @@ public class OCL2Service implements IConstraintLanguageService {
   }
 
   /**
-   * this class creates the constraint composite, i.e. editor the constructor sets
-   * up the initial look.
+   * this class creates the constraint composite, i.e. editor the constructor sets up the initial
+   * look.
    */
   public class DeepOCL2Composite extends ConstraintPropertySheetComposite {
     boolean editMode;
@@ -471,15 +464,15 @@ public class OCL2Service implements IConstraintLanguageService {
       if (persistenceService.getDefinitionContext() instanceof Clabject) {
         this.dm = ((Clabject) persistenceService.getDefinitionContext()).getDeepModel();
       } else if (persistenceService.getDefinitionContext() instanceof Attribute) {
-        this.dm = ((Attribute) persistenceService.getDefinitionContext()).getClabject()
-            .getDeepModel();
+        this.dm =
+            ((Attribute) persistenceService.getDefinitionContext()).getClabject().getDeepModel();
       } else if (persistenceService.getDefinitionContext() instanceof Method) {
         this.dm = ((Method) persistenceService.getDefinitionContext()).getClabject().getDeepModel();
       }
 
       /**
-       * this is for initializing the editor layout that is then returned to the
-       * custom propertySheet (parent).
+       * this is for initializing the editor layout that is then returned to the custom
+       * propertySheet (parent).
        */
 
       GridLayout gridLayout = new GridLayout(6, true);
@@ -561,8 +554,8 @@ public class OCL2Service implements IConstraintLanguageService {
         endLevelText.dispose();
       }
 
-      this.message = widgetFacotry.createText(this, ((Constraint) constraint).getMessage(),
-          SWT.SINGLE);
+      this.message =
+          widgetFacotry.createText(this, ((Constraint) constraint).getMessage(), SWT.SINGLE);
       this.message.setLayoutData(gridDateMessage);
       widgetFacotry.createCLabel(this, "Severity");
       this.severityCombo = widgetFacotry.createCCombo(this);
@@ -603,8 +596,8 @@ public class OCL2Service implements IConstraintLanguageService {
     }
 
     /**
-     * this is the saving operation on the clabject. everything has to be done with
-     * the emf command framework.
+     * this is the saving operation on the clabject. everything has to be done with the emf command
+     * framework.
      */
     @Override
     public void save() {
@@ -663,8 +656,8 @@ public class OCL2Service implements IConstraintLanguageService {
       }
       if (severityCombo.getText() != null && severityCombo.getText() != "") {
         ((Constraint) constraint).getSeverity();
-        org.melanee.ocl2.models.definition.constraint.Severity severity = Severity
-            .getByName(severityCombo.getText());
+        org.melanee.ocl2.models.definition.constraint.Severity severity =
+            Severity.getByName(severityCombo.getText());
         Command setSeverityCommand = SetCommand.create(editingDomain, constraint,
             ConstraintPackage.eINSTANCE.getConstraint_Severity(), severity);
         editingDomain.getCommandStack().execute(setSeverityCommand);
@@ -925,11 +918,14 @@ public class OCL2Service implements IConstraintLanguageService {
                 DeepOclLexer ocl2Lexer = new DeepOclLexer(new ANTLRInputStream(oclExpression));
                 DeepOclParser parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
                 ParseTree tree = parser.derCS();
-                DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(
-                    ((Attribute) attr).getClabject());
+                DeepOclRuleVisitor visitor =
+                    new DeepOclRuleVisitor(((Attribute) attr).getClabject());
                 Object result = visitor.visit(tree);
                 if (result instanceof Collection) {
                   result = ((Collection) result).toArray()[0];
+                  if (result instanceof Attribute) {
+                    result = ((Attribute) result).getValue();
+                  }
                 }
                 if (result instanceof Attribute) {
                   result = ((Attribute) result).getValue();

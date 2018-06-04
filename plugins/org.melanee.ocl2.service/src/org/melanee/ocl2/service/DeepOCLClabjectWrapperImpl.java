@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering All rights
+ * reserved. This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *    Ralph Gerbig - initial API and implementation and initial documentation
- *    Arne Lange - ocl2 implementation
+ * Contributors: Ralph Gerbig - initial API and implementation and initial documentation Arne Lange
+ * - ocl2 implementation
  *******************************************************************************/
 package org.melanee.ocl2.service;
 
@@ -27,7 +25,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -64,7 +61,6 @@ import org.melanee.ocl2.service.util.Tuple;
 public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   private Element context;
   private Collection<Element> newContext;
-  private Collection<Element> tempCollection;
   private List<String> operationList;
   private String right;
   private String operator;
@@ -78,7 +74,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 
   public DeepOCLClabjectWrapperImpl(Element context) {
     this.context = context;
-    this.tempCollection = new ArrayList<>();
+    new ArrayList<>();
     this.operationList = new ArrayList<>();
     this.loadOperations(operationList);
     this.newContext = null;
@@ -94,7 +90,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 
   public DeepOCLClabjectWrapperImpl(Element context, Collection<Element> parameters) {
     this.context = context;
-    this.tempCollection = new ArrayList<>();
+    new ArrayList<>();
     this.operationList = new ArrayList<>();
     this.loadOperations(operationList);
     this.newContext = null;
@@ -180,6 +176,11 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return this.newContext;
   }
 
+  /**
+   * resets the context to self.
+   * 
+   * @param context "self"
+   */
   public void setContext(String context) {
     if (context.equals("self")) {
       this.newContext = new ArrayList<>(Arrays.asList(this.context));
@@ -187,11 +188,10 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * Please look at the operation you want to invoke in order to create the exact
-   * Object array.
+   * Please look at the operation you want to invoke in order to create the exact Object array.
    * 
-   * @param operation
-   * @param arg
+   * @param operation to invoke
+   * @param arg arguments to invoke the operation with
    * @return Object
    */
   public Object invoke(String operation, Object[] arg) throws Exception {
@@ -209,8 +209,6 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       return insertAt(arg);
     } else if (operation.equals("any")) {
       return any(arg);
-    } else if (operation.equals("collect")) {
-      return collect(arg);
     } else if (operation.equals("collectNested")) {
       return collectNested(arg);
     } else if (operation.equals("reject")) {
@@ -273,12 +271,13 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       return instanceOf(arg);
     } else if (operation.equals("including")) {
       return including(arg);
-    } else if (operation.equals("sortedBy")) { return sortedBy(arg); }
+    } else if (operation.equals("sortedBy")) {
+      return sortedBy(arg);
+    }
     return null;
   }
   /*
-   * public void addOperation(String operation){
-   * this.operationList.add(operation); }
+   * public void addOperation(String operation){ this.operationList.add(operation); }
    */
 
   private Object collectNested(Object[] arg) {
@@ -287,30 +286,54 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * navigation Operation. navigation has to be on the same level as the current
-   * context navigation, if not this operation won't find any stuff.
+   * navigation Operation. navigation has to be on the same level as the current context navigation,
+   * if not this operation won't find any stuff.
    */
   @Override
   public Object navigate(String target) throws NavigationException {
     List<Element> returnList = new ArrayList<>();
     Collection<Element> currentNavigation = this.navigationStack.peek().getSecond();
     for (Element element : currentNavigation) {
-      if (element instanceof Attribute
-          && navigationStack.size() == 1) { throw new NavigationException("something wrong here.",
-              new Throwable(target)); }
+      if (element instanceof Attribute && navigationStack.size() == 1) {
+        throw new NavigationException("something wrong here.", new Throwable(target));
+      }
       if (element instanceof Connection) {
         Connection connection = (Connection) element;
         for (ConnectionEnd connectionEnd : connection.getConnectionEnd()) {
-          if (connectionEnd.getMoniker().equals(target)) {
+          if (connectionEnd.getMoniker() != null && connectionEnd.getMoniker().equals(target)) {
             returnList.add(connectionEnd.getDestination());
           } else if (connectionEnd.getDestination().getName() != null
               && connectionEnd.getDestination().getName().equals(target)) {
             returnList.add(connectionEnd.getDestination());
           }
         }
+        if (returnList.isEmpty()) {
+          for (Attribute attribute : connection.getAllAttributes()) {
+            if (attribute.getName().equals(target)) {
+              returnList.add(attribute);
+            }
+          }
+        }
         this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
         return returnList;
       } else if (element instanceof Clabject) {
+        if (target.equals("Clabject")) {
+          Clabject clabject = (Clabject) element;
+          List<Element> clabList = new ArrayList<Element>();
+          for (Clabject clab : clabject.getLevel().getEntities()) {
+            clabList.add(clab);
+          }
+          this.navigationStack.push(new Tuple<String, Collection<Element>>("Clabjects", clabList));
+          return clabList;
+        } else if (target.equals("Connection")) {
+          List<Element> connectionList = new ArrayList<Element>();
+          for (Connection connection : ((Clabject) element).getLevel().getConnections()) {
+            connectionList.add(connection);
+          }
+          this.navigationStack
+              .push(new Tuple<String, Collection<Element>>("Connections", connectionList));
+          return connectionList;
+        }
         for (Feature feature : ((Clabject) element).getFeature()) {
           if (feature instanceof Attribute) {
             Attribute attr = (Attribute) feature;
@@ -331,8 +354,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
                   // if ontological navigation we have to
                   // perform a lot of comparison on multiple
                   // levels.
-                  Clabject ontoNav = (Clabject) this.navigationStack.peek().getSecond()
-                      .toArray()[0];
+                  Clabject ontoNav =
+                      (Clabject) this.navigationStack.peek().getSecond().toArray()[0];
                   int levelIndex = ((Clabject) this.context).getLevelIndex();
                   DeepModel dm = ((Clabject) this.context).getDeepModel();
                   Level level = dm.getLevelAtIndex(levelIndex + 1);
@@ -414,19 +437,6 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
           }
         }
         this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
-      } else if (!this.letVariables.isEmpty() && returnList.isEmpty()) {
-        for (LetVariable letVariable : this.letVariables) {
-          if (letVariable.getName().equals(target)) {
-            // necessary because second item of the tuple has to
-            // be a collection of elements
-            Attribute attr = PLMFactory.eINSTANCE.createAttribute();
-            attr.setDatatype(letVariable.getDataType());
-            attr.setValue(letVariable.getValue().toString());
-            attr.setName(letVariable.getName());
-            returnList.add(attr);
-            this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
-          }
-        }
       } else if (element instanceof DeepModel) {
         if (target.equals("Clabject")) {
           DeepModel deepModel = (DeepModel) element;
@@ -436,7 +446,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             Iterator<Element> iter = clabList.iterator();
             while (iter.hasNext()) {
               Element clab = iter.next();
-              if (clab instanceof Connection || clab instanceof ConnectionEnd) iter.remove();
+              if (clab instanceof Connection || clab instanceof ConnectionEnd) {
+                iter.remove();
+              }
             }
             this.navigationStack
                 .push(new Tuple<String, Collection<Element>>("Clabjects", clabList));
@@ -457,12 +469,26 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         }
       }
     }
+    if (!this.letVariables.isEmpty() && returnList.isEmpty()) {
+      for (LetVariable letVariable : this.letVariables) {
+        if (letVariable.getName().equals(target)) {
+          // necessary because second item of the tuple has to
+          // be a collection of elements
+          Attribute attr = PLMFactory.eINSTANCE.createAttribute();
+          attr.setDatatype(letVariable.getDataType());
+          attr.setValue(letVariable.getValue().toString());
+          attr.setName(letVariable.getName());
+          returnList.add(attr);
+          this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
+        }
+      }
+    }
     return returnList.size() == 0 ? null : returnList;
   }
 
   /**
-   * if you want navigate up to a higher level, ie to the directType of the
-   * context your in use this method (level cast)
+   * if you want navigate up to a higher level, ie to the directType of the context your in use this
+   * method (level cast)
    * 
    * @param target
    * @return
@@ -486,6 +512,13 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return returnCollection.size() == 0 ? null : returnCollection;
   }
 
+  /**
+   * implies functionality.
+   * 
+   * @param a implies b
+   * @param b is implied by a
+   * @return boolean value
+   */
   public boolean implies(boolean a, boolean b) {
     if (a) {
       if (b) {
@@ -555,7 +588,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         clazz = Class.forName("org.melanee.core.models.plm.PLM." + target);
       }
       for (Element e : this.navigationStack.peek().getSecond()) {
-        if (e.getClass().isInstance(clazz)) { return e.getClass().cast(clazz); }
+        if (e.getClass().isInstance(clazz)) {
+          return e.getClass().cast(clazz);
+        }
       }
     } catch (Exception e1) {
       e1.printStackTrace();
@@ -583,35 +618,61 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * "Deep" methods block
+   * "Deep" methods block.
    */
 
+  /**
+   * 
+   * @param text
+   * @return
+   */
   public Boolean isDeepDirectInstanceOf(String text) {
     Clabject context = (Clabject) this.context;
     List<Clabject> resultList = new ArrayList<>();
     resultList = DeepOCL2Util.traverseClassifications(context, resultList);
     for (Clabject clab : resultList) {
-      if (clab.getName().equals(text)) { return true; }
+      if (clab.getName().equals(text)) {
+        return true;
+      }
     }
     return false;
   }
 
+  /**
+   * 
+   * @param text
+   * @return
+   */
   public Boolean isDirectInstanceOf(String text) {
     Clabject context = (Clabject) this.context;
     for (Element type : context.getDirectTypes()) {
-      if (type.getName().equals(text)) { return true; }
+      if (type.getName().equals(text)) {
+        return true;
+      }
     }
     return false;
   }
 
+  /**
+   * 
+   * @param text
+   * @return
+   */
   public Boolean isDeepInstanceOf(String text) {
     Clabject context = (Clabject) this.context;
     for (Element type : context.getClassificationTreeAsInstance()) {
-      if (type.getName().equals(text)) { return true; }
+      if (type.getName().equals(text)) {
+        return true;
+      }
     }
     return false;
   }
 
+  /**
+   * 
+   * @param text
+   * @return
+   */
   public Object isInstanceOf(String text) {
     Boolean result = false;
     try {
@@ -631,8 +692,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 
   /**
    * 
-   * @param text
-   *          Clabject
+   * @param text Clabject
    * @return
    */
   public Object isDeepKindOf(String text) {
@@ -668,19 +728,23 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return result;
   }
 
+  /**
+   * 
+   * @param arg
+   * @return
+   */
   private Boolean instanceOf(Object[] arg) {
     return ((Clabject) this.context).isInstanceOf((Clabject) arg[0]);
   }
 
   /**
-   * arg[0] has to the collection to insert at arg[1] has to the object to insert
-   * into the collection arg[2] has to the index.
+   * arg[0] has to the collection to insert at arg[1] has to the object to insert into the
+   * collection arg[2] has to the index.
    * 
-   * @param arg
-   *          Object[]
+   * @param arg Object[]
    * @return
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private Collection<?> insertAt(Object[] arg) {
     Collection collection = (Collection<?>) arg[0];
     Object object = arg[1];
@@ -688,7 +752,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return CollectionUtil.insertAt(collection, index, object);
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private Collection<?> symmetricDifference(Object[] arg) {
     return CollectionUtil.symmetricDifference((Set) arg[0], (Set) arg[1]);
   }
@@ -740,37 +804,39 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
+   * makes a set out of a collection.
    * 
-   * @param arg
+   * @param arg collection to make a set from.
    * @return collection as Set
    */
   private Collection<?> asSet(Object[] arg) {
     return CollectionUtil.asSet((Collection<?>) arg[0]);
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private Collection<?> append(Object[] arg) {
     return CollectionUtil.append((Collection) arg[0], arg[1]);
 
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private Collection<?> prepend(Object[] arg) {
     return CollectionUtil.prepend((Collection) arg[0], arg[1]);
   }
 
   /**
+   * collection intersection.
    * 
-   * @param collection
-   * @param collection1
-   * @return
+   * @param collection to intersect with
+   * @param collection1 to intersect with
+   * @return the intersected collection.
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private Collection<?> intersection(Object[] arg) {
     return CollectionUtil.intersection((Collection) arg[0], (Collection) arg[1]);
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private Collection<?> including(Object[] arg) {
     return CollectionUtil.including((Collection) arg[0], arg[1]);
   }
@@ -808,7 +874,19 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   private Number sum(Object[] arg) {
-    return (Number) CollectionUtil.sum((Collection<?>) arg[0]);
+    List<Double> sumList = new ArrayList<>();
+    if (arg[0] instanceof Collection) {
+      for (Object object : (Collection) arg[0]) {
+        if (object instanceof Attribute) {
+          Double sumElement = Double.parseDouble(((Attribute) object).getValue());
+          sumList.add(sumElement);
+        }
+      }
+    }
+    return sumList == null || sumList.isEmpty()
+        ? (Number) CollectionUtil.sum((Collection<?>) arg[0])
+        : (Number) CollectionUtil.sum(sumList);
+
   }
 
   /**
@@ -855,16 +933,15 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         resultCollection.add(attr.getClabject());
       }
     }
+    this.navigationStack.push(new Tuple<String, Collection<Element>>("sortedBy", resultCollection));
     return resultCollection;
   }
 
   /**
    * this sorts an array of Attributes.
    * 
-   * @param collectionToSort
-   *          Collection that will be sorted from lowest to highest
-   * @param dataType
-   *          data type of the attributes.
+   * @param collectionToSort Collection that will be sorted from lowest to highest
+   * @param dataType data type of the attributes.
    * @return returns a sorted list of attributes
    */
   private List<Attribute> sort(List<Attribute> collectionToSort, String dataType) {
@@ -885,8 +962,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * return the inverse collection compared to the select operation returns all
-   * element for which the expression is false as a collection
+   * return the inverse collection compared to the select operation returns all element for which
+   * the expression is false as a collection
    * 
    * @param collection
    * @param expression
@@ -908,11 +985,11 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * arg[0] has to a collection and arg[1] has to be an expression
+   * arg[0] has to a collection and arg[1] has to be an expression.
    * 
-   * @param collection
-   * @param expression
-   * @return
+   * @param collection collection to chose one element from.
+   * @param expression no expression needed here.
+   * @return returns one element from the passed collection.
    */
   private Boolean one(Object[] arg) {
     Set<Clabject> returnCollection = new HashSet<>();
@@ -924,7 +1001,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       Attribute attr = (Attribute) c.getFeatureForName(expressionMap.get("left"));
       if (compare(attr.getValue(), expressionMap.get("right"), expressionMap.get("operator"))) {
         returnCollection.add(c);
-        if (returnCollection.size() > 1) { return false; }
+        if (returnCollection.size() > 1) {
+          return false;
+        }
       }
     }
     return true;
@@ -934,8 +1013,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     if (this.navigationStack.peek().getSecond().size() == 1) {
       List<Element> returnCollection = new ArrayList<>();
       if (this.navigationStack.peek().getSecond().toArray()[0] instanceof Clabject) {
-        Collection<Clabject> tempCollection = ((Clabject) this.navigationStack.peek().getSecond()
-            .toArray()[0]).getDefinedInstances();
+        Collection<Clabject> tempCollection =
+            ((Clabject) this.navigationStack.peek().getSecond().toArray()[0]).getDefinedInstances();
         for (Clabject c : tempCollection) {
           returnCollection.add(c);
         }
@@ -954,8 +1033,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     if (this.navigationStack.peek().getSecond().size() == 1) {
       List<Element> returnCollection = new ArrayList<>();
       if (this.navigationStack.peek().getSecond().toArray()[0] instanceof Clabject) {
-        Collection<Clabject> tempCollection = ((Clabject) this.navigationStack.peek().getSecond()
-            .toArray()[0]).getDefinedInstances();
+        Collection<Clabject> tempCollection =
+            ((Clabject) this.navigationStack.peek().getSecond().toArray()[0])
+                .getClassificationTreeAsType();
         for (Clabject c : tempCollection) {
           returnCollection.add(c);
         }
@@ -970,6 +1050,15 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     }
   }
 
+  /**
+   * This function evaluates OCL statements. It puts the necessary information into a HashMap and
+   * passes it on to the castAndCompare function.
+   * 
+   * @param right side of the equation.
+   * @param operator indicates how the left and right side a related to each other.
+   * @return returns a boolean value.
+   * @throws InterpreterException if something went wrong this exception will be thrown.
+   */
   public Boolean eval(String right, String operator) throws InterpreterException {
     if (this.navigationStack.peek().getSecond() != null
         && this.navigationStack.peek().getSecond().size() == 1) {
@@ -983,6 +1072,15 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     }
   }
 
+  /**
+   * If the right side is not a String an instead an object it is most likely a collection that
+   * wraps an attribute (PLM). This is unpacked and then passed into the other eval function.
+   * 
+   * @param right is here most likely a collection with an attribute.
+   * @param operator to compare left and right
+   * @return a boolean value
+   * @throws InterpreterException is thrown when the Object is not a collection with an attribute.
+   */
   public Boolean eval(Object right, String operator) throws InterpreterException {
     if (right instanceof Collection) {
       right = ((Collection) right).toArray()[0];
@@ -997,7 +1095,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         return castAndCompare((Attribute) this.navigationStack.peek().getSecond().toArray()[0],
             expressionMap);
       } else {
-        throw new InterpreterException("tried to access an attribute from a collection?");
+        throw new InterpreterException("Object is not a collection with an attribute");
       }
     } else if (right instanceof String) {
       return eval((String) right, operator);
@@ -1028,10 +1126,20 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       expressionMap.put("right", right.toString());
       expressionMap.put("operator", operator);
       return castAndCompare(attributeLeft, expressionMap);
+    } else if (right instanceof Boolean && left instanceof Boolean) {
+      return left == right;
     } else if (right instanceof String) {
       return eval((String) right, operator);
     } else if (right instanceof Number) {
       return eval(right.toString(), operator);
+    } else if (right instanceof Clabject && left instanceof Clabject) {
+      if (operator.equals("=")) {
+        return left == right;
+      } else if (operator.equals("<>")) {
+        return left != right;
+      } else {
+        throw new InterpreterException("which operator do you want?");
+      }
     } else {
       throw new InterpreterException("did not work");
     }
@@ -1052,11 +1160,11 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * arg[0] has to be a collection and arg[1] has to be the expression
+   * arg[0] has to be a collection and arg[1] has to be the expression.
    * 
-   * @param collection
-   * @param expression
-   * @return
+   * @param collection collection that is checked if some property is unique.
+   * @param expression has to refer to some property in the elements in the collection.
+   * @return a boolean value.
    */
   private Boolean isUnique(Object[] arg) {
     Set set = new HashSet<>();
@@ -1065,8 +1173,10 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     Iterator<?> it = collection.iterator();
     while (it.hasNext()) {
       Clabject clabject = (Clabject) it.next();
-      if (!set.add(((Attribute) clabject.getFeatureForName(expressionMap.get("attribute")))
-          .getValue())) { return false; }
+      if (!set.add(
+          ((Attribute) clabject.getFeatureForName(expressionMap.get("attribute"))).getValue())) {
+        return false;
+      }
     }
     return true;
   }
@@ -1074,10 +1184,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   /**
    * arg[0] has to be a collection and arg[1] has to be an expression.
    * 
-   * @param collection
-   *          collection to check
-   * @param expression
-   *          expression to check the collection for
+   * @param collection collection to check
+   * @param expression expression to check the collection for
    * @return
    */
   private Boolean exists(Object[] arg) {
@@ -1087,29 +1195,18 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     while (it.hasNext()) {
       Clabject c = (Clabject) it.next();
       Attribute a = (Attribute) c.getFeatureForName(expressionMap.get("left"));
-      if (castAndCompare(a, expressionMap)) { return true; }
+      if (castAndCompare(a, expressionMap)) {
+        return true;
+      }
     }
     return false;
   }
 
-  /**
-   * collects the value of the attribute (expression), and puts it in a collection
-   * of that type. method is pretty long and similar to the cast and compare
-   * method a little further down due the casting of the proper data type for the
-   * lists that are returned.
-   * 
-   * @param arg
-   *          : arg[0] collection; arg[1] expression
-   * @return
-   */
-  private Collection<?> collect(Object[] arg) {
-    return null;
-  }
 
   /**
-   * arg[0] = collection<?> ; arg[1] = expression : String
+   * arg[0] = collection<?> ; arg[1] = expression : String.
    * 
-   * @return
+   * @return one element from the collection
    */
   private Collection<?> any(Object[] arg) {
     List<Clabject> returnCollection = new ArrayList<>();
@@ -1235,7 +1332,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             EList parameterTypes = operation.getETypeParameters();
             int index = 0;
             for (ETypeParameter parameter : operation.getETypeParameters()) {
-              if (!parameter.getName().equals(argList.get(index))) { return new OclInvalid(); }
+              if (!parameter.getName().equals(argList.get(index))) {
+                return new OclInvalid();
+              }
               index++;
             }
             try {
@@ -1261,7 +1360,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             EList parameterTypes = operation.getETypeParameters();
             int index = 0;
             for (ETypeParameter parameter : operation.getETypeParameters()) {
-              if (!parameter.getName().equals(argList.get(index))) { return new OclInvalid(); }
+              if (!parameter.getName().equals(argList.get(index))) {
+                return new OclInvalid();
+              }
               index++;
             }
             try {
@@ -1286,7 +1387,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             EList parameterTypes = operation.getETypeParameters();
             int index = 0;
             for (ETypeParameter parameter : operation.getETypeParameters()) {
-              if (!parameter.getName().equals(argList.get(index))) { return new OclInvalid(); }
+              if (!parameter.getName().equals(argList.get(index))) {
+                return new OclInvalid();
+              }
               index++;
             }
             try {
@@ -1315,7 +1418,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             EList parameterTypes = operation.getETypeParameters();
             int index = 0;
             for (ETypeParameter parameter : operation.getETypeParameters()) {
-              if (!parameter.getName().equals(argList.get(index))) { return new OclInvalid(); }
+              if (!parameter.getName().equals(argList.get(index))) {
+                return new OclInvalid();
+              }
               index++;
             }
             try {
@@ -1341,7 +1446,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             EList parameterTypes = operation.getETypeParameters();
             int index = 0;
             for (ETypeParameter parameter : operation.getETypeParameters()) {
-              if (!parameter.getName().equals(argList.get(index))) { return new OclInvalid(); }
+              if (!parameter.getName().equals(argList.get(index))) {
+                return new OclInvalid();
+              }
               index++;
             }
             try {
@@ -1404,18 +1511,13 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return result;
   }
 
-  /**
-   * |=====================================================================|
-   * |helper operations section |
-   * |=====================================================================|
-   */
+  // helper operation section
 
   /**
-   * maybe more types are needed, these are enough for the moment. Input values
-   * are the clabject's attribute and the expression which the value of the
-   * attribute is compared with. The first value of the returnCollection is the
-   * casted attribute value and the second value is the properly casted expression
-   * which the attribute is compared with
+   * maybe more types are needed, these are enough for the moment. Input values are the clabject's
+   * attribute and the expression which the value of the attribute is compared with. The first value
+   * of the returnCollection is the casted attribute value and the second value is the properly
+   * casted expression which the attribute is compared with
    * 
    * @param a
    * @param expressionMap
@@ -1463,8 +1565,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * splits the expression if the string contains a special character, like = >=
-   * <= and so on.
+   * splits the expression if the string contains a special character, like = >= <= and so on.
    * 
    * @param expression
    * @return
@@ -1586,10 +1687,25 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     }
   }
 
+  /**
+   * resets the context to the original context.
+   */
   public void self() {
     this.navigationStack.clear();
     this.navigationStack.push(new Tuple<String, Collection<Element>>(this.context.getName(),
         Arrays.asList(this.context)));
+  }
+
+  /**
+   * when doing loop collection operation a new instance of this class, with a context parameter is
+   * created for each iterator variable and we need a method to navigate to the old context. that is
+   * why we need this method.
+   * 
+   * @param context2 is the clabject that is passed from the loop operation
+   */
+  public void self(Clabject context2) {
+    this.navigationStack.push(
+        new Tuple<String, Collection<Element>>(this.context.getName(), Arrays.asList(context2)));
   }
 
   public void setRight(String right) {
@@ -1613,8 +1729,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * adds a Tuple to let Variable list. First element is the name of the variable
-   * and the second element in the tuple is the actual variable
+   * adds a Tuple to let Variable list. First element is the name of the variable and the second
+   * element in the tuple is the actual variable
    * 
    * @param letName
    * @param letType
@@ -1628,9 +1744,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * assign a value to a let variable
+   * assign a value to a let variable.
    * 
-   * @param value
+   * @param value value to assign the let variable with
    * @return
    */
   public Object assign(String value) {
@@ -1655,19 +1771,25 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return null;
   }
 
-  // when doing loop collection operation a new instance of this class, with a
-  // context parameter is created for each iterator variable and we need a
-  // method to navigate to the old context. that is why we need this method
-  public void self(Clabject context2) {
-    this.navigationStack.push(
-        new Tuple<String, Collection<Element>>(this.context.getName(), Arrays.asList(context2)));
-  }
-
+  /**
+   * checks if the operation is in the operations list.
+   * 
+   * @param text String with the name of the operation
+   * @return returns true if the operation is in the list and false if not.
+   */
   public boolean operationExist(String text) {
-    if (this.operationList.contains(text)) { return true; }
+    if (this.operationList.contains(text)) {
+      return true;
+    }
     return false;
   }
 
+  /**
+   * checks if a certain method of the clabject in the current context is present.
+   * 
+   * @param operation name
+   * @return true or false
+   */
   public boolean operationOnClabject(String operation) {
     boolean result = false;
     for (Element element : this.navigationStack.peek().getSecond()) {
@@ -1684,7 +1806,13 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return result;
   }
 
-  // execute methods that are defined by def or body constraints
+  /**
+   * executes an operation/method on the clabject.
+   * 
+   * @param text method name
+   * @param args arguments passed to the method
+   * @return result of the method execution
+   */
   public Object executeClabjectOperation(String text, Object[] args) {
     Object result = null;
     boolean preConstraint = true;

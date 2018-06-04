@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering All rights
+ * reserved. This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *    Ralph Gerbig - initial API and implementation and initial documentation
- *    Arne Lange - ocl2 implementation
+ * Contributors: Ralph Gerbig - initial API and implementation and initial documentation Arne Lange
+ * - ocl2 implementation
  *******************************************************************************/
 
 package org.melanee.ocl2.service;
@@ -20,10 +18,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
 import javax.management.RuntimeErrorException;
 import javax.naming.OperationNotSupportedException;
-
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -127,11 +123,9 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   private Boolean assign;
 
   /**
-   * Deep OCL Rule visitor is the main class for interpreting the parsed ocl
-   * statement.
+   * Deep OCL Rule visitor is the main class for interpreting the parsed ocl statement.
    * 
-   * @param context
-   *          - is a Clabject
+   * @param context - is a Clabject
    */
   public DeepOclRuleVisitor(Clabject context) {
     super();
@@ -156,8 +150,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   /**
    * Different constructor.
    * 
-   * @param context
-   *          is a Clabject (context of the OCL statement)
+   * @param context is a Clabject (context of the OCL statement)
    */
   public DeepOclRuleVisitor(Element context) {
     super();
@@ -182,10 +175,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   /**
    * Different constructor.
    * 
-   * @param context
-   *          is a Clabject
-   * @param parameters
-   *          is a Collection of Elements from PLM
+   * @param context is a Clabject
+   * @param parameters is a Collection of Elements from PLM
    */
   public DeepOclRuleVisitor(Clabject context, Collection<Element> parameters) {
     super();
@@ -406,15 +397,13 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   }
 
   /**
-   * so here it gets messy. probably a spot to begin refactoring. every time it is
-   * almost the same procedure. check if the tempCollection is not null and gather
-   * the parameters from the tree. iteration operation that return another
-   * selection rather than Integer or Boolean, get the current iterator object
-   * from the wrapper that represent the actual navigation in the deep model. As
-   * long as the iterator has next a new Wrapper object is created and as the new
-   * context the current navigation is set initially. Every operation that returns
-   * a new collection as a result is using the tempCollection. As mentioned,
-   * pretty messy!
+   * so here it gets messy. probably a spot to begin refactoring. every time it is almost the same
+   * procedure. check if the tempCollection is not null and gather the parameters from the tree.
+   * iteration operation that return another selection rather than Integer or Boolean, get the
+   * current iterator object from the wrapper that represent the actual navigation in the deep
+   * model. As long as the iterator has next a new Wrapper object is created and as the new context
+   * the current navigation is set initially. Every operation that returns a new collection as a
+   * result is using the tempCollection. As mentioned, pretty messy!
    */
   @SuppressWarnings("unchecked")
   @Override
@@ -476,8 +465,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
                 .push(new Tuple<String, Collection<Element>>("at", Arrays.asList(e)));
             return e;
           } else {
-            Element e = (Element) this.wrapper.getNavigationStack().peek().getSecond()
-                .toArray()[index];
+            Element e =
+                (Element) this.wrapper.getNavigationStack().peek().getSecond().toArray()[index];
             this.wrapper.getNavigationStack()
                 .push(new Tuple<String, Collection<Element>>("at", Arrays.asList(e)));
             return e;
@@ -502,11 +491,15 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             return e;
           } else {
             int size = this.wrapper.getNavigationStack().peek().getSecond().size();
-            Element e = (Element) this.wrapper.getNavigationStack().peek().getSecond()
-                .toArray()[size - 1];
-            this.wrapper.getNavigationStack()
-                .add(new Tuple<String, Collection<Element>>("last", Arrays.asList(e)));
-            return e;
+            if (size > 0) {
+              Element e = (Element) this.wrapper.getNavigationStack().peek().getSecond()
+                  .toArray()[size - 1];
+              this.wrapper.getNavigationStack()
+                  .add(new Tuple<String, Collection<Element>>("last", Arrays.asList(e)));
+              return e;
+            } else {
+              return new OclInvalid();
+            }
           }
         }
         // is Empty
@@ -541,7 +534,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           if (!collection.isEmpty()) {
             Clabject clabject = (Clabject) collection.toArray()[0];
             Attribute a = (Attribute) clabject.getFeatureForName(expression);
-            if (a.getDatatype().equals("Integer")) {
+            if (a.getDatatype().equals("Integer") || a.getDatatype().equals("Natural")) {
               List<Integer> integerCollection = new ArrayList<>();
               Iterator<?> it = collection.iterator();
               while (it.hasNext()) {
@@ -560,16 +553,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
                     Double.parseDouble(((Attribute) c.getFeatureForName(expression)).getValue()));
               }
               this.tempCollection = doubleCollection;
-              return this.tempCollection;
-            } else if (a.getDatatype().equals("Natural")) {
-              List<Integer> integerCollection = new ArrayList<>();
-              Iterator<?> it = collection.iterator();
-              while (it.hasNext()) {
-                Clabject c = (Clabject) it.next();
-                integerCollection.add(
-                    Integer.parseInt(((Attribute) c.getFeatureForName(expression)).getValue()));
-              }
-              this.tempCollection = integerCollection;
               return this.tempCollection;
             } else if (a.getDatatype().equals("String")) {
               List<String> stringCollection = new ArrayList<>();
@@ -592,6 +575,48 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             }
           }
         }
+        // collectNested
+        else if (ctx.opName.getText().equals("collectNested")) {
+          this.tempCollection = null;
+          Collection<?> collection = this.wrapper.getNavigationStack().peek().getSecond();
+          String expression = ctx.arg.getText();
+          Collection<Element> returnCollection = new ArrayList<>();
+          DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
+          if (!collection.isEmpty()) {
+            for (Object clab : collection) {
+              if (clab instanceof Clabject) {
+                Clabject clabject = (Clabject) clab;
+                DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clabject);
+                this.wrapper = newWrapper;
+                Object result = visit(ctx.arg);
+                if (result instanceof Number) {
+                  Attribute attr = PLMFactory.eINSTANCE.createAttribute();
+                  attr.setDatatype("Real");
+                  attr.setValue(result.toString());
+                  returnCollection.add(attr);
+                } else if (result instanceof Attribute) {
+                  Attribute attr = (Attribute) result;
+                  returnCollection.add(attr);
+                } else if (result instanceof Collection) {
+                  if (((Collection) result).toArray()[0] instanceof Attribute) {
+                    Attribute attr = (Attribute) ((Collection) result).toArray()[0];
+                    returnCollection.add(attr);
+                  }
+                } else if (result instanceof String) {
+                  Attribute attr = PLMFactory.eINSTANCE.createAttribute();
+                  attr.setDatatype("String");
+                  attr.setValue(result.toString());
+                  returnCollection.add(attr);
+                }
+              }
+            }
+          }
+          this.wrapper = oldWrapper;
+          this.wrapper.getNavigationStack()
+              .push(new Tuple<String, Collection<Element>>("collectNested", returnCollection));
+          return returnCollection;
+        }
+
         // sum
         else if (ctx.opName.getText().equals("sum")) {
           Object[] arg = new Object[1];
@@ -617,7 +642,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
               this.wrapper.getNavigationStack()
                   .push(new Tuple<String, Collection<Element>>("sum", Arrays.asList(attr)));
             }
-
           } catch (Exception e) {
             return new OclInvalid();
           }
@@ -1135,8 +1159,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
       }
       if (this.wrapper.getNavigationStack().peek().getSecond().size() == 1) {
         try {
-          Attribute attr = (Attribute) this.wrapper.getNavigationStack().peek().getSecond()
-              .toArray()[0];
+          Attribute attr =
+              (Attribute) this.wrapper.getNavigationStack().peek().getSecond().toArray()[0];
           if (attr.getDatatype().equals("String")) {
             this.tempString = attr.getValue() + visitNavigatingArgCS(ctx.arg);
             return this.tempString;
@@ -1177,11 +1201,12 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
       return this.wrapper.isDirectInstanceOf(ctx.arg.getText());
     } else if (ctx.opName.getText().equals("isDeepDirectInstanceOf")) {
       return this.wrapper.isDeepDirectInstanceOf(ctx.arg.getText());
-    } else if (ctx.opName.getText()
-        .equals("isDeepKindOf")) { return this.wrapper.isDeepKindOf(ctx.arg.getText()); }
+    } else if (ctx.opName.getText().equals("isDeepKindOf")) {
+      return this.wrapper.isDeepKindOf(ctx.arg.getText());
+    }
     if (this.wrapper.operationExist(ctx.opName.getText())) {
       if (ctx.arg != null && ctx.arg.getText() != "") {
-        Object[] arg = { this.wrapper.getNavigationStack().peek().getSecond(), ctx.arg.getText() };
+        Object[] arg = {this.wrapper.getNavigationStack().peek().getSecond(), ctx.arg.getText()};
         try {
           return this.wrapper.invoke(ctx.opName.getText(), arg);
         } catch (Exception e) {
@@ -1452,8 +1477,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   }
 
   /**
-   * for navigation a level higher in the model, e.g. from O2 to O1 models and
-   * using their navigation
+   * for navigation a level higher in the model, e.g. from O2 to O1 models and using their
+   * navigation
    */
   @Override
   public Object visitOntologicalName(OntologicalNameContext ctx) {
@@ -1472,13 +1497,13 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   public Object visitLinguisticalName(LinguisticalNameContext ctx) {
     if (ctx.getText().contains("(")) {
       // System.out.println(ctx.aspect.getText());
-      String param = ctx.getText().substring(ctx.getText().indexOf('(') + 1,
-          ctx.getText().length() - 2);
+      String param =
+          ctx.getText().substring(ctx.getText().indexOf('(') + 1, ctx.getText().length() - 2);
       if (param.contains(",")) {
         String[] params = param.split(",");
         return this.wrapper.getLinguisticAspect(ctx.aspect.getText(), params);
       } else {
-        String[] params = { param };
+        String[] params = {param};
         return this.wrapper.getLinguisticAspect(ctx.aspect.getText(), params);
       }
     }
@@ -1509,7 +1534,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
       this.wrapper.self((Clabject) this.context);
     }
     this.wrapper.self();
-    return visitChildren(ctx);
+    return this.context;
   }
 
   /**

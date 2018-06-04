@@ -115,7 +115,7 @@ public class DeepOCL2ClassificationTests {
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(c1);
     Object returnValue = visitor.visit(tree);
-    assertEquals(Arrays.asList(c2), returnValue);
+    assertEquals(Arrays.asList(c2,c3), returnValue);
   }
 
   /**
