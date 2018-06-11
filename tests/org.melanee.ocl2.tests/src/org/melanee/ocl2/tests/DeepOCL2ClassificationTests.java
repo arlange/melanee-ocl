@@ -1,20 +1,18 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering All rights
+ * reserved. This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *    Ralph Gerbig - initial API and implementation and initial documentation
- *    Arne Lange - ocl2 implementation
+ * Contributors: Ralph Gerbig - initial API and implementation and initial documentation Arne Lange
+ * - ocl2 implementation
  *******************************************************************************/
 package org.melanee.ocl2.tests;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
-
+import java.util.Collection;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -32,6 +30,7 @@ import org.melanee.ocl2.service.DeepOclRuleVisitor;
 
 /**
  * This test class checks for Deep Classification
+ * 
  * @author Arne Lange
  *
  */
@@ -51,8 +50,8 @@ public class DeepOCL2ClassificationTests {
   }
 
   /**
-   * This test should only return instances that are directly connected to the
-   * source clabject. source.allInstances()
+   * This test should only return instances that are directly connected to the source clabject.
+   * source.allInstances()
    */
   @Test
   public void allInstancesTest_One() {
@@ -79,8 +78,8 @@ public class DeepOCL2ClassificationTests {
   }
 
   /**
-   * This test should only return one level of the classification tree hierarchy.
-   * c1 - c2; not c2 and c3
+   * This test should only return one level of the classification tree hierarchy. c1 - c2; not c2
+   * and c3
    */
   @Test
   public void allInstancesTest_More() {
@@ -115,12 +114,12 @@ public class DeepOCL2ClassificationTests {
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(c1);
     Object returnValue = visitor.visit(tree);
-    assertEquals(Arrays.asList(c2,c3), returnValue);
+    assertTrue(((Collection) returnValue).contains(c2) && ((Collection) returnValue).contains(c3));
   }
 
   /**
-   * This test should only return one level of the classification tree hierarchy.
-   * c1 - c2; not c2 and c3
+   * This test should only return one level of the classification tree hierarchy. c1 - c2; not c2
+   * and c3
    */
   @Test
   public void allInstancesTest_OneMore() {
@@ -194,8 +193,8 @@ public class DeepOCL2ClassificationTests {
     Attribute attr = PLMFactory.eINSTANCE.createAttribute();
     attr.setName("attr");
     c.getFeature().add(attr);
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("self.attr.oclIsKindOf(Attribute)"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("self.attr.oclIsKindOf(Attribute)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(c);
@@ -222,8 +221,8 @@ public class DeepOCL2ClassificationTests {
     Attribute attr = PLMFactory.eINSTANCE.createAttribute();
     attr.setName("attr");
     c.getFeature().add(attr);
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("self.attr.oclIsTypeOf(Attribute)"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("self.attr.oclIsTypeOf(Attribute)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(c);

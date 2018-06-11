@@ -1,7 +1,6 @@
 package org.melanee.ocl2.tests;
 
 import static org.junit.Assert.assertEquals;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -329,8 +328,8 @@ public class BPMN2Tests {
 
   @Test
   public void isDeepKindOfTest7() {
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("self.isDeepKindOf(ThrowWEvent)"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("self.isDeepKindOf(ThrowWEvent)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.orderPizza);
@@ -410,12 +409,33 @@ public class BPMN2Tests {
 
     this.hungerSatisfied.getFeature().add(attribute);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("leer <> \"\""));
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("leer <> \"\""));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.hungerSatisfied);
     Object returnValue = visitor.visit(tree);
     assertEquals(true, Boolean.parseBoolean(returnValue.toString()));
+  }
+
+  @Test
+  public void contextSensitiveVisualization() {
+    Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
+    attribute.setDatatype("String");
+    attribute.setName("status");
+    attribute.setValue("running");
+
+    this.hungerSatisfied.getFeature().add(attribute);
+
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("let color: String = \"BLACK\" in \n"
+            + "if self.status = \"executed\" and not(self.status = \"error\") \n"
+            + "then color=\"GREEN\" \n" + "else \n" + "    if self.status = \"running\" \n"
+            + "    then color=\"ORANGE\" \n" + "    else color = \"GREY\" \n" + "    endif \n"
+            + "endif"));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.hungerSatisfied);
+    Object returnValue = visitor.visit(tree);
+    assertEquals("\"ORANGE\"", returnValue.toString());
   }
 }

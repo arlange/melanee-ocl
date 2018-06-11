@@ -527,7 +527,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         return false;
       }
     } else {
-      return false;
+      return true;
     }
   }
 
@@ -579,6 +579,12 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return isTypeOf;
   }
 
+  /**
+   * try to cast a clabject into other other clabject.
+   * 
+   * @param target Clabject to cast to.
+   * @return casted clabject
+   */
   public Object oclAsType(String target) {
     try {
       Class<?> clazz;
@@ -691,15 +697,17 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
+   * This function returns true if the clabject is ontological or through a combination of
+   * ontological and subsumption relationship connected to the clabject passed in the parameter.
    * 
-   * @param text Clabject
-   * @return
+   * @param text Clabject.
+   * @return true or false
    */
   public Object isDeepKindOf(String text) {
     Boolean result = false;
     try {
-      Clabject context = (Clabject) this.context;
-      for (Element type : context.getDirectTypes()) {
+      Clabject clabject = (Clabject) this.navigationStack.peek().getSecond().toArray()[0];
+      for (Element type : clabject.getDirectTypes()) {
         Clabject clab = (Clabject) type;
         // is there is no name of the clabject a NullPointer will be thrown. Like
         // connection without a name
@@ -712,7 +720,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         }
       }
       if (!result) {
-        for (Element type : context.getDirectTypes()) {
+        for (Element type : clabject.getDirectTypes()) {
           Clabject clab = (Clabject) type;
           for (Clabject supertype : clab.getSupertypes()) {
             if (supertype.getName().equals(text)) {
@@ -721,7 +729,14 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
           }
         }
       }
-    } catch (ClassCastException e) {
+      if (!result) {
+        for (Element superType : clabject.getSupertypes()) {
+          if (superType.getName().equals(text)) {
+            result = true;
+          }
+        }
+      }
+    } catch (ArrayIndexOutOfBoundsException | ClassCastException e) {
       // not castable to Clabject, which is necessary
       return null;
     }
@@ -945,18 +960,22 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    * @return returns a sorted list of attributes
    */
   private List<Attribute> sort(List<Attribute> collectionToSort, String dataType) {
-    if (dataType.equals("Integer") || dataType.equals("Real") || dataType.equals("Natural")) {
-      Comparator<Attribute> comp = (Attribute a, Attribute b) -> {
-        Double c = Double.parseDouble(b.getValue());
-        Double d = Double.parseDouble(a.getValue());
-        return d.compareTo(c);
-      };
-      Collections.sort(collectionToSort, comp);
-    } else if (dataType.equals("String")) {
-      Comparator<Attribute> comp = (Attribute a, Attribute b) -> {
-        return a.getValue().compareTo(b.getValue());
-      };
-      Collections.sort(collectionToSort, comp);
+    try {
+      if (dataType.equals("Integer") || dataType.equals("Real") || dataType.equals("Natural")) {
+        Comparator<Attribute> comp = (Attribute a, Attribute b) -> {
+          Double c = Double.parseDouble(b.getValue());
+          Double d = Double.parseDouble(a.getValue());
+          return d.compareTo(c);
+        };
+        Collections.sort(collectionToSort, comp);
+      } else if (dataType.equals("String")) {
+        Comparator<Attribute> comp = (Attribute a, Attribute b) -> {
+          return a.getValue().compareTo(b.getValue());
+        };
+        Collections.sort(collectionToSort, comp);
+      }
+    } catch (NumberFormatException e) {
+      e.printStackTrace();
     }
     return collectionToSort;
   }

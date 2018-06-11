@@ -326,10 +326,10 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
 
   @Override
   public Object visitIfExpCS(IfExpCSContext ctx) {
+    this.assign = false;
     Object result = visit(ctx.ifexp);
     try {
       Boolean bool = Boolean.parseBoolean(result.toString());
-      System.out.println(bool);
       this.assign = true;
       if (bool) {
         return visit(ctx.thenexp);
