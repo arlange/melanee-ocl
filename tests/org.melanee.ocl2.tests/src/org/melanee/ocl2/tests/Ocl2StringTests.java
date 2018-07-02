@@ -107,7 +107,7 @@ public class Ocl2StringTests {
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(product);
     Object returnValue = visitor.visit(tree);
-    assertEquals(true, returnValue);
+    assertEquals(433.99, returnValue);
   }
 
 }
