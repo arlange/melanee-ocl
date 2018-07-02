@@ -438,4 +438,15 @@ public class BPMN2Tests {
     Object returnValue = visitor.visit(tree);
     assertEquals("\"ORANGE\"", returnValue.toString());
   }
+  
+  @Test
+  public void PANLevelTests() {
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("Level -> reject(l|l.#getLevel()# = 0) -> forAll(l|l.#getEntities()# -> forAll(self.#getClassificationTreeAsInstance()# -> size() > 0))"));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
+    Object returnValue = visitor.visit(tree);
+    assertEquals(true, returnValue);
+  }
 }

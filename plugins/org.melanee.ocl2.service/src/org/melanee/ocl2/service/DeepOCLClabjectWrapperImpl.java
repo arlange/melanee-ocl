@@ -142,6 +142,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     operationList.add("sum");
     operationList.add("including");
     operationList.add("closure");
+    operationList.add("substring");
     // deepOCL operations
     operationList.add("allInstances");
     operationList.add("indirectInstances");
@@ -1478,6 +1479,12 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
               } else if (result instanceof Element) {
                 this.navigationStack.push(
                     new Tuple<String, Collection<Element>>(text, Arrays.asList((Element) result)));
+              } else if (result instanceof Integer) {
+                Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
+                attribute.setDatatype("Integer");
+                attribute.setValue(result.toString());
+                this.navigationStack
+                    .push(new Tuple<String, Collection<Element>>(text, Arrays.asList(attribute)));
               }
             } catch (Exception exception) {
               return new OclInvalid();

@@ -910,21 +910,21 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
           Iterator<Element> it = wrapper.getCurrentCollectionIterator();
           while (it.hasNext()) {
-            Clabject clab = (Clabject) it.next();
+            Element element = it.next();
             if (ctx.arg.getText().equals("self")) {
-              if (!clab.equals(wrapper.getContext())) {
-                list.add(clab);
+              if (!element.equals(wrapper.getContext())) {
+                list.add(element);
               }
               continue;
             }
-            DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
+            DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(element);
             this.wrapper = newWrapper;
             Object result = visit(ctx.arg);
             if (result != null) {
               try {
                 boolean r = Boolean.parseBoolean(result.toString());
                 if (r == false) {
-                  list.add(clab);
+                  list.add(element);
                 }
               } catch (Exception e) {
                 System.out.println("was not boolean nature");
@@ -951,8 +951,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
           Iterator<Element> it = wrapper.getCurrentCollectionIterator();
           while (it.hasNext()) {
-            Clabject clab = (Clabject) it.next();
-            DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
+            Element element = it.next();
+            DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(element);
             this.wrapper = newWrapper;
             Object result = visit(ctx.arg);
             if (result != null) {
@@ -1175,7 +1175,30 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         }
 
       }
-    } // oclIsTypeOf
+    } else if (ctx.opName.getText().equals("substring")) {
+      if (this.tempString != null) {
+        this.tempString = this.tempString + visitChildren(ctx);
+        return this.tempString;
+      } else if (ctx.getText().contains("(")) {
+        int arg1 = Integer.parseInt(
+            ctx.getText().substring(ctx.getText().indexOf("(") + 1, ctx.getText().indexOf(",")));
+        int arg2 = Integer.parseInt(
+            ctx.getText().substring(ctx.getText().indexOf(",") + 1, ctx.getText().indexOf(")")));
+        if (this.wrapper.getNavigationStack().peek().getSecond() instanceof Collection) {
+          Attribute attr =
+              (Attribute) this.wrapper.getNavigationStack().peek().getSecond().toArray()[0];
+          if (attr.getDatatype().equals("String")) {
+            String result = attr.getValue().substring(arg1 - 1, arg2);
+            Attribute resultAttribute = PLMFactory.eINSTANCE.createAttribute();
+            resultAttribute.setDatatype("String");
+            resultAttribute.setValue(result);
+            this.wrapper.getNavigationStack().push(new Tuple<String, Collection<Element>>(
+                "substring", Arrays.asList(resultAttribute)));
+          }
+        }
+      }
+    }
+    // oclIsTypeOf
     else if (ctx.opName.getText().equals("oclIsTypeOf")) {
       return this.wrapper.oclIsTypeOf(ctx.arg.getText());
     } // oclIsKindOf
