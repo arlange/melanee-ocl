@@ -1,19 +1,16 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering All rights
+ * reserved. This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *    Ralph Gerbig - initial API and implementation and initial documentation
- *    Arne Lange - ocl2 implementation
+ * Contributors: Ralph Gerbig - initial API and implementation and initial documentation Arne Lange
+ * - ocl2 implementation
  *******************************************************************************/
 package org.melanee.ocl2.service.util;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -159,7 +156,9 @@ public class DeepOCL2Util {
         try {
           // result has to be of boolean nature to be
           // valid
-          if (Boolean.parseBoolean(result.toString()) == false) { return false; }
+          if (Boolean.parseBoolean(result.toString()) == false) {
+            return false;
+          }
         } catch (Exception e) {
           return false;
         }
@@ -190,6 +189,9 @@ public class DeepOCL2Util {
       }
     }
     return returnList;
+  }
 
+  public static boolean isWord(String s) {
+    return (s.length() > 0 && s.split("\\s+").length == 1);
   }
 }

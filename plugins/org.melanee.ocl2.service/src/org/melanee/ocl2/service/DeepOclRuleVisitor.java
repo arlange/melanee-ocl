@@ -839,6 +839,10 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             Element element = it.next();
             DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(element);
             this.wrapper = newWrapper;
+            if(ctx.arg.getText().contains("|")) {
+              String iteratorName = ctx.arg.getText().substring(0, 1);
+              this.wrapper.setIteratorName(iteratorName);
+            }
             Object result = visit(ctx.arg);
             if (result != null) {
               try {
@@ -1198,6 +1202,36 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         }
       }
     }
+    // to Upper Case
+    else if (ctx.opName.getText().equals("toUpperCase")) {
+      if (this.wrapper.getNavigationStack().peek().getSecond() instanceof Attribute) {
+        Attribute attribute = (Attribute) this.wrapper.getNavigationStack().peek().getSecond();
+        if (attribute.getDatatype().equals("String")) {
+          Attribute toUpper = PLMFactory.eINSTANCE.createAttribute();
+          toUpper.setDatatype("String");
+          toUpper.setValue(attribute.getValue().toUpperCase());
+          this.wrapper.getNavigationStack()
+              .push(new Tuple<String, Collection<Element>>("toUpperCase", Arrays.asList(toUpper)));
+        } else {
+          return null;
+        }
+      }
+    }
+    // to Lower Case
+    else if (ctx.opName.getText().equals("toLowerCase")) {
+      if (this.wrapper.getNavigationStack().peek().getSecond() instanceof Attribute) {
+        Attribute attribute = (Attribute) this.wrapper.getNavigationStack().peek().getSecond();
+        if (attribute.getDatatype().equals("String")) {
+          Attribute toLower = PLMFactory.eINSTANCE.createAttribute();
+          toLower.setDatatype("String");
+          toLower.setValue(attribute.getValue().toLowerCase());
+          this.wrapper.getNavigationStack()
+              .push(new Tuple<String, Collection<Element>>("toLowerCase", Arrays.asList(toLower)));
+        } else {
+          return null;
+        }
+      }
+    }
     // oclIsTypeOf
     else if (ctx.opName.getText().equals("oclIsTypeOf")) {
       return this.wrapper.oclIsTypeOf(ctx.arg.getText());
@@ -1385,7 +1419,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
       }
     }
     Double dLeft = Double.parseDouble(left.toString());
-    Object right = visit(ctx.left);
+    Object right = visit(ctx.right);
     if (right instanceof Collection) {
       right = ((Collection) right).toArray()[0];
       if (right instanceof Attribute) {

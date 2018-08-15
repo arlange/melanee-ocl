@@ -3094,10 +3094,10 @@ public class DeepOclParser extends Parser {
 
 	public static class NavigatingExpCSContext extends ParserRuleContext {
 		public IndexExpCSContext opName;
+		public NavigatingBarAgrsCSContext barArg;
 		public NavigatingArgCSContext arg;
 		public NavigatingCommaArgCSContext commaArg;
 		public NavigatingSemiAgrsCSContext semiArg;
-		public NavigatingBarAgrsCSContext barArg;
 		public IndexExpCSContext indexExpCS() {
 			return getRuleContext(IndexExpCSContext.class,0);
 		}
@@ -3106,6 +3106,12 @@ public class DeepOclParser extends Parser {
 		}
 		public OnespaceContext onespace(int i) {
 			return getRuleContext(OnespaceContext.class,i);
+		}
+		public List<NavigatingBarAgrsCSContext> navigatingBarAgrsCS() {
+			return getRuleContexts(NavigatingBarAgrsCSContext.class);
+		}
+		public NavigatingBarAgrsCSContext navigatingBarAgrsCS(int i) {
+			return getRuleContext(NavigatingBarAgrsCSContext.class,i);
 		}
 		public List<NavigatingArgCSContext> navigatingArgCS() {
 			return getRuleContexts(NavigatingArgCSContext.class);
@@ -3124,12 +3130,6 @@ public class DeepOclParser extends Parser {
 		}
 		public NavigatingSemiAgrsCSContext navigatingSemiAgrsCS(int i) {
 			return getRuleContext(NavigatingSemiAgrsCSContext.class,i);
-		}
-		public List<NavigatingBarAgrsCSContext> navigatingBarAgrsCS() {
-			return getRuleContexts(NavigatingBarAgrsCSContext.class);
-		}
-		public NavigatingBarAgrsCSContext navigatingBarAgrsCS(int i) {
-			return getRuleContext(NavigatingBarAgrsCSContext.class,i);
 		}
 		public NavigatingExpCSContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -3208,7 +3208,7 @@ public class DeepOclParser extends Parser {
 							{
 							{
 							setState(459);
-							((NavigatingExpCSContext)_localctx).arg = navigatingArgCS();
+							((NavigatingExpCSContext)_localctx).barArg = navigatingBarAgrsCS();
 							}
 							} 
 						}
@@ -3219,11 +3219,11 @@ public class DeepOclParser extends Parser {
 					setState(468);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la==T__3) {
+					while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__2) | (1L << T__11) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__40) | (1L << T__43) | (1L << T__47) | (1L << T__52) | (1L << T__58) | (1L << T__59))) != 0) || ((((_la - 65)) & ~0x3f) == 0 && ((1L << (_la - 65)) & ((1L << (UnaryOperatorCS - 65)) | (1L << (InvalIDLiteralExpCS - 65)) | (1L << (NumberLiteralExpCS - 65)) | (1L << (BooleanLiteralExpCS - 65)) | (1L << (NullLiteralExpCS - 65)) | (1L << (ID - 65)) | (1L << (STRING - 65)))) != 0)) {
 						{
 						{
 						setState(465);
-						((NavigatingExpCSContext)_localctx).commaArg = navigatingCommaArgCS();
+						((NavigatingExpCSContext)_localctx).arg = navigatingArgCS();
 						}
 						}
 						setState(470);
@@ -3233,11 +3233,11 @@ public class DeepOclParser extends Parser {
 					setState(474);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la==T__55) {
+					while (_la==T__3) {
 						{
 						{
 						setState(471);
-						((NavigatingExpCSContext)_localctx).semiArg = navigatingSemiAgrsCS();
+						((NavigatingExpCSContext)_localctx).commaArg = navigatingCommaArgCS();
 						}
 						}
 						setState(476);
@@ -3247,11 +3247,11 @@ public class DeepOclParser extends Parser {
 					setState(480);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while (_la==T__40) {
+					while (_la==T__55) {
 						{
 						{
 						setState(477);
-						((NavigatingExpCSContext)_localctx).barArg = navigatingBarAgrsCS();
+						((NavigatingExpCSContext)_localctx).semiArg = navigatingSemiAgrsCS();
 						}
 						}
 						setState(482);
@@ -3404,7 +3404,6 @@ public class DeepOclParser extends Parser {
 		enterRule(_localctx, 70, RULE_navigatingCommaArgCS);
 		int _la;
 		try {
-			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(502);
@@ -3430,24 +3429,18 @@ public class DeepOclParser extends Parser {
 				match(T__10);
 				setState(510); 
 				_errHandler.sync(this);
-				_alt = 1;
+				_la = _input.LA(1);
 				do {
-					switch (_alt) {
-					case 1:
-						{
-						{
-						setState(509);
-						expCS();
-						}
-						}
-						break;
-					default:
-						throw new NoViableAltException(this);
+					{
+					{
+					setState(509);
+					expCS();
+					}
 					}
 					setState(512); 
 					_errHandler.sync(this);
-					_alt = getInterpreter().adaptivePredict(_input,63,_ctx);
-				} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
+					_la = _input.LA(1);
+				} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__2) | (1L << T__11) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__40) | (1L << T__43) | (1L << T__47) | (1L << T__52) | (1L << T__58) | (1L << T__59))) != 0) || ((((_la - 65)) & ~0x3f) == 0 && ((1L << (_la - 65)) & ((1L << (UnaryOperatorCS - 65)) | (1L << (InvalIDLiteralExpCS - 65)) | (1L << (NumberLiteralExpCS - 65)) | (1L << (BooleanLiteralExpCS - 65)) | (1L << (NullLiteralExpCS - 65)) | (1L << (ID - 65)) | (1L << (STRING - 65)))) != 0) );
 				}
 			}
 
@@ -4861,13 +4854,13 @@ public class DeepOclParser extends Parser {
 		"\2\2\u01c5\u01eb\3\2\2\2\u01c6\u01c8\7\5\2\2\u01c7\u01c9\79\2\2\u01c8"+
 		"\u01c7\3\2\2\2\u01c8\u01c9\3\2\2\2\u01c9\u01cb\3\2\2\2\u01ca\u01cc\5`"+
 		"\61\2\u01cb\u01ca\3\2\2\2\u01cb\u01cc\3\2\2\2\u01cc\u01d0\3\2\2\2\u01cd"+
-		"\u01cf\5N(\2\u01ce\u01cd\3\2\2\2\u01cf\u01d2\3\2\2\2\u01d0\u01ce\3\2\2"+
-		"\2\u01d0\u01d1\3\2\2\2\u01d1\u01d6\3\2\2\2\u01d2\u01d0\3\2\2\2\u01d3\u01d5"+
-		"\5H%\2\u01d4\u01d3\3\2\2\2\u01d5\u01d8\3\2\2\2\u01d6\u01d4\3\2\2\2\u01d6"+
-		"\u01d7\3\2\2\2\u01d7\u01dc\3\2\2\2\u01d8\u01d6\3\2\2\2\u01d9\u01db\5F"+
-		"$\2\u01da\u01d9\3\2\2\2\u01db\u01de\3\2\2\2\u01dc\u01da\3\2\2\2\u01dc"+
-		"\u01dd\3\2\2\2\u01dd\u01e2\3\2\2\2\u01de\u01dc\3\2\2\2\u01df\u01e1\5L"+
-		"\'\2\u01e0\u01df\3\2\2\2\u01e1\u01e4\3\2\2\2\u01e2\u01e0\3\2\2\2\u01e2"+
+		"\u01cf\5L\'\2\u01ce\u01cd\3\2\2\2\u01cf\u01d2\3\2\2\2\u01d0\u01ce\3\2"+
+		"\2\2\u01d0\u01d1\3\2\2\2\u01d1\u01d6\3\2\2\2\u01d2\u01d0\3\2\2\2\u01d3"+
+		"\u01d5\5N(\2\u01d4\u01d3\3\2\2\2\u01d5\u01d8\3\2\2\2\u01d6\u01d4\3\2\2"+
+		"\2\u01d6\u01d7\3\2\2\2\u01d7\u01dc\3\2\2\2\u01d8\u01d6\3\2\2\2\u01d9\u01db"+
+		"\5H%\2\u01da\u01d9\3\2\2\2\u01db\u01de\3\2\2\2\u01dc\u01da\3\2\2\2\u01dc"+
+		"\u01dd\3\2\2\2\u01dd\u01e2\3\2\2\2\u01de\u01dc\3\2\2\2\u01df\u01e1\5F"+
+		"$\2\u01e0\u01df\3\2\2\2\u01e1\u01e4\3\2\2\2\u01e2\u01e0\3\2\2\2\u01e2"+
 		"\u01e3\3\2\2\2\u01e3\u01e6\3\2\2\2\u01e4\u01e2\3\2\2\2\u01e5\u01e7\79"+
 		"\2\2\u01e6\u01e5\3\2\2\2\u01e6\u01e7\3\2\2\2\u01e7\u01e8\3\2\2\2\u01e8"+
 		"\u01ea\7\7\2\2\u01e9\u01c6\3\2\2\2\u01ea\u01ed\3\2\2\2\u01eb\u01e9\3\2"+

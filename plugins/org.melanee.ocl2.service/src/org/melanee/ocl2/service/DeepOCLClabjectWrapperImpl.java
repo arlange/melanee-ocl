@@ -71,6 +71,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   private Integer startLevel;
   private Integer endLevel;
   private boolean ontologicalNavigation;
+  private String iteratorName;
 
   public DeepOCLClabjectWrapperImpl(Element context) {
     this.context = context;
@@ -86,6 +87,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     this.startLevel = null;
     this.endLevel = null;
     this.ontologicalNavigation = false;
+    this.iteratorName = null;
   }
 
   public DeepOCLClabjectWrapperImpl(Element context, Collection<Element> parameters) {
@@ -103,6 +105,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     this.startLevel = null;
     this.endLevel = null;
     this.ontologicalNavigation = false;
+    this.iteratorName = null;
   }
 
   private void loadOperations(List<String> operationList) {
@@ -297,6 +300,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     for (Element element : currentNavigation) {
       if (element instanceof Attribute && navigationStack.size() == 1) {
         throw new NavigationException("something wrong here.", new Throwable(target));
+      }
+      if (target.equals(this.iteratorName)) {
+        self();
       }
       if (element instanceof Connection) {
         Connection connection = (Connection) element;
@@ -511,6 +517,22 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       throw new NavigationException("upcast is only possible from one element");
     }
     return returnCollection.size() == 0 ? null : returnCollection;
+  }
+
+  /**
+   * 
+   * @return the direct instances as a collection
+   */
+  public Collection<Clabject> getDirectInstances() {
+    if (this.context instanceof Clabject) {
+      Clabject clab = (Clabject) this.context;
+      @SuppressWarnings("rawtypes")
+      List returnList = clab.getInstances();
+      this.navigationStack
+          .push(new Tuple<String, Collection<Element>>("directInstance", returnList));
+      return returnList;
+    }
+    return null;
   }
 
   /**
@@ -1558,7 +1580,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     try {
       if (a.getDatatype().equals("Integer")) {
         int first = Integer.parseInt(a.getValue());
-        Double d = Double.parseDouble(expressionMap.get("right"));
+        String intermediate = expressionMap.get("right").replaceAll("\"", "");
+        Double d = Double.parseDouble(intermediate);
         int second = d.intValue();
         return compare(first, second, expressionMap.get("operator"));
       } else if (a.getDatatype().equals("Real")) {
@@ -1574,7 +1597,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         Boolean second = Boolean.parseBoolean(expressionMap.get("right"));
         return compare(first, second, expressionMap.get("operator"));
       }
-    } catch (NullPointerException e) {
+    } catch (NullPointerException | NumberFormatException e) {
       System.out
           .println("Could not access Attribute " + a + " or get Value from this Attribute. \n");
       // if the attribute has no value as a String or otherwise then this check will
@@ -1611,7 +1634,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         }
       }
       return map;
-    } else {
+    } else if (!DeepOCL2Util.isWord(expression)) {
       String operator = "";
       Matcher matcher = pattern.matcher(expression);
       while (matcher.find()) {
@@ -1624,7 +1647,11 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       map.put("right", subRight.trim());
       map.put("operator", operator);
       return map;
+    } else {
+      map.put("attribute", expression);
+      return map;
     }
+
   }
 
   /**
@@ -1881,5 +1908,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       }
     }
     return result;
+  }
+
+  public void setIteratorName(String iteratorName) {
+    this.iteratorName = iteratorName;
   }
 }

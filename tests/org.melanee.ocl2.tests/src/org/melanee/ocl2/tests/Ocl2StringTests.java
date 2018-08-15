@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.melanee.core.models.plm.PLM.Attribute;
 import org.melanee.core.models.plm.PLM.Clabject;
@@ -37,7 +38,7 @@ public class Ocl2StringTests {
   public void destroy() {
     this.dm = null;
   }
-
+  @Ignore
   @Test
   public void InvoicePriceYearTests() {
     Clabject product = PLMFactory.eINSTANCE.createEntity();
@@ -51,10 +52,19 @@ public class Ocl2StringTests {
     product.setPotency(1);
 
     Clabject susanStorm = PLMFactory.eINSTANCE.createEntity();
+    susanStorm.setName("SusanStorm");
     Clabject bike = PLMFactory.eINSTANCE.createEntity();
     susanStorm.setPotency(0);
     bike.setPotency(0);
 
+    Clabject susanStorm1 = PLMFactory.eINSTANCE.createEntity();
+    susanStorm1.setName("SusanStorm222");
+    Clabject bike1 = PLMFactory.eINSTANCE.createEntity();
+    susanStorm1.setPotency(0);
+    bike1.setPotency(0);
+
+    level1.getContent().add(susanStorm1);
+    level1.getContent().add(bike1);
     level1.getContent().add(susanStorm);
     level1.getContent().add(bike);
 
@@ -67,6 +77,16 @@ public class Ocl2StringTests {
     productBike.setInstance(bike);
     productBike.setType(product);
     this.level1.getContent().add(productBike);
+
+    Classification customerSusan1 = PLMFactory.eINSTANCE.createClassification();
+    customerSusan1.setInstance(susanStorm1);
+    customerSusan1.setType(customer);
+    this.level1.getContent().add(customerSusan1);
+
+    Classification productBike1 = PLMFactory.eINSTANCE.createClassification();
+    productBike1.setInstance(bike1);
+    productBike1.setType(product);
+    this.level1.getContent().add(productBike1);
 
     Connection invoice = PLMFactory.eINSTANCE.createConnection();
     invoice.setName("Invoice");
@@ -81,33 +101,57 @@ public class Ocl2StringTests {
     productEnd.setConnection(invoice);
     customerEnd.setConnection(invoice);
 
+    Connection invoice1 = PLMFactory.eINSTANCE.createConnection();
+    invoice1.setName("Invoice");
+    ConnectionEnd productEnd1 = PLMFactory.eINSTANCE.createConnectionEnd();
+    ConnectionEnd customerEnd1 = PLMFactory.eINSTANCE.createConnectionEnd();
+    productEnd1.setDestination(bike1);
+    customerEnd1.setDestination(susanStorm1);
+    productEnd1.setMoniker("product");
+    customerEnd1.setMoniker("customer");
+    productEnd1.setNavigable(true);
+    customerEnd1.setNavigable(true);
+    productEnd1.setConnection(invoice1);
+    customerEnd1.setConnection(invoice1);
 
     Attribute price = PLMFactory.eINSTANCE.createAttribute();
     Attribute date = PLMFactory.eINSTANCE.createAttribute();
 
+    Attribute price1 = PLMFactory.eINSTANCE.createAttribute();
+    Attribute date1 = PLMFactory.eINSTANCE.createAttribute();
+
     price.setName("price");
     date.setName("date");
+    price1.setName("price");
+    date1.setName("date");
 
     price.setDatatype("Real");
     date.setDatatype("String");
+    price1.setDatatype("Real");
+    date1.setDatatype("String");
 
     price.setValue("433.99");
     date.setValue("12.05.2017");
 
+    price1.setValue("432222.99");
+    date1.setValue("12.05.2018");
+
     invoice.getFeature().add(date);
     invoice.getFeature().add(price);
 
+    invoice1.getFeature().add(date1);
+    invoice1.getFeature().add(price1);
+
     level1.getContent().add(invoice);
+    level1.getContent().add(invoice1);
 
     DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("self.allInstances() -> select(c|c.#getPotency()# = 0) -> \n"
-            + "select(c|c.Invoice.date.substring(7,10) = \"2017\") -> collectNested(Invoice.price) -> sum() \n"
-            + "/ self.allInstances() -> select(c|c.#getPotency()# = 0) -> size()"));
+        new ANTLRInputStream("self.allInstances() -> select(c|c.#getPotency()# = 0 and c.Invoice.date.substring(7,10) = \"2017\") -> collectNested(Invoice.price) -> sum() \n"
+            + "/ self.allInstances() -> select(#getPotency()# = 0 and Invoice.date.substring(7,10) = \"2017\") -> size()"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(product);
     Object returnValue = visitor.visit(tree);
     assertEquals(433.99, returnValue);
   }
-
 }

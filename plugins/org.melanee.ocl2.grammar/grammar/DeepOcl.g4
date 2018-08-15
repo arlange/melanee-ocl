@@ -223,7 +223,7 @@
 
  prefixedExpCS
  :
-     not = UnaryOperatorCS+ exp = primaryExpCS 
+     not = UnaryOperatorCS+ exp = primaryExpCS
      | primaryExpCS
      (
          navigationOperatorCS primaryExpCS
@@ -252,7 +252,9 @@
 
  nestedExpCS
  :
-     ('(' exp=expCS+ ')')+
+     (
+         '(' exp = expCS+ ')'
+     )+
  ;
 
  ifExpCS
@@ -380,9 +382,9 @@
          '@' 'pre'
      )?
      (
-         '(' '"'? onespace? arg = navigatingArgCS* commaArg =
-         navigatingCommaArgCS* semiArg = navigatingSemiAgrsCS* barArg =
-         navigatingBarAgrsCS* '"'? ')'
+         '(' '"'? onespace? barArg = navigatingBarAgrsCS* arg =
+         navigatingArgCS* commaArg = navigatingCommaArgCS* semiArg =
+         navigatingSemiAgrsCS* '"'? ')'
      )*
  ;
 

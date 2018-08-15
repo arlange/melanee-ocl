@@ -1,14 +1,12 @@
 package org.melanee.ocl2.tests;
 
 import static org.junit.Assert.*;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -111,8 +109,8 @@ public class DeepReflectiveConstraints {
     this.level0.getContent().add(NonAbstract);
     this.NonAbstract.setPotency(1);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("Clabject -> select(c|c.#getPotency()# = 0)"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("Clabject -> select(c|c.#getPotency()# = 0)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
@@ -132,8 +130,8 @@ public class DeepReflectiveConstraints {
     connection.setName("connection");
     connection.setPotency(0);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("Clabject -> select(c|c.#getPotency()# = 0)"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("Clabject -> select(c|c.#getPotency()# = 0)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
@@ -158,8 +156,8 @@ public class DeepReflectiveConstraints {
     connection1.setName("connection");
     connection1.setPotency(1);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("Connection -> select(c|c.#getPotency()# = 0)"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("Connection -> select(c|c.#getPotency()# = 0)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
@@ -180,8 +178,8 @@ public class DeepReflectiveConstraints {
     connection.setPotency(0);
     level0.setName("level0");
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("Level -> first().#getEntities()#"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("Level -> first().#getEntities()#"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
@@ -202,8 +200,8 @@ public class DeepReflectiveConstraints {
     connection.setPotency(0);
     level0.setName("level0");
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("Level -> first().#getConnections()#"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("Level -> first().#getConnections()#"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
@@ -243,16 +241,43 @@ public class DeepReflectiveConstraints {
     this.level1.getContent().add(NonAbstract);
     this.NonAbstract.setPotency(1);
     this.NonAbstract.setName("NonAbstract");
-    
+
     Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
     attribute.setDatatype("Boolean");
     attribute.setName("isStart");
     attribute.setValue("true");
-    
+
     this.NonAbstract.getFeature().add(attribute);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("Level -> at(1).#getEntities()# -> select(c|c.isStart = true) -> size() > 0"));
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "Level -> at(1).#getEntities()# -> select(c|c.isStart = true) -> size() > 0"));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
+    Object returnValue = visitor.visit(tree);
+    assertEquals(true, returnValue);
+  }
+
+  @Test
+  public void testIsonymicInstantiation() {
+    this.dm.getContent().add(level0);
+    this.dm.getContent().add(level1);
+    this.level0.getContent().add(Abstract);
+    this.Abstract.setPotency(1);
+    this.Abstract.setName("Start");
+    this.level1.getContent().add(NonAbstract);
+    this.NonAbstract.setPotency(1);
+    this.NonAbstract.setName("NonAbstract");
+
+    Attribute attribute = PLMFactory.eINSTANCE.createAttribute();
+    attribute.setDatatype("Boolean");
+    attribute.setName("isStart");
+    attribute.setValue("true");
+
+    this.NonAbstract.getFeature().add(attribute);
+
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "Clabject -> forAll(select(c|c.#getFeature()# -> select(f|f.#getDurability()# >= 1)) -> size() = self.getDirectInstances() -> select(c|c.#getFeature()#) -> size())"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
