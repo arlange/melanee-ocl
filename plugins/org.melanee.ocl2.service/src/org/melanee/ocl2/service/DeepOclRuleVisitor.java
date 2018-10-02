@@ -360,7 +360,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         }
       }
       if (value == null) {
-        value = visit(ctx.exp);
+        value = exp;
       }
       this.wrapper.createLetVariable(ctx.name.getText(), type.toString(), value.toString());
     } catch (InterpreterException e) {

@@ -38,7 +38,7 @@ public class Ocl2StringTests {
   public void destroy() {
     this.dm = null;
   }
-  @Ignore
+  
   @Test
   public void InvoicePriceYearTests() {
     Clabject product = PLMFactory.eINSTANCE.createEntity();
@@ -147,7 +147,7 @@ public class Ocl2StringTests {
 
     DeepOclLexer oclLexer = new DeepOclLexer(
         new ANTLRInputStream("self.allInstances() -> select(c|c.#getPotency()# = 0 and c.Invoice.date.substring(7,10) = \"2017\") -> collectNested(Invoice.price) -> sum() \n"
-            + "/ self.allInstances() -> select(#getPotency()# = 0 and Invoice.date.substring(7,10) = \"2017\") -> size()"));
+            + "/ self.allInstances() -> select(c|c.#getPotency()# = 0 and c.Invoice.date.substring(7,10) = \"2017\") -> size()"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(product);

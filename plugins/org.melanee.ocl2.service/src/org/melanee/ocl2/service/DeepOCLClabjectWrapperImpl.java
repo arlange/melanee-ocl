@@ -1745,6 +1745,10 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    */
   public void self() {
     this.navigationStack.clear();
+    if (this.context instanceof Feature) {
+      Feature feature = (Feature) this.context;
+      this.context = feature.getClabject();
+    }
     this.navigationStack.push(new Tuple<String, Collection<Element>>(this.context.getName(),
         Arrays.asList(this.context)));
   }

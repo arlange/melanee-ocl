@@ -889,6 +889,14 @@ public class OCL2Service implements IConstraintLanguageService {
       ParseTree tree = parser.initCS();
       DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(attribute);
       Object result = visitor.visit(tree);
+      if (result instanceof Collection) {
+        Collection collection = (Collection) result;
+        result = collection.toArray()[0];
+      } 
+      if (result instanceof Attribute) {
+        Attribute attr = (Attribute) result;
+        result = attr.getValue();
+      }
       return DeepOCL2Util.createSetCommandForValue(editingDomain, attribute, result);
     }
     return null;

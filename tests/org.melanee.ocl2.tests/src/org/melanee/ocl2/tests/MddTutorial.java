@@ -106,7 +106,5 @@ public class MddTutorial {
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(sdCard);
     Object returnValue = visitor.visit(tree);
     assertEquals(false, returnValue);
-
   }
-
 }
