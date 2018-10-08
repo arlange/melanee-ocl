@@ -892,10 +892,13 @@ public class OCL2Service implements IConstraintLanguageService {
       if (result instanceof Collection) {
         Collection collection = (Collection) result;
         result = collection.toArray()[0];
-      } 
+      }
       if (result instanceof Attribute) {
         Attribute attr = (Attribute) result;
         result = attr.getValue();
+      }
+      if (result instanceof String) {
+        result = ((String) result).replaceAll("\"", "");
       }
       return DeepOCL2Util.createSetCommandForValue(editingDomain, attribute, result);
     }
@@ -931,7 +934,7 @@ public class OCL2Service implements IConstraintLanguageService {
                       new DeepOclRuleVisitor(((Attribute) attr).getClabject());
                   Object result = visitor.visit(tree);
                   if (result instanceof Collection) {
-                    result = ((Collection) result).toArray()[0];
+                    result = ((Collection<?>) result).toArray()[0];
                     if (result instanceof Attribute) {
                       result = ((Attribute) result).getValue();
                     }
