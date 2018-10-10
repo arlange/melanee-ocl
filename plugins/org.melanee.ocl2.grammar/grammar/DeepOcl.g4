@@ -283,13 +283,18 @@
 
  collectionLiteralExpCS
  :
-     collectionTypeCS '{'
+     type = collectionTypeCS '{'
      (
-         collectionLiteralPartCS
-         (
-             ',' collectionLiteralPartCS
-         )*
+         argument = collectionArguments
      )? '}'
+ ;
+
+ collectionArguments
+ :
+     collectionLiteralPartCS
+     (
+         ',' collectionLiteralPartCS
+     )*
  ;
 
  collectionLiteralPartCS
@@ -395,7 +400,10 @@
          ':' typeName = typeExpCS
      )?
      (
-         '=' exp = expCS
+         '=' exp = infixedExpCS
+     )?
+     (
+         '|' expCS
      )?
  ;
 

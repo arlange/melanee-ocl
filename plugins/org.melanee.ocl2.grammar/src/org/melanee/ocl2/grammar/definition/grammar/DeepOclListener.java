@@ -388,6 +388,16 @@ public interface DeepOclListener extends ParseTreeListener {
 	 */
 	void exitCollectionLiteralExpCS(DeepOclParser.CollectionLiteralExpCSContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link DeepOclParser#collectionArguments}.
+	 * @param ctx the parse tree
+	 */
+	void enterCollectionArguments(DeepOclParser.CollectionArgumentsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DeepOclParser#collectionArguments}.
+	 * @param ctx the parse tree
+	 */
+	void exitCollectionArguments(DeepOclParser.CollectionArgumentsContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link DeepOclParser#collectionLiteralPartCS}.
 	 * @param ctx the parse tree
 	 */

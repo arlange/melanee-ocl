@@ -448,6 +448,18 @@ public class DeepOclBaseListener implements DeepOclListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterCollectionArguments(DeepOclParser.CollectionArgumentsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCollectionArguments(DeepOclParser.CollectionArgumentsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterCollectionLiteralPartCS(DeepOclParser.CollectionLiteralPartCSContext ctx) { }
 	/**
 	 * {@inheritDoc}

@@ -671,7 +671,6 @@ public class OCL2Service implements IConstraintLanguageService {
       message.setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
       nameText.setBackground(getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
       this.requestLayout();
-
     }
 
     @Override
@@ -691,7 +690,6 @@ public class OCL2Service implements IConstraintLanguageService {
       message.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
       nameText.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
       this.layout();
-
     }
 
     @Override
@@ -745,7 +743,6 @@ public class OCL2Service implements IConstraintLanguageService {
                 clabSet.add((Clabject) elm);
               }
             }
-
           }
         }
       }
@@ -870,7 +867,6 @@ public class OCL2Service implements IConstraintLanguageService {
     public Element getObject() {
       return this.element;
     }
-
   }
 
   @Override

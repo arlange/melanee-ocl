@@ -72,6 +72,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   private Integer endLevel;
   private boolean ontologicalNavigation;
   private String iteratorName;
+  private Map iterationMap;
 
   public DeepOCLClabjectWrapperImpl(Element context) {
     this.context = context;
@@ -88,6 +89,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     this.endLevel = null;
     this.ontologicalNavigation = false;
     this.iteratorName = null;
+    this.iterationMap = new HashMap<>();
   }
 
   public DeepOCLClabjectWrapperImpl(Element context, Collection<Element> parameters) {
@@ -106,6 +108,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     this.endLevel = null;
     this.ontologicalNavigation = false;
     this.iteratorName = null;
+    this.iterationMap = new HashMap<>();
   }
 
   private void loadOperations(List<String> operationList) {
@@ -146,6 +149,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     operationList.add("including");
     operationList.add("closure");
     operationList.add("substring");
+    operationList.add("sortedBy");
     // deepOCL operations
     operationList.add("allInstances");
     operationList.add("indirectInstances");
@@ -160,7 +164,6 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     operationList.add("isIndirectInstanceOf");
     operationList.add("isDeepIndirectInstanceOf");
     operationList.add("isDeepKindOf");
-    operationList.add("sortedBy");
 
   }
 
@@ -295,6 +298,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    */
   @Override
   public Object navigate(String target) throws NavigationException {
+    if (this.iterationMap.containsKey(target)) {
+      return this.iterationMap.get(target);
+    }
     List<Element> returnList = new ArrayList<>();
     Collection<Element> currentNavigation = this.navigationStack.peek().getSecond();
     for (Element element : currentNavigation) {
@@ -1916,5 +1922,13 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 
   public void setIteratorName(String iteratorName) {
     this.iteratorName = iteratorName;
+  }
+
+  public void addIterationMap(String key, Object value) {
+    this.iterationMap.put(key, value);
+  }
+
+  public void clearIterationMap() {
+    this.iterationMap.clear();
   }
 }

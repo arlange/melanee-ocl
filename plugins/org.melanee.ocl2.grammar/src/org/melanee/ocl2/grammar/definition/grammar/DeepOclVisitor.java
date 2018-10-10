@@ -237,6 +237,12 @@ public interface DeepOclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCollectionLiteralExpCS(DeepOclParser.CollectionLiteralExpCSContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link DeepOclParser#collectionArguments}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCollectionArguments(DeepOclParser.CollectionArgumentsContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link DeepOclParser#collectionLiteralPartCS}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

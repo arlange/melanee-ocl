@@ -1,25 +1,20 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering All rights
+ * reserved. This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *    Ralph Gerbig - initial API and implementation and initial documentation
- *    Arne Lange - ocl2 implementation
+ * Contributors: Ralph Gerbig - initial API and implementation and initial documentation Arne Lange
+ * - ocl2 implementation
  *******************************************************************************/
 package org.melanee.ocl2.tests;
 
 import static org.junit.Assert.*;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.lang.model.element.Element;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -81,8 +76,8 @@ public class DeepOCLTreeVisitorTest {
     Attribute attr = PLMFactory.eINSTANCE.createAttribute();
     attr.setName("age");
     this.c.getFeature().add(attr);
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("context Customer\ninv ofAge: self.age"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("context Customer\ninv ofAge: self.age"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.contextDeclCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
@@ -250,168 +245,169 @@ public class DeepOCLTreeVisitorTest {
     assertEquals("true", returnValue.toString());
   }
 
-//  @Test
-//  public void nestedSelectTestWithClassificationOclInvalid() {
-//    Attribute attr = PLMFactory.eINSTANCE.createAttribute();
-//    // first level
-//    this.c.setName("Company");
-//    Clabject customer = PLMFactory.eINSTANCE.createEntity();
-//    customer.setName("Customer");
-//    Clabject transaction = PLMFactory.eINSTANCE.createEntity();
-//    transaction.setName("Transaction");
-//    // second level
-//    Clabject company = PLMFactory.eINSTANCE.createEntity();
-//    company.setName("IBM");
-//    Clabject customer1 = PLMFactory.eINSTANCE.createEntity();
-//    customer1.setName("Hans Jörg");
-//    Clabject customer2 = PLMFactory.eINSTANCE.createEntity();
-//    customer2.setName("Detlef");
-//    Clabject transaction1 = PLMFactory.eINSTANCE.createEntity();
-//    transaction1.setName("HAJO kauft CD");
-//    Clabject transaction2 = PLMFactory.eINSTANCE.createEntity();
-//    transaction2.setName("Dette kauft ein");
-//
-//    dm.getContent().add(l);
-//    Level l1 = PLMFactory.eINSTANCE.createLevel();
-//    dm.getContent().add(l1);
-//    l.getContent().add(this.c);
-//    l.getContent().add(customer);
-//    l.getContent().add(transaction);
-//    l1.getContent().add(company);
-//    l1.getContent().add(customer1);
-//    l1.getContent().add(transaction1);
-//    l1.getContent().add(customer2);
-//    l1.getContent().add(transaction2);
-//
-//    // company classification
-//    Classification classi9 = PLMFactory.eINSTANCE.createClassification();
-//    classi9.setInstance(this.c);
-//    classi9.setType(company);
-//    l1.getContent().add(classi9);
-//    // customer classification
-//    Classification classi = PLMFactory.eINSTANCE.createClassification();
-//    classi.setInstance(customer1);
-//    classi.setType(customer);
-//    l1.getContent().add(classi);
-//    Classification classi1 = PLMFactory.eINSTANCE.createClassification();
-//    classi1.setInstance(customer2);
-//    classi1.setType(customer);
-//    l1.getContent().add(classi1);
-//    // transaction classification
-//    Classification classi2 = PLMFactory.eINSTANCE.createClassification();
-//    classi2.setInstance(transaction1);
-//    classi2.setType(transaction);
-//    l1.getContent().add(classi2);
-//    Classification classi3 = PLMFactory.eINSTANCE.createClassification();
-//    classi3.setInstance(transaction2);
-//    classi3.setType(transaction);
-//    l1.getContent().add(classi3);
-//
-//    // Connection setUp company -> customer
-//    Connection connect = PLMFactory.eINSTANCE.createConnection();
-//    ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
-//    ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    parti2.setMoniker("customer");
-//    parti.setConnection(connect);
-//    parti.setDestination(this.c);
-//    parti2.setDestination(customer);
-//    parti2.setNavigable(true);
-//    parti2.setConnection(connect);
-//
-//    // Connection setUp customer -> transaction
-//    Connection connect2 = PLMFactory.eINSTANCE.createConnection();
-//    ConnectionEnd parti5 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    ConnectionEnd parti6 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    parti5.setConnection(connect2);
-//    parti5.setDestination(customer);
-//    parti6.setDestination(transaction);
-//    parti6.setMoniker("transaction");
-//    parti6.setNavigable(true);
-//    parti6.setConnection(connect2);
-//
-//    l.getContent().add(connect);
-//    l.getContent().add(connect2);
-//
-//    Connection connect10 = PLMFactory.eINSTANCE.createConnection();
-//    Classification classi10 = PLMFactory.eINSTANCE.createClassification();
-//    classi10.setInstance(connect10);
-//    classi10.setType(connect);
-//    ConnectionEnd parti18 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    ConnectionEnd parti19 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    parti18.setDestination(company);
-//    parti19.setDestination(customer1);
-//    parti19.setNavigable(true);
-//    parti18.setConnection(connect10);
-//    parti19.setConnection(connect10);
-//
-//    Connection connect11 = PLMFactory.eINSTANCE.createConnection();
-//    Classification classi11 = PLMFactory.eINSTANCE.createClassification();
-//    classi11.setInstance(connect11);
-//    classi11.setType(connect2);
-//    ConnectionEnd parti20 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    ConnectionEnd parti21 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    parti20.setDestination(company);
-//    parti21.setDestination(customer2);
-//    parti21.setNavigable(true);
-//    parti20.setConnection(connect11);
-//    parti21.setConnection(connect11);
-//
-//    Connection connect3 = PLMFactory.eINSTANCE.createConnection();
-//    Classification classi8 = PLMFactory.eINSTANCE.createClassification();
-//    classi8.setInstance(connect3);
-//    classi8.setType(connect2);
-//    ConnectionEnd parti7 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    ConnectionEnd parti8 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    parti7.setDestination(customer1);
-//    parti8.setDestination(transaction1);
-//    parti8.setNavigable(true);
-//    parti7.setConnection(connect3);
-//    parti8.setConnection(connect3);
-//
-//    Connection connect4 = PLMFactory.eINSTANCE.createConnection();
-//    Classification classi7 = PLMFactory.eINSTANCE.createClassification();
-//    classi7.setInstance(connect4);
-//    classi7.setType(connect2);
-//    ConnectionEnd parti9 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    ConnectionEnd parti10 = PLMFactory.eINSTANCE.createConnectionEnd();
-//    parti9.setDestination(customer2);
-//    parti10.setDestination(transaction2);
-//    parti10.setNavigable(true);
-//    parti9.setConnection(connect4);
-//    parti10.setConnection(connect4);
-//
-//    l1.getContent().add(connect3);
-//    l1.getContent().add(connect4);
-//
-//    attr.setName("value");
-//    attr.setValue("101");
-//    attr.setDatatype("Integer");
-//    Attribute attr1 = PLMFactory.eINSTANCE.createAttribute();
-//    transaction1.getFeature().add(attr);
-//    attr1.setName("value");
-//    attr1.setValue("108");
-//    attr1.setDatatype("Integer");
-//    transaction2.getFeature().add(attr1);
-//    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-//        "context(1) Company \ninv test: customer -> select(c|c.transaction -> select(value>100))->size()=1"));
-//    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
-//
-//    parser.addErrorListener(new BaseErrorListener() {
-//      @Override
-//      public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
-//          int charPositionInLine, String msg, RecognitionException e) {
-//        throw new IllegalStateException("failed to parse at line " + line + " due to " + msg, e);
-//      }
-//    });
-//
-//    ParseTree tree = parser.contextDeclCS();
-//    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
-//    long startTime = System.currentTimeMillis();
-//    Object returnValue = visitor.visit(tree);
-//    long endTime = System.currentTimeMillis();
-//    System.out.println(endTime - startTime + " ms");
-//    assertTrue(returnValue instanceof OclInvalid);
-//  }
+  // @Test
+  // public void nestedSelectTestWithClassificationOclInvalid() {
+  // Attribute attr = PLMFactory.eINSTANCE.createAttribute();
+  // // first level
+  // this.c.setName("Company");
+  // Clabject customer = PLMFactory.eINSTANCE.createEntity();
+  // customer.setName("Customer");
+  // Clabject transaction = PLMFactory.eINSTANCE.createEntity();
+  // transaction.setName("Transaction");
+  // // second level
+  // Clabject company = PLMFactory.eINSTANCE.createEntity();
+  // company.setName("IBM");
+  // Clabject customer1 = PLMFactory.eINSTANCE.createEntity();
+  // customer1.setName("Hans Jörg");
+  // Clabject customer2 = PLMFactory.eINSTANCE.createEntity();
+  // customer2.setName("Detlef");
+  // Clabject transaction1 = PLMFactory.eINSTANCE.createEntity();
+  // transaction1.setName("HAJO kauft CD");
+  // Clabject transaction2 = PLMFactory.eINSTANCE.createEntity();
+  // transaction2.setName("Dette kauft ein");
+  //
+  // dm.getContent().add(l);
+  // Level l1 = PLMFactory.eINSTANCE.createLevel();
+  // dm.getContent().add(l1);
+  // l.getContent().add(this.c);
+  // l.getContent().add(customer);
+  // l.getContent().add(transaction);
+  // l1.getContent().add(company);
+  // l1.getContent().add(customer1);
+  // l1.getContent().add(transaction1);
+  // l1.getContent().add(customer2);
+  // l1.getContent().add(transaction2);
+  //
+  // // company classification
+  // Classification classi9 = PLMFactory.eINSTANCE.createClassification();
+  // classi9.setInstance(this.c);
+  // classi9.setType(company);
+  // l1.getContent().add(classi9);
+  // // customer classification
+  // Classification classi = PLMFactory.eINSTANCE.createClassification();
+  // classi.setInstance(customer1);
+  // classi.setType(customer);
+  // l1.getContent().add(classi);
+  // Classification classi1 = PLMFactory.eINSTANCE.createClassification();
+  // classi1.setInstance(customer2);
+  // classi1.setType(customer);
+  // l1.getContent().add(classi1);
+  // // transaction classification
+  // Classification classi2 = PLMFactory.eINSTANCE.createClassification();
+  // classi2.setInstance(transaction1);
+  // classi2.setType(transaction);
+  // l1.getContent().add(classi2);
+  // Classification classi3 = PLMFactory.eINSTANCE.createClassification();
+  // classi3.setInstance(transaction2);
+  // classi3.setType(transaction);
+  // l1.getContent().add(classi3);
+  //
+  // // Connection setUp company -> customer
+  // Connection connect = PLMFactory.eINSTANCE.createConnection();
+  // ConnectionEnd parti = PLMFactory.eINSTANCE.createConnectionEnd();
+  // ConnectionEnd parti2 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // parti2.setMoniker("customer");
+  // parti.setConnection(connect);
+  // parti.setDestination(this.c);
+  // parti2.setDestination(customer);
+  // parti2.setNavigable(true);
+  // parti2.setConnection(connect);
+  //
+  // // Connection setUp customer -> transaction
+  // Connection connect2 = PLMFactory.eINSTANCE.createConnection();
+  // ConnectionEnd parti5 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // ConnectionEnd parti6 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // parti5.setConnection(connect2);
+  // parti5.setDestination(customer);
+  // parti6.setDestination(transaction);
+  // parti6.setMoniker("transaction");
+  // parti6.setNavigable(true);
+  // parti6.setConnection(connect2);
+  //
+  // l.getContent().add(connect);
+  // l.getContent().add(connect2);
+  //
+  // Connection connect10 = PLMFactory.eINSTANCE.createConnection();
+  // Classification classi10 = PLMFactory.eINSTANCE.createClassification();
+  // classi10.setInstance(connect10);
+  // classi10.setType(connect);
+  // ConnectionEnd parti18 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // ConnectionEnd parti19 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // parti18.setDestination(company);
+  // parti19.setDestination(customer1);
+  // parti19.setNavigable(true);
+  // parti18.setConnection(connect10);
+  // parti19.setConnection(connect10);
+  //
+  // Connection connect11 = PLMFactory.eINSTANCE.createConnection();
+  // Classification classi11 = PLMFactory.eINSTANCE.createClassification();
+  // classi11.setInstance(connect11);
+  // classi11.setType(connect2);
+  // ConnectionEnd parti20 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // ConnectionEnd parti21 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // parti20.setDestination(company);
+  // parti21.setDestination(customer2);
+  // parti21.setNavigable(true);
+  // parti20.setConnection(connect11);
+  // parti21.setConnection(connect11);
+  //
+  // Connection connect3 = PLMFactory.eINSTANCE.createConnection();
+  // Classification classi8 = PLMFactory.eINSTANCE.createClassification();
+  // classi8.setInstance(connect3);
+  // classi8.setType(connect2);
+  // ConnectionEnd parti7 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // ConnectionEnd parti8 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // parti7.setDestination(customer1);
+  // parti8.setDestination(transaction1);
+  // parti8.setNavigable(true);
+  // parti7.setConnection(connect3);
+  // parti8.setConnection(connect3);
+  //
+  // Connection connect4 = PLMFactory.eINSTANCE.createConnection();
+  // Classification classi7 = PLMFactory.eINSTANCE.createClassification();
+  // classi7.setInstance(connect4);
+  // classi7.setType(connect2);
+  // ConnectionEnd parti9 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // ConnectionEnd parti10 = PLMFactory.eINSTANCE.createConnectionEnd();
+  // parti9.setDestination(customer2);
+  // parti10.setDestination(transaction2);
+  // parti10.setNavigable(true);
+  // parti9.setConnection(connect4);
+  // parti10.setConnection(connect4);
+  //
+  // l1.getContent().add(connect3);
+  // l1.getContent().add(connect4);
+  //
+  // attr.setName("value");
+  // attr.setValue("101");
+  // attr.setDatatype("Integer");
+  // Attribute attr1 = PLMFactory.eINSTANCE.createAttribute();
+  // transaction1.getFeature().add(attr);
+  // attr1.setName("value");
+  // attr1.setValue("108");
+  // attr1.setDatatype("Integer");
+  // transaction2.getFeature().add(attr1);
+  // DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+  // "context(1) Company \ninv test: customer -> select(c|c.transaction ->
+  // select(value>100))->size()=1"));
+  // DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+  //
+  // parser.addErrorListener(new BaseErrorListener() {
+  // @Override
+  // public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
+  // int charPositionInLine, String msg, RecognitionException e) {
+  // throw new IllegalStateException("failed to parse at line " + line + " due to " + msg, e);
+  // }
+  // });
+  //
+  // ParseTree tree = parser.contextDeclCS();
+  // DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
+  // long startTime = System.currentTimeMillis();
+  // Object returnValue = visitor.visit(tree);
+  // long endTime = System.currentTimeMillis();
+  // System.out.println(endTime - startTime + " ms");
+  // assertTrue(returnValue instanceof OclInvalid);
+  // }
 
   @Test
   public void nestedRejectTest() {
@@ -732,8 +728,8 @@ public class DeepOCLTreeVisitorTest {
     this.l.getContent().add(connect3);
     this.dm.getContent().add(this.l);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("context A \ninv test: self.a.b->asSet()"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("context A \ninv test: self.a.b->asSet()"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.contextDeclCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
@@ -743,8 +739,8 @@ public class DeepOCLTreeVisitorTest {
     assertEquals(resultSet, returnValue);
     // controll test case, if not as set the clab3 is twice occurring in a
     // list
-    DeepOclLexer oclLexer1 = new DeepOclLexer(
-        new ANTLRInputStream("context A \ninv test: self.a.b"));
+    DeepOclLexer oclLexer1 =
+        new DeepOclLexer(new ANTLRInputStream("context A \ninv test: self.a.b"));
     DeepOclParser parser1 = new DeepOclParser(new CommonTokenStream(oclLexer1));
     ParseTree tree1 = parser1.contextDeclCS();
     Object returnValue1 = visitor.visit(tree1);
@@ -796,8 +792,8 @@ public class DeepOCLTreeVisitorTest {
     this.c.getFeature().add(meth);
     this.c.getFeature().add(attr);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("context A \ninv test: self.#getAllFeatures()#"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("context A \ninv test: self.#getAllFeatures()#"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.contextDeclCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
@@ -825,8 +821,8 @@ public class DeepOCLTreeVisitorTest {
 
     this.c.getFeature().add(meth);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("context A \ninv test: self.#getAllAttributes()#"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("context A \ninv test: self.#getAllAttributes()#"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.contextDeclCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
@@ -849,8 +845,8 @@ public class DeepOCLTreeVisitorTest {
     attr.setValue("false");
     this.c.getFeature().add(attr);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("context A \ninv test: self.#getPotency# = 1"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("context A \ninv test: self.#getPotency# = 1"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.contextDeclCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
@@ -888,8 +884,8 @@ public class DeepOCLTreeVisitorTest {
     attr.setValue("false");
     this.c.getFeature().add(attr);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("context DeepModel \ninv test: self.#content#"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("context DeepModel \ninv test: self.#content#"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.contextDeclCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
@@ -990,8 +986,8 @@ public class DeepOCLTreeVisitorTest {
 
     this.l.getContent().add(connect9);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.#getConnections()#.#getParticipants()#"));
+    DeepOclLexer oclLexer =
+        new DeepOclLexer(new ANTLRInputStream("self.#getConnections()#.#getParticipants()#"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(car);
@@ -1024,16 +1020,6 @@ public class DeepOCLTreeVisitorTest {
     parti6.setNavigable(true);
     parti6.setConnection(connect1);
 
-    Connection connect2 = PLMFactory.eINSTANCE.createConnection();
-    ConnectionEnd parti15 = PLMFactory.eINSTANCE.createConnectionEnd();
-    ConnectionEnd parti16 = PLMFactory.eINSTANCE.createConnectionEnd();
-    parti15.setConnection(connect2);
-    parti15.setDestination(this.c);
-    parti16.setDestination(clab2);
-    parti16.setMoniker("a");
-    parti16.setNavigable(true);
-    parti16.setConnection(connect2);
-
     Connection connect3 = PLMFactory.eINSTANCE.createConnection();
     ConnectionEnd parti7 = PLMFactory.eINSTANCE.createConnectionEnd();
     ConnectionEnd parti8 = PLMFactory.eINSTANCE.createConnectionEnd();
@@ -1050,7 +1036,7 @@ public class DeepOCLTreeVisitorTest {
     parti9.setConnection(connect4);
     parti9.setDestination(clab1);
     parti10.setDestination(clab3);
-    parti10.setMoniker("b");
+    parti10.setMoniker("c");
     parti10.setNavigable(true);
     parti10.setConnection(connect4);
 
@@ -1060,17 +1046,15 @@ public class DeepOCLTreeVisitorTest {
     this.l.getContent().add(this.c);
     this.l.getContent().add(connect4);
     this.l.getContent().add(connect1);
-    this.l.getContent().add(connect2);
     this.l.getContent().add(connect3);
     this.dm.getContent().add(this.l);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "context A inv test: self.a.b->asSet()->iterate(x : T; acc : T2 = Bag{} | acc->including(x.test))"));
+    DeepOclLexer oclLexer = new DeepOclLexer(
+        new ANTLRInputStream("Set{1,2,3}->iterate(i : Integer; sum : Integer = 0 | sum + i)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
-    ParseTree tree = parser.contextDeclCS();
+    ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
     Object returnValue = visitor.visit(tree);
-    Set<Clabject> resultSet = new HashSet<>();
-    // assertEquals(resultSet, returnValue);
+    assertEquals(6, returnValue);
   }
 }

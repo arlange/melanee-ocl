@@ -20,10 +20,13 @@ import java.util.List;
 import java.util.Queue;
 import javax.management.RuntimeErrorException;
 import javax.naming.OperationNotSupportedException;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.melanee.core.models.plm.PLM.Attribute;
 import org.melanee.core.models.plm.PLM.Clabject;
 import org.melanee.core.models.plm.PLM.Element;
@@ -33,6 +36,7 @@ import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.ArrowContext;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.BodyCSContext;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.BooleanContext;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.ClassifierContextCSContext;
+import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.CollectionArgumentsContext;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.CollectionLiteralExpCSContext;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.CollectionLiteralPartCSContext;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.CollectionTypeCSContext;
@@ -90,12 +94,15 @@ import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.TypeExpCSContex
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.TypeLiteralCSContext;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.TypeLiteralExpCSContext;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser.TypeNameExpCSContext;
+import org.melanee.ocl2.grammar.definition.grammar.DeepOclLexer;
+import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclVisitor;
 import org.melanee.ocl2.service.exception.InterpreterException;
 import org.melanee.ocl2.service.exception.NavigationException;
 import org.melanee.ocl2.service.util.LetVariable;
 import org.melanee.ocl2.service.util.OclInvalid;
 import org.melanee.ocl2.service.util.Tuple;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 /**
  * This class extends a class from the antlr4 generated parseTreeVisitor.
@@ -377,8 +384,23 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
 
   @Override
   public Object visitCollectionLiteralExpCS(CollectionLiteralExpCSContext ctx) {
-    return ctx.getText();
-    // return visitChildren(ctx);
+    String args = ctx.argument.getText();
+    if (ctx.type.getText().equals("Set") || ctx.type.getText().equals("OrderedSet")) {
+      HashSet<String> set = new HashSet<>();
+      for (String arg : args.split(",")) {
+        set.add(arg);
+      }
+      this.tempCollection = set;
+      return set;
+    } else if (ctx.type.getText().equals("Bag") || ctx.type.getText().equals("Sequence")) {
+      List<String> bag = new ArrayList<>();
+      for (String arg : args.split(",")) {
+        bag.add(arg);
+      }
+      this.tempCollection = bag;
+      return bag;
+    }
+    return visitChildren(ctx);
   }
 
   @Override
@@ -474,12 +496,94 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         }
         // iterate
         else if (ctx.opName.getText().equals("iterate")) {
-          if (this.tempCollection != null && this.tempCollection.size() > 0) {
-            Object[] semiArgs = (Object[]) visit(ctx.semiArg);
-            // TODO implement the rest of the iterate functionality.
-            // Object[] barArgs = (Object[]) visit(ctx.barArg);
+          String type = ctx.arg.getText().substring(ctx.arg.getText().indexOf(":") + 1,
+              ctx.arg.getText().length());
+          //defining a colelction beforehand, like Set{1,2,3}
+          if (type.equals("Integer") || type.equals("Real") || type.equals("Boolean")
+              || type.equals("String")) {
+            if (this.tempCollection != null && this.tempCollection.size() > 0) {
+              String iterationExpression = ctx.getText().substring(ctx.getText().indexOf("|") + 1,
+                  ctx.getText().indexOf(")"));
+              Object[] semiArgs = (Object[]) visit(ctx.semiArg);
+              String var = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf(":"));
 
+              Object accu = semiArgs[2].toString();
+              Iterator it = this.tempCollection.iterator();
+              while (it.hasNext()) {
+                Object itElement = it.next();
+                DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(iterationExpression));
+                DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+                ParseTree tree = parser.specificationCS();
+                DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.context);
+                visitor.getWrapper().addIterationMap(var, itElement);
+                visitor.getWrapper().addIterationMap(semiArgs[0].toString(), accu);
+                accu = visitor.visit(tree);
+              }
+              if (semiArgs[1].equals("Integer")) { 
+                Double d = Double.valueOf(accu.toString());
+                Integer acc = d.intValue();
+                accu = acc;
+              }
+              Attribute returnAttribute = PLMFactory.eINSTANCE.createAttribute();
+              returnAttribute.setValue(accu.toString());
+              this.wrapper.getNavigationStack().push(new Tuple<String, Collection<Element>>(
+                  "iterate", Arrays.asList(returnAttribute)));
+              return accu;
+            } else {
+              String iterationExpression = ctx.getText().substring(ctx.getText().indexOf("|") + 1,
+                  ctx.getText().indexOf(")"));
+              Object[] semiArgs = (Object[]) visit(ctx.semiArg);
+              String var = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf(":"));
+              Object accu = semiArgs[2].toString();
+              Iterator it = this.wrapper.getCurrentCollectionIterator();
+              while (it.hasNext()) {
+                Object itElement = it.next();
+                DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(iterationExpression));
+                DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+                ParseTree tree = parser.specificationCS();
+                DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.context);
+                visitor.getWrapper().addIterationMap(var, itElement);
+                visitor.getWrapper().addIterationMap(semiArgs[0].toString(), accu);
+                accu = visitor.visit(tree);
+              }
+              if (semiArgs[1].equals("Integer")) { 
+                Double d = Double.valueOf(accu.toString());
+                Integer acc = d.intValue();
+                accu = acc;
+              }
+              Attribute returnAttribute = PLMFactory.eINSTANCE.createAttribute();
+              returnAttribute.setValue(accu.toString());
+              this.wrapper.getNavigationStack().push(new Tuple<String, Collection<Element>>(
+                  "iterate", Arrays.asList(returnAttribute)));
+              return accu;
+            }
+
+          } 
+          // this is the section for real model navigation
+          else {
+            String iterationExpression =
+                ctx.getText().substring(ctx.getText().indexOf("|") + 1, ctx.getText().indexOf(")"));
+            Object[] semiArgs = (Object[]) visit(ctx.semiArg);
+            String var = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf(":"));
+            Object accu = semiArgs[2].toString();
+            Iterator<Element> it = this.wrapper.getCurrentCollectionIterator();
+            while (it.hasNext()) {
+              Element itElement = it.next();
+              DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(iterationExpression));
+              DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+              ParseTree tree = parser.specificationCS();
+              DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(itElement);
+              visitor.getWrapper().addIterationMap(semiArgs[0].toString(), accu);
+              visitor.wrapper.setIteratorName(var);
+              accu = visitor.visit(tree);
+            }
+            Attribute returnAttribute = PLMFactory.eINSTANCE.createAttribute();
+            returnAttribute.setValue(accu.toString());
+            this.wrapper.getNavigationStack().push(
+                new Tuple<String, Collection<Element>>("iterate", Arrays.asList(returnAttribute)));
+            return accu;
           }
+
         }
         // last
         else if (ctx.opName.getText().equals("last")) {
@@ -839,7 +943,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             Element element = it.next();
             DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(element);
             this.wrapper = newWrapper;
-            if(ctx.arg.getText().contains("|")) {
+            if (ctx.arg.getText().contains("|")) {
               String iteratorName = ctx.arg.getText().substring(0, 1);
               this.wrapper.setIteratorName(iteratorName);
             }
@@ -1604,6 +1708,12 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
 
   @Override
   public Object visitLevelSpecificationCS(LevelSpecificationCSContext ctx) {
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public Object visitCollectionArguments(CollectionArgumentsContext ctx) {
+    // TODO Auto-generated method stub
     return visitChildren(ctx);
   }
 }
