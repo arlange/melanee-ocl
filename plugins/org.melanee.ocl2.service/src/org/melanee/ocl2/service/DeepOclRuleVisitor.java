@@ -102,7 +102,6 @@ import org.melanee.ocl2.service.exception.NavigationException;
 import org.melanee.ocl2.service.util.LetVariable;
 import org.melanee.ocl2.service.util.OclInvalid;
 import org.melanee.ocl2.service.util.Tuple;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 /**
  * This class extends a class from the antlr4 generated parseTreeVisitor.
