@@ -497,7 +497,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         else if (ctx.opName.getText().equals("iterate")) {
           String type = ctx.arg.getText().substring(ctx.arg.getText().indexOf(":") + 1,
               ctx.arg.getText().length());
-          //defining a colelction beforehand, like Set{1,2,3}
+          // defining a colelction beforehand, like Set{1,2,3}
           if (type.equals("Integer") || type.equals("Real") || type.equals("Boolean")
               || type.equals("String")) {
             if (this.tempCollection != null && this.tempCollection.size() > 0) {
@@ -518,7 +518,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
                 visitor.getWrapper().addIterationMap(semiArgs[0].toString(), accu);
                 accu = visitor.visit(tree);
               }
-              if (semiArgs[1].equals("Integer")) { 
+              if (semiArgs[1].equals("Integer")) {
                 Double d = Double.valueOf(accu.toString());
                 Integer acc = d.intValue();
                 accu = acc;
@@ -545,7 +545,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
                 visitor.getWrapper().addIterationMap(semiArgs[0].toString(), accu);
                 accu = visitor.visit(tree);
               }
-              if (semiArgs[1].equals("Integer")) { 
+              if (semiArgs[1].equals("Integer")) {
                 Double d = Double.valueOf(accu.toString());
                 Integer acc = d.intValue();
                 accu = acc;
@@ -557,7 +557,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
               return accu;
             }
 
-          } 
+          }
           // this is the section for real model navigation
           else {
             String iterationExpression =
@@ -890,7 +890,16 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
               return new OclInvalid();
             }
           }
-        } // includes: this method is passed through to the wrapper.
+        } else if (ctx.opName.getText().equals("excluding")) {
+          this.tempCollection = null;
+          Object[] arg = {this.wrapper.getNavigationStack().peek().getSecond(), ctx.arg.getText()};
+          try {
+            return this.wrapper.invoke(ctx.opName.getText(), arg);
+          } catch (Exception e) {
+            return new OclInvalid();
+          }
+        }
+        // includes: this method is passed through to the wrapper.
         else if (ctx.opName.getText().equals("includes")) {
           if (this.tempCollection != null && this.tempCollection.size() > 0) {
             visit(ctx.arg);
@@ -1005,8 +1014,10 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           }
           this.wrapper = oldWrapper;
           if (list.size() > 0) {
+            this.wrapper.getNavigationStack().push(
+                new Tuple<String, Collection<Element>>("closure", (Collection<Element>) list));
             this.tempCollection = list;
-            return this.tempCollection;
+            return list;
           } else {
             return null;
           }

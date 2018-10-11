@@ -906,6 +906,13 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    * @return
    */
   private Collection<?> excluding(Object[] arg) {
+    if (arg[1].equals("self")) {
+      Collection<?> intermediate = CollectionUtil.excluding((Collection<?>) arg[0], this.context);
+      Collection<Element> returnCollection = (Collection<Element>) intermediate;
+      this.navigationStack
+          .push(new Tuple<String, Collection<Element>>("excluding", returnCollection));
+      return returnCollection;
+    }
     return CollectionUtil.excluding((Collection<?>) arg[0], arg[1]);
   }
 
