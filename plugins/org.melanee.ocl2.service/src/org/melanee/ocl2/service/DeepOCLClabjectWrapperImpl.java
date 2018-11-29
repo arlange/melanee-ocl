@@ -500,12 +500,12 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * if you want navigate up to a higher level, ie to the directType of the context your in use this
-   * method (level cast)
+   * if you want navigate up to a higher level, i.e. to the directType of the context your in use this
+   * method (level cast).
    * 
    * @param target
-   * @return
-   * @throws NavigationException
+   * @return null or result collection
+   * @throws NavigationException d
    */
   public Collection<Element> navigateOntoUp(String target) throws NavigationException {
     ontologicalNavigation = true;
@@ -526,6 +526,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
+   * get all direct instances of the context.
    * 
    * @return the direct instances as a collection
    */
@@ -1018,10 +1019,10 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
 
   /**
    * return the inverse collection compared to the select operation returns all element for which
-   * the expression is false as a collection
+   * the expression is false as a collection.
    * 
-   * @param collection
-   * @param expression
+   * @param collection argument collection
+   * @param expression expression to work on the collection of arguments
    * @return
    */
   private Collection<?> reject(Object[] arg) {
@@ -1672,22 +1673,23 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    * 
    * @param first
    * @param second
-   * @param operator
+   * @param operation
    * @return
    */
-  private Boolean compare(int first, int second, String operator) {
-    if ("=".equals(operator)) {
-      return first == second;
-    } else if ("<=".equals(operator)) {
-      return first <= second;
-    } else if (">=".equals(operator)) {
-      return first >= second;
-    } else if ("<".equals(operator)) {
-      return first < second;
-    } else if (">".equals(operator)) {
-      return first > second;
-    } else {
-      return null;
+  private Boolean compare(int first, int second, String operation) {
+    switch (operation) {
+      case "=":
+        return first == second;
+      case "<=":
+        return first <= second;
+      case ">=":
+        return first >= second;
+      case "<":
+        return first < second;
+      case ">":
+        return first > second;
+      default:
+        return null;
     }
   }
 
@@ -1699,19 +1701,20 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    * @param operator
    * @return
    */
-  private Boolean compare(double first, double second, String operator) {
-    if ("=".equals(operator)) {
-      return first == second;
-    } else if ("<=".equals(operator)) {
-      return first <= second;
-    } else if (">=".equals(operator)) {
-      return first >= second;
-    } else if ("<".equals(operator)) {
-      return first < second;
-    } else if (">".equals(operator)) {
-      return first > second;
-    } else {
-      return null;
+  private Boolean compare(double first, double second, String operation) {
+    switch ((operation)) {
+      case "=":
+        return first == second;
+      case "<=":
+        return first <= second;
+      case ">=":
+        return first >= second;
+      case "<":
+        return first < second;
+      case ">":
+        return first > second;
+      default:
+        return null;
     }
   }
 

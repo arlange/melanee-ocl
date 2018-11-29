@@ -133,7 +133,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
    * 
    * @param context - is a Clabject
    */
-  public DeepOclRuleVisitor(Clabject context) {
+  public DeepOclRuleVisitor(Clabject context) { 
     super();
     this.context = context;
     this.wrapper = new DeepOCLClabjectWrapperImpl(this.context);
