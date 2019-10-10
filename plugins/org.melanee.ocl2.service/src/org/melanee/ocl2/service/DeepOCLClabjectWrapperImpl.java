@@ -45,6 +45,7 @@ import org.melanee.core.models.plm.PLM.Element;
 import org.melanee.core.models.plm.PLM.Entity;
 import org.melanee.core.models.plm.PLM.Feature;
 import org.melanee.core.models.plm.PLM.Level;
+import org.melanee.core.models.plm.PLM.OwnedElement;
 import org.melanee.core.models.plm.PLM.PLMFactory;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclLexer;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser;
@@ -351,10 +352,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
           if (feature instanceof Attribute) {
             Attribute attr = (Attribute) feature;
             if (attr.getName().equals(target)) {
-              this.navigationStack
-                  .push(new Tuple<String, Collection<Element>>(target, Arrays.asList(attr)));
               returnList.add(attr);
-              return returnList;
             }
           }
         }
@@ -449,6 +447,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             }
           }
         }
+        if(this.navigationStack.peek().getFirst().equals(target)) {
+          this.navigationStack.pop();
+        }
         this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
       } else if (element instanceof DeepModel) {
         if (target.equals("Clabject")) {
@@ -479,6 +480,17 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
           this.navigationStack
               .push(new Tuple<String, Collection<Element>>("Connections", connectionList));
           return connectionList;
+        } else if (target.equals("Feature")) {
+          List<Element> featureList = new ArrayList<Element>();
+          for (Level level : ((DeepModel) context).getContent()) {
+            for (Clabject clabject : level.getClabjects()) {
+              for (Feature feature : clabject.getFeature()) {
+                featureList.add(feature);
+              }
+            }
+          }
+          this.navigationStack.push(new Tuple<String, Collection<Element>>("Feature", featureList));
+          return featureList;
         }
       }
     }
@@ -500,8 +512,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   /**
-   * if you want navigate up to a higher level, i.e. to the directType of the context your in use this
-   * method (level cast).
+   * if you want navigate up to a higher level, i.e. to the directType of the context your in use
+   * this method (level cast).
    * 
    * @param target
    * @return null or result collection
