@@ -798,13 +798,13 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         }
         // includesAll: this method is passed through to the wrapper.
         else if (ctx.opName.getText().equals("includesAll")) {
-          visit(ctx.arg);
           if (this.tempCollection != null && this.tempCollection.size() > 0) {
             Collection<Element> list = (Collection<Element>) tempCollection;
+            Object arg = visit(ctx.arg);
             tempCollection = null;
             Object[] args = new Object[2];
             args[0] = list;
-            args[1] = this.wrapper.getNavigationStack().peek().getSecond();
+            args[1] = arg;
             try {
               return Boolean.parseBoolean(this.wrapper.invoke("includesAll", args).toString());
             } catch (Exception e) {

@@ -447,7 +447,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
             }
           }
         }
-        if(this.navigationStack.peek().getFirst().equals(target)) {
+        if (this.navigationStack.peek().getFirst().equals(target)) {
           this.navigationStack.pop();
         }
         this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
@@ -899,7 +899,18 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   private Boolean includes(Object[] arg) {
-    return CollectionUtil.includes((Collection<?>) arg[0], arg[1]);
+    Collection<?> arg0 = (Collection<?>) arg[0];
+    List list = new ArrayList<>();
+    if (arg[1] instanceof Attribute) {
+      arg[1] = ((Attribute) arg[1]).getValue();
+    }
+    for (Object o : arg0) {
+      if (o instanceof String) {
+        String entry = o.toString().replaceAll("^\"|\"$", "");
+        list.add(entry);
+      }
+    }
+    return CollectionUtil.includes((Collection<?>) list, arg[1]);
   }
 
   /**
