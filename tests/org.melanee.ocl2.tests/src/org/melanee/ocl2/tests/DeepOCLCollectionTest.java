@@ -120,7 +120,7 @@ public class DeepOCLCollectionTest {
     l1.getContent().add(klmAirline);
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Set{\"Amsterdam\",\"Den Haag\",\"Eindhoven\"}->includes(self.origin.name) implies self.airline.name = \"KLM\""));
+        "Set{\"Amsterdam\",\"Den Haag\",\"Eindhoven\"}->includes(self.origin.name) and Set{\"Amsterdam\",\"Den Haag\",\"Eindhoven\"}->includes(self.destination.name) implies self.airline.name = \"KLM\""));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(flight);

@@ -1192,6 +1192,28 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     if (left instanceof Collection && !((Collection) left).isEmpty()) {
       left = ((Collection) left).toArray()[0];
     }
+    if (left instanceof Integer && right instanceof Attribute) {
+      Attribute attributeRight = (Attribute) right;
+      Integer integerLeft = (Integer) left;
+      Attribute attributeLeft = PLMFactory.eINSTANCE.createAttribute();
+      attributeLeft.setDatatype("Integer");
+      attributeLeft.setValue(integerLeft.toString());
+      Map<String, String> expressionMap = new HashMap<>();
+      expressionMap.put("right", attributeRight.getValue());
+      expressionMap.put("operator", operator);
+      return castAndCompare(attributeLeft, expressionMap);
+    } else if (right instanceof Integer && left instanceof Attribute) {
+      Integer integerRight = (Integer) right;
+      Attribute attributeLeft = (Attribute) left;
+      Attribute attributeRight = PLMFactory.eINSTANCE.createAttribute();
+      attributeRight.setDatatype("Integer");
+      attributeRight.setValue(integerRight.toString());
+      Map<String, String> expressionMap = new HashMap<>();
+      expressionMap.put("right", attributeRight.getValue());
+      expressionMap.put("operator", operator);
+      return castAndCompare(attributeLeft, expressionMap);
+    }
+
     if (right instanceof Attribute && left instanceof Attribute) {
       Attribute attributeRight = (Attribute) right;
       Attribute attributeLeft = (Attribute) left;
