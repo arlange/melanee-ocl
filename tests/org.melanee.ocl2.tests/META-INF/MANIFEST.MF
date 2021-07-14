@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.antlr.runtime;bundle-version="4.3.0",
  org.melanee.ocl2.models.definition;bundle-version="1.0.0",
  org.melanee.core.models.plm
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Import-Package: org.melanee.ocl2.service,
  org.melanee.ocl2.service.util

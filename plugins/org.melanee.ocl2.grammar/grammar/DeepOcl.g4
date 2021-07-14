@@ -80,6 +80,12 @@
  :
      'pre' ID? ':' specificationCS
  ;
+ 
+  filterCS
+ :
+     'filter' ID ':' specificationCS
+ ;
+ 
 
  defCS
  :
@@ -524,6 +530,7 @@
      (
          invCS
          | defCS
+         | filterCS
      )*
  ;
 
