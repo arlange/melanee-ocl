@@ -14,7 +14,6 @@
 		<!--<eclipse-repo.url>http://download.eclipse.org/releases/luna</eclipse-repo.url>
 		<epsilon-repo.url>http://download.eclipse.org/epsilon/interim/</epsilon-repo.url>
 		<swtbot-repo.url>http://download.eclipse.org/technology/swtbot/snapshots</swtbot-repo.url>-->
-		
 		<!-- Maven plugin repositories -->
 		<tycho-maven-snapshots-repo.url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</tycho-maven-snapshots-repo.url>
 		

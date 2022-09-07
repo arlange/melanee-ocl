@@ -19,8 +19,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.melanee.core.modeleditor,
  org.melanee.ocl2.models.definition,
  org.eclipse.emf.common.ui,
- org.eclipse.emf.edit.ui
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+ org.eclipse.emf.edit.ui,
+ org.eclipse.ocl;bundle-version="3.6.0",
+ org.melanee.core.workbench;bundle-version="2.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: org.melanee.ocl2.service,
  org.melanee.ocl2.service.exception,

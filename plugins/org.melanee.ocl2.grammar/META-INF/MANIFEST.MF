@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.melanee.ocl2.grammar
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.melanee.ocl2.grammar.Activator
 Require-Bundle: org.eclipse.core.runtime
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: org.antlr.v4.runtime,
  org.antlr.v4.runtime.atn,
