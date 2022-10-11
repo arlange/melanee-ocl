@@ -499,7 +499,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object> impleme
 				else if (ctx.opName.getText().equals("iterate")) {
 					String type = ctx.arg.getText().substring(ctx.arg.getText().indexOf(":") + 1,
 							ctx.arg.getText().length());
-					// defining a colelction beforehand, like Set{1,2,3}
+					// defining a collection beforehand, like Set{1,2,3}
 					if (type.equals("Integer") || type.equals("Real") || type.equals("Boolean")
 							|| type.equals("String")) {
 						if (this.tempCollection != null && this.tempCollection.size() > 0) {
