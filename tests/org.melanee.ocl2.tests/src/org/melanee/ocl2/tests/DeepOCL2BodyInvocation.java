@@ -54,21 +54,24 @@ public class DeepOCL2BodyInvocation {
     Attribute name = PLMFactory.eINSTANCE.createAttribute();
     name.setName("name");
     name.setValue("gold");
-    
+
     Method getCurrentLevelName = PLMFactory.eINSTANCE.createMethod();
     getCurrentLevelName.setName("getCurrentLevelName");
-    
+
     Parameter param1 = PLMFactory.eINSTANCE.createPrimitiveParameter();
     param1.setName("test");
     param1.setExpression("String");
-    
+
     Parameter output = PLMFactory.eINSTANCE.createPrimitiveParameter();
     output.setName("result");
     output.setExpression("String");
     output.setOutput(true);
-    
+
     getCurrentLevelName.getParameter().add(param1);
     getCurrentLevelName.getParameter().add(output);
+    
+    
+    membership.getFeature().add(getCurrentLevelName);
 
     level.getFeature().add(name);
 
@@ -95,13 +98,13 @@ public class DeepOCL2BodyInvocation {
     constraintText.setText("currentLevel.name");
     constraint.getExpression().add(constraintText);
 
-    membership.getConstraint().add(constraint);
+    getCurrentLevelName.getConstraint().add(constraint);
 
     DeepOclLexer oclLexer =
-        new DeepOclLexer(new ANTLRInputStream("self.getCurrentLevelName() = 'gold'"));
+        new DeepOclLexer(new ANTLRInputStream("self.getCurrentLevelName() = \"gold\""));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(membership);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(getCurrentLevelName);
     Object returnValue = visitor.visit(tree);
     assertEquals(true, Boolean.parseBoolean(returnValue.toString()));
 
