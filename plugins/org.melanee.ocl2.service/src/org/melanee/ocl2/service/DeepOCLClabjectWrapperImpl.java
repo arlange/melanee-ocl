@@ -151,20 +151,25 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     operationList.add("closure");
     operationList.add("substring");
     operationList.add("sortedBy");
+    operationList.add("reverse");
     // deepOCL operations
     operationList.add("allInstances");
-    operationList.add("indirectInstances");
-    operationList.add("directInstances");
-    operationList.add("deepDirectInstances");
-    operationList.add("deepIndirectInstances");
-    operationList.add("deepInstances");
-    operationList.add("instanceOf");
-    operationList.add("isDeepInstanceOf");
-    operationList.add("isDirectInstanceOf");
-    operationList.add("isDeepDirectInstanceOf");
-    operationList.add("isIndirectInstanceOf");
-    operationList.add("isDeepIndirectInstanceOf");
-    operationList.add("isDeepKindOf");
+    operationList.add("allDeepInstances");
+    operationList.add("getindirectInstances");
+    operationList.add("getDirectInstances");
+    operationList.add("getDeepDirectInstances");
+    operationList.add("getDeepIndirectInstances");
+    operationList.add("getDeepInstances");
+    operationList.add("doclIsInstanceOf");
+    operationList.add("doclIsDeepInstanceOf");
+    operationList.add("doclIsDirectInstanceOf");
+    operationList.add("doclIsDeepDirectInstanceOf");
+    operationList.add("doclIsIndirectInstanceOf");
+    operationList.add("doclIsDeepIndirectInstanceOf");
+    operationList.add("doclIsDeepKindOf");
+    operationList.add("doclIsDeepTypeOf");
+    operationList.add("doclIsIsonymOf");
+    operationList.add("doclIsHyponymOf");
 
   }
 
@@ -275,12 +280,16 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       return instances(arg);
     } else if (operation.equals("allInstances")) {
       return allInstances(arg);
+    } else if (operation.equals("allDeepInstances")) {
+      return allDeepInstances(arg);
     } else if (operation.equals("instanceOf")) {
       return instanceOf(arg);
     } else if (operation.equals("including")) {
       return including(arg);
     } else if (operation.equals("sortedBy")) {
       return sortedBy(arg);
+    } else if (operation.equals("getDirectInstances")) {
+      return getDirectInstances();
     }
     return null;
   }
@@ -570,7 +579,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       @SuppressWarnings("rawtypes")
       List returnList = clab.getInstances();
       this.navigationStack
-          .push(new Tuple<String, Collection<Element>>("directInstance", returnList));
+          .push(new Tuple<String, Collection<Element>>("directInstances", returnList));
       return returnList;
     }
     return null;
@@ -629,7 +638,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       } else {
         clazz = Class.forName("org.melanee.core.models.plm.PLM." + target);
       }
-      // I think the string comparison is more exact in this cas than the
+      // I think the string comparison is more exact in this case than the
       // regular JAVA tool to compare instances of classes
       for (Element e : this.navigationStack.peek().getSecond()) {
         if (!e.getClass().getInterfaces()[0].equals(clazz)) {
@@ -706,6 +715,10 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       }
     }
     return false;
+  }
+
+  public Boolean isDeepTypeOf(String text) {
+    return isDeepDirectInstanceOf(text);
   }
 
   /**
@@ -804,6 +817,71 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       // not castable to Clabject, which is necessary
       return null;
     }
+    return result;
+  }
+
+
+
+  public Object doclIsIsonymOf(String text) {
+    Boolean result = false;
+
+    try {
+      Clabject clabject = (Clabject) this.navigationStack.peek().getSecond().toArray()[0];
+      if (clabject.getAllFeatures().size() == 0) {
+        return false;
+      }
+      int levelIndex = clabject.getLevelIndex();
+      if (levelIndex > 0) {
+        Level typeLevel = clabject.getDeepModel().getLevelAtIndex(levelIndex - 1);
+        Boolean match = true;
+        outer: for (Element element : typeLevel.getContent()) {
+          Clabject clab = (Clabject) element;
+          Map<String, Feature> featureMap = new HashMap<String, Feature>();
+          for (Feature feature : clab.getAllFeatures()) {
+            featureMap.put(feature.getName(), feature);
+          }
+          for (Feature feature : clabject.getAllFeatures()) {
+            if (featureMap.containsKey(feature.getName())) {
+              Feature typeFeature = featureMap.get(feature.getName());
+              if (typeFeature instanceof Attribute && feature instanceof Attribute) {
+                Attribute typeAttribute = (Attribute) typeFeature;
+                Attribute attribute = (Attribute) feature;
+                if (typeAttribute.getDatatype() == attribute.getDatatype()
+                    && typeAttribute.getDurability() - 1 == attribute.getDurability()) {
+                  return true;
+                } else
+                  match = false;
+              }
+              if (typeFeature instanceof org.melanee.core.models.plm.PLM.Method
+                  && feature instanceof org.melanee.core.models.plm.PLM.Method) {
+                org.melanee.core.models.plm.PLM.Method typeMethod =
+                    (org.melanee.core.models.plm.PLM.Method) typeFeature;
+                org.melanee.core.models.plm.PLM.Method method =
+                    (org.melanee.core.models.plm.PLM.Method) feature;
+                if (typeMethod.getParameter() == method.getParameter()) {
+                  return true;
+                } else {
+                  match = false;
+                }
+              } else
+                match = false;
+              continue outer;
+            }
+          }
+        }
+        if (!match) {
+          result = false;
+        }
+      } else
+        return false;
+    } catch (ClassCastException e) {
+      return new OclInvalid();
+    }
+    return result;
+  }
+
+  public Boolean doclIsHyponymOf(String text) {
+    Boolean result = false;
     return result;
   }
 
@@ -1136,12 +1214,32 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       List<Element> returnCollection = new ArrayList<>();
       if (this.navigationStack.peek().getSecond().toArray()[0] instanceof Clabject) {
         Collection<Clabject> tempCollection =
+            ((Clabject) this.navigationStack.peek().getSecond().toArray()[0]).getInstances();
+        for (Clabject c : tempCollection) {
+          returnCollection.add(c);
+        }
+        this.navigationStack.push(new Tuple<String, Collection<Element>>("allInstances",
+            (Collection<Element>) returnCollection));
+        return returnCollection;
+      } else {
+        return new OclInvalid();
+      }
+    } else {
+      return new OclInvalid();
+    }
+  }
+
+  private Object allDeepInstances(Object[] arg) {
+    if (this.navigationStack.peek().getSecond().size() == 1) {
+      List<Element> returnCollection = new ArrayList<>();
+      if (this.navigationStack.peek().getSecond().toArray()[0] instanceof Clabject) {
+        Collection<Clabject> tempCollection =
             ((Clabject) this.navigationStack.peek().getSecond().toArray()[0])
                 .getClassificationTreeAsType();
         for (Clabject c : tempCollection) {
           returnCollection.add(c);
         }
-        this.navigationStack.push(new Tuple<String, Collection<Element>>("allInstances",
+        this.navigationStack.push(new Tuple<String, Collection<Element>>("allDeepInstances",
             (Collection<Element>) returnCollection));
         return returnCollection;
       } else {
@@ -1239,6 +1337,19 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       Attribute attributeLeft = PLMFactory.eINSTANCE.createAttribute();
       attributeLeft.setDatatype("Integer");
       attributeLeft.setValue(integerLeft.toString());
+      Map<String, String> expressionMap = new HashMap<>();
+      expressionMap.put("right", attributeRight.getValue());
+      expressionMap.put("operator", operator);
+      return castAndCompare(attributeLeft, expressionMap);
+    } else if (left instanceof Integer && right instanceof Integer) {
+      Integer integerRight = (Integer) right;
+      Integer integerLeft = (Integer) left;
+      Attribute attributeLeft = PLMFactory.eINSTANCE.createAttribute();
+      attributeLeft.setDatatype("Integer");
+      attributeLeft.setValue(integerLeft.toString());
+      Attribute attributeRight = PLMFactory.eINSTANCE.createAttribute();
+      attributeRight.setDatatype("Integer");
+      attributeRight.setValue(integerRight.toString());
       Map<String, String> expressionMap = new HashMap<>();
       expressionMap.put("right", attributeRight.getValue());
       expressionMap.put("operator", operator);
@@ -1885,8 +1996,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    * @param context2 is the clabject that is passed from the loop operation
    */
   public void self(Clabject context2) {
-    this.navigationStack.push(
-        new Tuple<String, Collection<Element>>(this.context.getName(), Arrays.asList(context2)));
+    this.navigationStack
+        .push(new Tuple<String, Collection<Element>>(context2.getName(), Arrays.asList(context2)));
   }
 
   public void setRight(String right) {
@@ -1927,10 +2038,10 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   /**
    * assign a value to a let variable.
    * 
-   * @param value value to assign the let variable with
+   * @param value to assign the let variable with
    * @return
    */
-  public Object assign(String value) {
+  public Object assign(Object left, String value) {
     if (this.navigationStack.peek().getSecond().size() == 1) {
       try {
         Attribute attr = (Attribute) this.navigationStack.pop().getSecond().toArray()[0];
@@ -2073,4 +2184,28 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   public void clearIterationMap() {
     this.iterationMap.clear();
   }
+
+  public Object oclIsUndefined() {
+    Collection<Element> elementColletion = this.navigationStack.peek().getSecond();
+    if (elementColletion.size() == 1) {
+      Element element = (Element) elementColletion.toArray()[0];
+      if (element instanceof Attribute) {
+        Attribute attribute = (Attribute) element;
+        if (attribute.getValue() == "" || attribute.getValue() == null) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public Object assign(Object left, Attribute rightAttribute) {
+    if (left instanceof Attribute) {
+      Attribute leftAttribute = (Attribute) left;
+      leftAttribute.setValue(rightAttribute.getValue());
+      return rightAttribute.getValue();
+    }
+    return null;
+  }
+
 }

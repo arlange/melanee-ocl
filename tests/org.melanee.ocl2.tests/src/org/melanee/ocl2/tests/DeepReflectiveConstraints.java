@@ -277,11 +277,15 @@ public class DeepReflectiveConstraints {
     this.NonAbstract.getFeature().add(attribute);
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> forAll(select(c|c.#getFeature()# -> select(f|f.#getDurability()# >= 1)) -> size() = self.getDirectInstances() -> select(c|c.#getFeature()#) -> size())"));
+        "self.#getAllFeatures()# -> select(f|f.#getDurability()# >= 1)) -> size() = self.getDirectInstances() -> select(cc|cc.#getAllFeatures()#) -> size())"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
-    Object returnValue = visitor.visit(tree);
-    assertEquals(true, returnValue);
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabj : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabj);
+        Object returnValue = visitor.visit(tree);
+        assertEquals(true, returnValue);
+      }
+    }
   }
 }

@@ -83,7 +83,7 @@
  
   filterCS
  :
-     'filter' ID ':' specificationCS
+     'filter' ID? ':' specificationCS
  ;
  
 

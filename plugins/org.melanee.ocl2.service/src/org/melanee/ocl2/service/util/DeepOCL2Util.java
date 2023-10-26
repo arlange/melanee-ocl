@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.melanee.ocl2.service.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -32,6 +31,7 @@ import org.melanee.ocl2.models.definition.constraint.BodyConstraint;
 import org.melanee.ocl2.models.definition.constraint.Constraint;
 import org.melanee.ocl2.models.definition.constraint.PreConstraint;
 import org.melanee.ocl2.service.DeepOclRuleVisitor;
+import org.melanee.ocl2.service.exception.PreConstraintFailedException;
 
 public class DeepOCL2Util {
 
@@ -147,19 +147,20 @@ public class DeepOCL2Util {
   public static boolean checkPreConstraints(Feature feature, Clabject element) {
     for (AbstractConstraint constraint : feature.getConstraint()) {
       if (constraint instanceof PreConstraint) {
-        String oclExpression = "pre:" + ((BodyConstraint) constraint).getText();
+        String oclExpression = ((PreConstraint) constraint).getText();
         DeepOclLexer ocl2Lexer = new DeepOclLexer(new ANTLRInputStream(oclExpression));
         DeepOclParser parser = new DeepOclParser(new CommonTokenStream(ocl2Lexer));
-        ParseTree tree = parser.preCS();
+        ParseTree tree = parser.specificationCS();
         DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(element);
         Object result = visitor.visit(tree);
         try {
           // result has to be of boolean nature to be
           // valid
           if (Boolean.parseBoolean(result.toString()) == false) {
-            return false;
+            throw new PreConstraintFailedException(feature.getName());
           }
         } catch (Exception e) {
+          e.printStackTrace();
           return false;
         }
 

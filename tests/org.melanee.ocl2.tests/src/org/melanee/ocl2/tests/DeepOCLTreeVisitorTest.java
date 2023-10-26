@@ -999,7 +999,7 @@ public class DeepOCLTreeVisitorTest {
   @Test
   public void iterateTest() {
     DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("Set{1,2,3}->iterate(i : Integer; sum : Integer = 0 | sum + i)"));
+        new ANTLRInputStream("Set{1,2,3}->iterate(i : Integer; s : Integer = 0 | s + i)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
