@@ -336,7 +336,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     Object result = visit(ctx.ifexp);
     try {
       Boolean bool = Boolean.parseBoolean(result.toString());
-      this.assign = true;
+      //why this assign = true
+      //this.assign = true;
       if (bool) {
         return visit(ctx.thenexp);
       } else {
@@ -459,7 +460,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             }
           }
         }
-
         // first
         else if (ctx.opName.getText().equals("first")) {
           if (this.tempCollection != null && this.tempCollection.size() > 0) {
@@ -470,6 +470,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             return this.wrapper.getNavigationStack().peek().getSecond().toArray()[0];
           }
         }
+
+
         // at
         else if (ctx.opName.getText().equals("at")) {
           Integer index;
@@ -787,7 +789,45 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             // return false if the list is smaller or bigger than 1
             return false;
           }
-        } else if (ctx.opName.getText().equals("any")) {
+        }
+        // exists operation
+        else if (ctx.opName.getText().equals("exists")) {
+          Collection<Element> list = new ArrayList<>();
+          DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
+          Iterator<Element> it = wrapper.getCurrentCollectionIterator();
+          while (it.hasNext()) {
+            Clabject clab = (Clabject) it.next();
+            DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
+            this.wrapper = newWrapper;
+            Object result = visit(ctx.arg);
+            if (result != null) {
+              try {
+                boolean r = Boolean.parseBoolean(result.toString());
+                if (r == true) {
+                  return true;
+                }
+              } catch (Exception e) {
+                oldWrapper.getNavigationStack()
+                    .push(new Tuple<String, Collection<Element>>("exists", null));
+                return new OclInvalid();
+              }
+            } else {
+              oldWrapper.getNavigationStack()
+                  .push(new Tuple<String, Collection<Element>>("exists", null));
+            }
+          }
+          this.wrapper = oldWrapper;
+          // return true if only one element was found for the
+          // statement
+          if (list.size() == 1) {
+            return true;
+          } else {
+            // return false if the list is smaller or bigger than 1
+            return false;
+          }
+        }
+        // any
+        else if (ctx.opName.getText().equals("any")) {
           if (this.tempCollection != null && this.tempCollection.size() > 0) {
             Element e = (Element) tempCollection.toArray()[0];
             tempCollection = null;
@@ -859,9 +899,9 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             Element element;
             if (this.wrapper.getNavigationStack().peek().getSecond().size() == 1) {
               element = (Element) this.wrapper.getNavigationStack().peek().getSecond().toArray()[0];
+            } else {
+              element = null;
             }
-            // else
-            element = null;
             Collection<Element> list = (Collection<Element>) tempCollection;
             tempCollection = null;
             Object[] args = new Object[2];
@@ -1022,6 +1062,46 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           } else {
             return null;
           }
+        } // nonReflexiveClosure operation
+        else if (ctx.opName.getText().equals("nonReflexiveClosure")) {
+          // limit the navigation to 300 steps to make sure it isn't in an endless loop
+          // (cycle).
+          // maybe a problem in very big model, where the transitive navigation could be
+          // more than 300 steps...
+          int maxIterations = 300;
+          int counter = 0;
+          boolean removed = false;
+          Collection<Element> list = new HashSet<Element>();
+          DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
+          // list.addAll(oldWrapper.getNavigationStack().peek().getSecond());
+          Collection<Element> originalList = wrapper.getNavigationStack().peek().getSecond();
+          Iterator<Element> it = wrapper.getCurrentCollectionIterator();
+          Queue<Element> closureQueue = new LinkedList<Element>();
+          while (it.hasNext()) {
+            Clabject clab = (Clabject) it.next();
+            closureQueue.add(clab);
+          }
+          while (!closureQueue.isEmpty() && counter <= maxIterations) {
+            counter++;
+            Clabject clab = (Clabject) closureQueue.poll();
+            if (!originalList.contains(clab) || removed) {
+              list.add(clab);
+            }
+            removed = true;
+            DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
+            this.wrapper = newWrapper;
+            Object result = visit(ctx.arg);
+            if (result != null) {
+              if (result instanceof Collection) {
+                closureQueue.addAll((Collection<Element>) result);
+              }
+            }
+          }
+          this.wrapper = oldWrapper;
+          this.wrapper.getNavigationStack().push(new Tuple<String, Collection<Element>>(
+              "nonReflexiveClosure", (Collection<Element>) list));
+          this.tempCollection = list;
+
         }
         // closure operation
         else if (ctx.opName.getText().equals("closure")) {
@@ -1054,14 +1134,10 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             }
           }
           this.wrapper = oldWrapper;
-          if (list.size() > 0) {
-            this.wrapper.getNavigationStack().push(
-                new Tuple<String, Collection<Element>>("closure", (Collection<Element>) list));
-            this.tempCollection = list;
-            return list;
-          } else {
-            return null;
-          }
+          this.wrapper.getNavigationStack()
+              .push(new Tuple<String, Collection<Element>>("closure", (Collection<Element>) list));
+          this.tempCollection = list;
+          return list;
         }
         // reverse logic as select operation
         else if (ctx.opName.getText().equals("reject")) {
@@ -1427,7 +1503,11 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     } else if (ctx.opName.getText().equals("isDeepDirectInstanceOf")) {
       return this.wrapper.isDeepDirectInstanceOf(ctx.arg.getText());
     } else if (ctx.opName.getText().equals("isDeepKindOf")) {
-      return this.wrapper.isDeepKindOf(ctx.arg.getText());
+      return this.wrapper.isDeepInstanceOf(ctx.arg.getText());
+    } else if (ctx.opName.getText().equals("doclIsDeepKindOf")) {
+      return this.wrapper.doclIsDeepKindOf(ctx.arg.getText());
+    } else if (ctx.opName.getText().equals("doclIsDeepTypeOf")) {
+      return this.wrapper.doclIsDeepTypeOf(ctx.arg.getText());
     } else if (ctx.opName.getText().equals("doclIsIsonymOf")) {
       return this.wrapper.doclIsIsonymOf(ctx.arg.getText());
     } else if (ctx.opName.getText().equals("doclIsHyponymOf")) {

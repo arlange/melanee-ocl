@@ -10,6 +10,7 @@
 package org.melanee.ocl2.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collection;
@@ -78,8 +79,7 @@ public class DeepOCL2ClassificationTests {
   }
 
   /**
-   * This test should only return one level of the classification tree hierarchy. c1 - c2; not c2
-   * and c3
+   * This test should only return one level of the classification tree hierarchy. c1 - c2; not c3
    */
   @Test
   public void allInstancesTest_More() {
@@ -114,12 +114,12 @@ public class DeepOCL2ClassificationTests {
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(c1);
     Object returnValue = visitor.visit(tree);
-    assertTrue(((Collection) returnValue).contains(c2) && ((Collection) returnValue).contains(c3));
+    assertTrue(((Collection) returnValue).contains(c2));
+    assertFalse(((Collection) returnValue).contains(c3));
   }
 
   /**
-   * This test should only return one level of the classification tree hierarchy. c1 - c2; not c2
-   * and c3
+   * This test should only return one level of the classification tree hierarchy. c2 - c3
    */
   @Test
   public void allInstancesTest_OneMore() {

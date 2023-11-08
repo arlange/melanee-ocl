@@ -1,6 +1,7 @@
 package org.melanee.ocl2.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -225,10 +226,10 @@ public class BPMN2Tests {
     this.level1.getContent().add(startToEnd);
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.allInstances() -> forAll(p|p.receive->forAll(r|r.isDeepKindOf(CatchEvent)) and p.send->forAll(s|s.isDeepKindOf(ThrowEvent)))"));
+        "self.receive -> forAll(r|r.doclIsDeepKindOf(CatchEvent)) and self.send -> forAll(s|s.doclIsDeepKindOf(ThrowEvent))"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(connection1);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(startToEnd);
     Object returnValue = visitor.visit(tree);
     assertEquals(false, Boolean.parseBoolean(returnValue.toString()));
   }
@@ -257,10 +258,10 @@ public class BPMN2Tests {
     this.level1.getContent().add(startToEnd);
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.allInstances() -> forAll(p|p.receive->forAll(r|r.isDeepKindOf(CatchEvent)) and p.send->forAll(s|s.isDeepKindOf(ThrowEvent)))"));
+        "self.receive -> forAll(r|r.doclIsDeepKindOf(CatchEvent)) and self.send -> forAll(s|s.doclIsDeepKindOf(ThrowEvent))"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(connection1);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(startToEnd);
     Object returnValue = visitor.visit(tree);
     assertEquals(true, Boolean.parseBoolean(returnValue.toString()));
 
@@ -438,11 +439,11 @@ public class BPMN2Tests {
     Object returnValue = visitor.visit(tree);
     assertEquals("\"ORANGE\"", returnValue.toString());
   }
-  
+
   @Test
   public void PANLevelTests() {
-    DeepOclLexer oclLexer =
-        new DeepOclLexer(new ANTLRInputStream("Level -> reject(l|l.#getLevel()# = 0) -> forAll(l|l.#getEntities()# -> forAll(self.#getClassificationTreeAsInstance()# -> size() > 0))"));
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "Level -> reject(l|l.#getLevel()# = 0) -> forAll(l|l.#getEntities()# -> forAll(self.#getClassificationTreeAsInstance()# -> size() > 0))"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);

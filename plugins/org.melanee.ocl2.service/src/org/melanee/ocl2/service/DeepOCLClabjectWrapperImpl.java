@@ -149,6 +149,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     operationList.add("sum");
     operationList.add("including");
     operationList.add("closure");
+    operationList.add("nonReflexiveClosure");
     operationList.add("substring");
     operationList.add("sortedBy");
     operationList.add("reverse");
@@ -717,7 +718,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return false;
   }
 
-  public Boolean isDeepTypeOf(String text) {
+  public Boolean doclIsDeepTypeOf(String text) {
     return isDeepDirectInstanceOf(text);
   }
 
@@ -780,7 +781,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    * @param text Clabject.
    * @return true or false
    */
-  public Object isDeepKindOf(String text) {
+  public Object doclIsDeepKindOf(String text) {
     Boolean result = false;
     try {
       Clabject clabject = (Clabject) this.navigationStack.peek().getSecond().toArray()[0];
@@ -2207,5 +2208,7 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     }
     return null;
   }
+
+
 
 }
