@@ -9,8 +9,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.melanee.core.models.plm.PLM.Attribute;
 import org.melanee.core.models.plm.PLM.Clabject;
 import org.melanee.core.models.plm.PLM.Classification;
+import org.melanee.core.models.plm.PLM.Connection;
+import org.melanee.core.models.plm.PLM.ConnectionEnd;
 import org.melanee.core.models.plm.PLM.DeepModel;
 import org.melanee.core.models.plm.PLM.Inheritance;
 import org.melanee.core.models.plm.PLM.Level;
@@ -288,7 +291,7 @@ public class DOCLStylesTests {
 
     Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
     clabjectB.setName("B");
-    clabjectB.setPotency(0);
+    clabjectB.setPotency(2);
     this.l1.getContent().add(clabjectB);
 
     Clabject clabjectC = PLMFactory.eINSTANCE.createEntity();
@@ -333,7 +336,7 @@ public class DOCLStylesTests {
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("if self.#getPotency()# = 0 \n"
         + "        then (self.#getSubtypes()# -> exists(sub|sub.#getPotency()# > 0))\n"
-        + "        else (self.#getSubtypes()# -> forAll(sub|sub.#getPotency()# >= \n"
+        + "        else (self.#getSubtypes()# -> forAll(sub|sub.#getPotency()# <= \n"
         + "            self.#getPotency()#))\n" + "    endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
@@ -348,182 +351,604 @@ public class DOCLStylesTests {
 
   @Test
   public void durabilityClassificationTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
-    // context is Feature
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("self.#getClabject()#.#getTypes()# -> first().#getFeatures()# ->\n"
-            + "    iterate(feature; valid:Boolean=false|\n"
-            + "        if feature.#name# = self.#name#\n"
-            + "        then valid = feature.#getDurability()# > self.#getDurability()#\n"
-            + "        else valid = false\n" + "        endif"));
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    this.l1.getContent().add(inheritanceDA);
+
+
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
+    attributeB.setDurability(1);
+    attributeB.setMutability(1);
+    attributeB.setName("a");
+    attributeB.setDatatype("String");
+    attributeB.setValue("test");
+    clabjectB.getFeature().add(attributeB);
+
+    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
+    attributeV.setDurability(1);
+    attributeV.setMutability(1);
+    attributeV.setName("y");
+    attributeV.setDatatype("String");
+    attributeV.setValue("test");
+    clabjectB.getFeature().add(attributeV);
+
+    this.l2.getContent().add(clabjectB);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+
+    this.l2.getContent().add(classificationAB);
+
+    // context is Clabject
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "if self.#getDirectType()# -> size() = 1 then true else self.#getDirectType()#.#getDefinedAttributes()# -> select(attr|attr.#durability# > 0) -> collect(#name#) -> includesAll(self.#getAllAttributes()# -> collect(#name#)) endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
 
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
 
   @Test
   public void durabilityInheritanceTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
-    // context is Feature
-    DeepOclLexer oclLexer =
-        new DeepOclLexer(new ANTLRInputStream("let durability = self.#getDurability()#  in \n"
-            + "    self.#getDirectSuperType()#.#getAttributes()# -> select(a|a.#getName()# = self.#getName()#) -> iterate(a; result = true|\n"
-            + "        if a.#getDurability()# = 0\n" + "            then result = true\n"
-            + "            else if durability <> a.#getDurability()#\n"
-            + "                then result = false\n" + "            endif\n" + "        endif)"));
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("y");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    this.l1.getContent().add(inheritanceDA);
+
+
+    // context is Clabject
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "self.#getDirectSupertypes()#.#getAllAttributes()# -> reject(a|a.#getDurability()# = 0) -> forAll(a| let name:String = a.#name# in self.#getAttributeByName(name)#.#getDurability# = a.#getDurability()#)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
 
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   @Test
   public void mutabilityClassificationTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    this.l1.getContent().add(inheritanceDA);
+
+
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
+    attributeB.setDurability(1);
+    attributeB.setMutability(1);
+    attributeB.setName("a");
+    attributeB.setDatatype("String");
+    attributeB.setValue("test");
+    clabjectB.getFeature().add(attributeB);
+
+    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
+    attributeV.setDurability(1);
+    attributeV.setMutability(1);
+    attributeV.setName("y");
+    attributeV.setDatatype("String");
+    attributeV.setValue("test");
+    clabjectB.getFeature().add(attributeV);
+
+    this.l2.getContent().add(clabjectB);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+
     // context is Attribute
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("self.#getClabject()#.#getTypes()# -> first().#getFeatures()# -> \n"
-            + "    iterate(feature; valid:Boolean=false|\n"
-            + "        if feature.#name# = self.#name# and feature.#getMutability()# > 0\n"
-            + "        then valid = feature.#getMutability()# > self.#getMutability()#\n"
-            + "        else if feature.#name# = self.#name# and feature.#getMutability()# = 0\n"
-            + "            then valid = self.#getMutability()# = 0\n"
-            + "            else valid = false\n" + "            endif\n" + "        endif"));
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "self.#getClabject()#.#getDirectType()#.#getDefinedAttributes()# -> reject(a|a.#getDurability()# = 0) -> forAll(a| if a.#name# = self.#name# and a.#getMutabilityAsString()# > 0 then a.#getMutabilityAsString()# > self.#getMutabilityAsString()# else if a.#name# = self.#name# and a.#getMutabilityAsString()# = 0 then self.#getMutabilityAsString()# = 0 else true endif endif)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
 
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        for (Attribute attribute : clabject.getAllAttributes()) {
+          DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(attribute);
+          Object returnValue = visitor.visit(tree);
+          assertTrue(Boolean.parseBoolean(returnValue.toString()));
+        }
+      }
+    }
   }
 
   @Test
   public void mutabilityInheritanceTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("a");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    this.l1.getContent().add(inheritanceDA);
+
     // context is Attribute
-    DeepOclLexer oclLexer =
-        new DeepOclLexer(new ANTLRInputStream("let mutability = self.#getMutability()#  in \n"
-            + "    self.#getDirectSuperType()#.#getAttributes()# -> select(a|a.#getName()# = self.#getName()#) -> iterate(a; result = true|\n"
-            + "        if a.#getDutability()# = 0 and a.#getMutability()# = 0\n"
-            + "            then result = true\n"
-            + "            else if a.#getMutability()# = 1 and mutability >= 1\n"
-            + "                then result = false\n"
-            + "            else if mutability <> a.#getMutability()#\n"
-            + "                then result = false\n" + "                endif\n"
-            + "            endif\n" + "        endif)"));
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "let mutability:Integer = self.#getMutability()#  in self.#getClabject()#.#getDirectSupertypes()#.#getAllAttributes()# -> select(a|a.#getName()# = self.#getName()# and a.#getDurability()# > 0) -> forAll(a| if a.#getMutability()# = 1 and mutability >= 1 then false else if mutability <> a.#getMutability()# then false else true endif endif)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        for (Attribute attribute : clabject.getAllAttributes()) {
+          DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(attribute);
+          Object returnValue = visitor.visit(tree);
+          assertTrue(Boolean.parseBoolean(returnValue.toString()));
+        }
+      }
+    }
   }
 
   @Test
   public void strictModelingInstanceOfTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    this.l1.getContent().add(clabjectD);
+
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+
+    this.l2.getContent().add(clabjectB);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+
+
+    Connection connectionAD = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd endA = PLMFactory.eINSTANCE.createConnectionEnd();
+    ConnectionEnd endD = PLMFactory.eINSTANCE.createConnectionEnd();
+    endA.setDestination(clabjectA);
+    endA.setConnection(connectionAD);
+    endD.setDestination(clabjectD);
+    endD.setConnection(connectionAD);
+
+    this.l1.getContent().add(connectionAD);
+    /*
+     * this makes the test fail: Connection connectionAB = PLMFactory.eINSTANCE.createConnection();
+     * ConnectionEnd endAA = PLMFactory.eINSTANCE.createConnectionEnd(); ConnectionEnd endB =
+     * PLMFactory.eINSTANCE.createConnectionEnd(); endAA.setDestination(clabjectA);
+     * endAA.setConnection(connectionAB); endB.setDestination(clabjectB);
+     * endB.setConnection(connectionAB);
+     * 
+     * this.l1.getContent().add(connectionAB);
+     */
+
+
     // context is Connection
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.#getParticipants()# -> forAll(participant|participant.#getLevel()# = self.#getLeve()#)"));
+        "self.#getParticipants()# -> forAll(participant|participant.#getLevelIndex()# = self.#getLevelIndex()#)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Connection connection : level.getConnections()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(connection);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   @Test
   public void strictModelingInheritanceTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
-    // context is Inheritance
+
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    this.l1.getContent().add(inheritanceDA);
+
+    // context is Inheritance... should it be clabject
     DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("self.#superType#.#superType#.#levelIndex# -> asSet() -> size() = 1 \n"
-            + "and self.#subType#.#subType#.#levelIndex# -> asSet() -> size() = 1 \n"
-            + "and self.#superType#.#superType#.#levelIndex# -> asSet() -> first() =\n"
-            + "self.#subType#.#subType#.#levelIndex# -> asSet() -> first()"));
+        new ANTLRInputStream("self.#getSupertypes()#.#getLevelIndex()# -> asSet() -> size() = 1 \n"
+            + "and self.#getSubtypes()#.#getLevelIndex()# -> asSet() -> size() = 1 \n"
+            + "and self.#getSupertypes()#.#getLevelIndex()# -> asSet() =\n"
+            + "self.#getSubtypes()#.#getLevelIndex()# -> asSet()"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Inheritance inheritance : level.getAllInheritances()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(inheritance);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   @Test
   public void strictMonotonicTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    this.l2.getContent().add(clabjectB);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(1);
+    this.l2.getContent().add(clabjectD);
+
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    Classification classificationAD = PLMFactory.eINSTANCE.createClassification();
+    classificationAD.setInstance(clabjectD);
+    classificationAD.setType(clabjectA);
+
+    this.l2.getContent().add(classificationAB);
+    this.l2.getContent().add(classificationAD);
+
+
+
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.#getDirectInstances()# -> forAll(clabject|clabject.#getLevelIndex()# = self.#getLevelIndex()# + 1)"));
+        "let levelIndex:Integer = self.#getLevelIndex()# in if self.getDirectInstances() -> size() = 0 then true else self.getDirectInstances() -> forAll(c|c.#getLevelIndex()# = levelIndex + 1) endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   @Test
   public void universalOntologicalClassificationStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    this.l2.getContent().add(clabjectD);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+
+    this.l2.getContent().add(clabjectB);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationAD = PLMFactory.eINSTANCE.createClassification();
+    classificationAD.setInstance(clabjectD);
+    classificationAD.setType(clabjectA);
+    this.l2.getContent().add(classificationAD);
+
+
     // context is DeepModel
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> reject(c|c.#getLevel()#.#name# = 'O0') -> forAll(c|c.#getDirectType()# -> size() = 1)"));
+        "Clabject -> reject(c|c.#getLevelIndex()# = 0) -> forAll(c|c.#getDirectType()# -> size() = 1)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
     Object returnValue = visitor.visit(tree);
-
-    fail();
+    assertTrue(Boolean.parseBoolean(returnValue.toString()));
   }
 
   @Test
   public void mandatorySelectiveClassificationStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Connection connection1 = PLMFactory.eINSTANCE.createConnection();
+    this.l1.getContent().add(connection1);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    this.l2.getContent().add(clabjectD);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    this.l2.getContent().add(clabjectB);
+
+    Connection connection1Instance = PLMFactory.eINSTANCE.createConnection();
+    this.l2.getContent().add(connection1Instance);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationAD = PLMFactory.eINSTANCE.createClassification();
+    classificationAD.setInstance(clabjectD);
+    classificationAD.setType(clabjectA);
+    this.l2.getContent().add(classificationAD);
+
+    Classification classificationConnection = PLMFactory.eINSTANCE.createClassification();
+    classificationConnection.setInstance(connection1Instance);
+    classificationConnection.setType(connection1);
+    this.l2.getContent().add(classificationConnection);
+
     // context is DeepModel
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Connection -> reject(c|c.#getLevel()#.#name# = 'O0') -> forAll(c|c.#getDirectType()# -> size() = 1)"));
+        "Connection -> reject(c|c.#getLevelIndex()# = 0) -> forAll(c|c.#getDirectType()# -> size() = 1)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.dm);
     Object returnValue = visitor.visit(tree);
-
-    fail();
+    assertTrue(Boolean.parseBoolean(returnValue.toString()));
   }
 
   @Test
   public void universalIsonymicStyleTest1() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
-    // context is DeepModel
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(1);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(1);
+    attributeY.setMutability(1);
+    attributeY.setName("a");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l2.getContent().add(clabjectD);
+
+    Classification classificationAD = PLMFactory.eINSTANCE.createClassification();
+    classificationAD.setInstance(clabjectD);
+    classificationAD.setType(clabjectA);
+    this.l2.getContent().add(classificationAD);
+
+    // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> forAll(select(c|c.#getFeature()# -> select(f|f.#getDurability()# > 0)) -> size() = c.#getDirectInstances()# -> select(cc|cc.#getFeature()#) -> size())"));
+        "if self.getDirectInstances() -> size > 0 then let featureSize:Integer = self.#getFeature()# -> select(f|f.#getDurability()# > 0) -> size() in self.getDirectInstances() -> forAll(i|i.#getFeature()# -> size() = featureSize) else true endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   @Test
   public void universalIsonymicStyleTest2() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
-    // context is DeepModel
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(1);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(1);
+    attributeY.setMutability(1);
+    attributeY.setName("a");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l2.getContent().add(clabjectD);
+
+    Classification classificationAD = PLMFactory.eINSTANCE.createClassification();
+    classificationAD.setInstance(clabjectD);
+    classificationAD.setType(clabjectA);
+    this.l2.getContent().add(classificationAD);
+
+    // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> forAll(select(c|c.#getFeature()# -> select(f|f.#getDurability()# > 0) -> collect(#name#)) -> includesAll(c.#getDirectInstances()# -> select(cc|cc.#getFeature()#) -> collect(#name#)))"));
+        "if self.getDirectInstances() -> size > 0 then let featureNames:Set = self.#getFeature()# -> select(f|f.#getDurability()# > 0) -> collect(#name#) in self.getDirectInstances() -> forAll(i|i.#getFeature()# -> collect(#name#) -> includesAll(featureNames)) else true endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   /**
@@ -533,17 +958,82 @@ public class DOCLStylesTests {
    */
   @Test
   public void structuralTypingST1Test() {
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
 
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    this.l1.getContent().add(inheritanceDA);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
+    attributeB.setDurability(1);
+    attributeB.setMutability(1);
+    attributeB.setName("a");
+    attributeB.setDatatype("String");
+    attributeB.setValue("test");
+    clabjectB.getFeature().add(attributeB);
+    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
+    attributeV.setDurability(1);
+    attributeV.setMutability(1);
+    attributeV.setName("y");
+    attributeV.setDatatype("String");
+    attributeV.setValue("test");
+    clabjectB.getFeature().add(attributeV);
+    this.l2.getContent().add(clabjectB);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> exists(c|(self.doclIsHyponymOf(c) or self.doclIsIsonymOf(c)) implies self.#isInstanceOf(c)#)"));
+        "Clabject -> exists(c|(self.doclIsHyponymOf(c) or self.doclIsIsonymOf(c)) implies self.doclIsInstanceOf(c))"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   /**
@@ -554,16 +1044,82 @@ public class DOCLStylesTests {
    */
   @Test
   public void structuralTypingST2Test() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    this.l1.getContent().add(inheritanceDA);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
+    attributeB.setDurability(1);
+    attributeB.setMutability(1);
+    attributeB.setName("a");
+    attributeB.setDatatype("String");
+    attributeB.setValue("test");
+    clabjectB.getFeature().add(attributeB);
+    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
+    attributeV.setDurability(1);
+    attributeV.setMutability(1);
+    attributeV.setName("y");
+    attributeV.setDatatype("String");
+    attributeV.setValue("test");
+    clabjectB.getFeature().add(attributeV);
+    this.l2.getContent().add(clabjectB);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> exists(c|c.#getInstances()# -> includesAll(self.#getInstances()#) implies c.#getSubTypes()# -> includes(self))"));
+        "Clabject -> reject(self) -> select(c|c.doclGetInstances() -> size() > 0 and c.doclGetInstances() -> includesAll(self.doclGetInstances())) -> forAll(c| if c.#getSubtypes()# -> size() = 0 then true else c.#getSubtypes()# -> includes(self) endif)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   /**
@@ -574,16 +1130,82 @@ public class DOCLStylesTests {
    */
   @Test
   public void structuralTypingST3Test() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    this.l1.getContent().add(inheritanceDA);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
+    attributeB.setDurability(1);
+    attributeB.setMutability(1);
+    attributeB.setName("a");
+    attributeB.setDatatype("String");
+    attributeB.setValue("test");
+    clabjectB.getFeature().add(attributeB);
+    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
+    attributeV.setDurability(1);
+    attributeV.setMutability(1);
+    attributeV.setName("y");
+    attributeV.setDatatype("String");
+    attributeV.setValue("test");
+    clabjectB.getFeature().add(attributeV);
+    this.l2.getContent().add(clabjectB);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> exists(c|(self.doclIsHyponymOf(c) or self.doclIsIsonymOf(c) and c.#getSubTypes()# -> size() = 0) implies self.#getDirectType()# = c)"));
+        "Clabject -> select(c|self.doclIsHyponymOf(c) or self.doclIsIsonymOf(c) and c.#getSubtypes()# -> size() = 0) -> forAll(c|self.#getDirectType()# = c)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   /**
@@ -591,49 +1213,354 @@ public class DOCLStylesTests {
    */
   @Test
   public void structuralTypingST4Test() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    this.l1.getContent().add(inheritanceDA);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
+    attributeB.setDurability(1);
+    attributeB.setMutability(1);
+    attributeB.setName("a");
+    attributeB.setDatatype("String");
+    attributeB.setValue("test");
+    clabjectB.getFeature().add(attributeB);
+    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
+    attributeV.setDurability(1);
+    attributeV.setMutability(1);
+    attributeV.setName("y");
+    attributeV.setDatatype("String");
+    attributeV.setValue("test");
+    clabjectB.getFeature().add(attributeV);
+    this.l2.getContent().add(clabjectB);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
     // context is Clabject
     DeepOclLexer oclLexer =
         new DeepOclLexer(new ANTLRInputStream("self.#getDirectType()# -> size() <= 1"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   @Test
   public void exclusiveAbstractSupertypeStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(0);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    inheritanceDA.setComplete(true);// this is important for this test!!!!
+    this.l1.getContent().add(inheritanceDA);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
+    attributeB.setDurability(1);
+    attributeB.setMutability(1);
+    attributeB.setName("a");
+    attributeB.setDatatype("String");
+    attributeB.setValue("test");
+    clabjectB.getFeature().add(attributeB);
+    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
+    attributeV.setDurability(1);
+    attributeV.setMutability(1);
+    attributeV.setName("y");
+    attributeV.setDatatype("String");
+    attributeV.setValue("test");
+    clabjectB.getFeature().add(attributeV);
+    this.l2.getContent().add(clabjectB);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
     // context is Inheritance
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.#supertype#.#supertype# -> forAll(super|super.#getPotency()# = 0 and super.#getDirectInstances()# -> size() = 0) and self.#complete# = true"));
+        "self.#getSupertypes()# -> forAll(s|s.#getPotency()# = 0 and s.getDirectInstances() -> size() = 0) and self.#isComplete()# = true"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : dm.getContent()) {
+      for (Inheritance inheritance : level.getAllInheritances()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(inheritance);
+        Object returnValue = visitor.visit(tree);
+        assertTrue(Boolean.parseBoolean(returnValue.toString()));
+      }
+    }
   }
 
   @Test
   public void exclusiveConcreteSupertypeStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    inheritanceDA.setComplete(false);// this is important for this test!!!!
+    this.l1.getContent().add(inheritanceDA);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
+    attributeB.setDurability(1);
+    attributeB.setMutability(1);
+    attributeB.setName("a");
+    attributeB.setDatatype("String");
+    attributeB.setValue("test");
+    clabjectB.getFeature().add(attributeB);
+    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
+    attributeV.setDurability(1);
+    attributeV.setMutability(1);
+    attributeV.setName("y");
+    attributeV.setDatatype("String");
+    attributeV.setValue("test");
+    clabjectB.getFeature().add(attributeV);
+    this.l2.getContent().add(clabjectB);
+
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(0);
+    this.l2.getContent().add(clabjectF);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Inheritance inheritanceBF = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superF = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subB = PLMFactory.eINSTANCE.createSubtype();
+    superF.setSupertype(clabjectF);
+    subB.setSubtype(clabjectB);
+    inheritanceBF.getSubtype().add(subB);
+    inheritanceBF.getSupertype().add(superF);
+    inheritanceBF.setComplete(true);// this is important for this test!!!!
+    this.l2.getContent().add(inheritanceBF);
+
+
     // context is Inheritance
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.#supertype#.#supertype# -> forAll(super|super.#getPotency()# > 0) and self.#complete# = false"));
+        "self.#getSupertypes()# -> forAll(super|super.#getPotency()# > 0) and self.#isComplete()# = false"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(inheritanceDA);
     Object returnValue = visitor.visit(tree);
+    assertTrue(Boolean.parseBoolean(returnValue.toString()));
 
-    fail();
+    DeepOclRuleVisitor visitor1 = new DeepOclRuleVisitor(inheritanceBF);
+    Object returnValue1 = visitor1.visit(tree);
+    assertFalse(Boolean.parseBoolean(returnValue1.toString()));
   }
 
   @Test
   public void universalRootStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    inheritanceDA.setComplete(false);// this is important for this test!!!!
+    this.l1.getContent().add(inheritanceDA);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
+    attributeB.setDurability(1);
+    attributeB.setMutability(1);
+    attributeB.setName("a");
+    attributeB.setDatatype("String");
+    attributeB.setValue("test");
+    clabjectB.getFeature().add(attributeB);
+    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
+    attributeV.setDurability(1);
+    attributeV.setMutability(1);
+    attributeV.setName("y");
+    attributeV.setDatatype("String");
+    attributeV.setValue("test");
+    clabjectB.getFeature().add(attributeV);
+    this.l2.getContent().add(clabjectB);
+
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(0);
+    this.l2.getContent().add(clabjectF);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Inheritance inheritanceBF = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superF = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subB = PLMFactory.eINSTANCE.createSubtype();
+    superF.setSupertype(clabjectF);
+    subB.setSubtype(clabjectB);
+    inheritanceBF.getSubtype().add(subB);
+    inheritanceBF.getSupertype().add(superF);
+    inheritanceBF.setComplete(true);// this is important for this test!!!!
+    this.l2.getContent().add(inheritanceBF);
+
     // context is Level
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("if self.#isLeafLevel()#\n"
         + "    then true\n" + "    else self.#getClabjects()# -> select(c|c.#getSupertypes()# -> \n"
@@ -641,95 +1568,968 @@ public class DOCLStylesTests {
         + "    -> includesAll(self.#getClabjects()#)\n" + "    endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    for (Level level : this.dm.getContent()) {
+      DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(level);
+      Object returnValue = visitor.visit(tree);
+      assertTrue(Boolean.parseBoolean(returnValue.toString()));
+    }
   }
 
   @Test
   public void classicPotencyStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
+    attributeA.setDurability(2);
+    attributeA.setMutability(2);
+    attributeA.setName("a");
+    attributeA.setDatatype("String");
+    attributeA.setValue("test");
+    clabjectA.getFeature().add(attributeA);
+    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
+    attributeZ.setDurability(0);
+    attributeZ.setMutability(0);
+    attributeZ.setName("z");
+    attributeZ.setDatatype("String");
+    attributeZ.setValue("test");
+    clabjectA.getFeature().add(attributeZ);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(2);
+    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
+    attributeY.setDurability(2);
+    attributeY.setMutability(2);
+    attributeY.setName("y");
+    attributeY.setDatatype("String");
+    attributeY.setValue("test");
+    clabjectD.getFeature().add(attributeY);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    inheritanceDA.setComplete(false);// this is important for this test!!!!
+    this.l1.getContent().add(inheritanceDA);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(1);
+    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
+    attributeB.setDurability(1);
+    attributeB.setMutability(1);
+    attributeB.setName("a");
+    attributeB.setDatatype("String");
+    attributeB.setValue("test");
+    clabjectB.getFeature().add(attributeB);
+    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
+    attributeV.setDurability(1);
+    attributeV.setMutability(1);
+    attributeV.setName("y");
+    attributeV.setDatatype("String");
+    attributeV.setValue("test");
+    clabjectB.getFeature().add(attributeV);
+    this.l2.getContent().add(clabjectB);
+
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(1);
+    this.l2.getContent().add(clabjectF);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Clabject clabjectG = PLMFactory.eINSTANCE.createEntity();
+    clabjectG.setName("G");
+    clabjectG.setPotency(0);
+
+    this.l3.getContent().add(clabjectG);
+
+    Classification classificationBG = PLMFactory.eINSTANCE.createClassification();
+    classificationBG.setInstance(clabjectG);
+    classificationBG.setType(clabjectB);
+
+    this.l3.getContent().add(classificationBG);
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.#getDirectInstances()# -> forAll(c|c.#getPotency()# = self.#getPotency()# - 1)"));
+        "self.getDirectInstances() -> forAll(c|c.#getPotency()# = self.#getPotency()# - 1)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    Boolean aggregatedResult = true;
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        aggregatedResult = aggregatedResult && Boolean.parseBoolean(returnValue.toString());
+      }
+    }
+    assertTrue(aggregatedResult);
   }
 
   @Test
   public void untypedAbstractTypeStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectE = PLMFactory.eINSTANCE.createEntity();
+    clabjectE.setName("E");
+    clabjectE.setPotency(2);
+    this.l1.getContent().add(clabjectE);
+
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(0);
+    this.l1.getContent().add(clabjectD);
+
+    Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superD = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subA = PLMFactory.eINSTANCE.createSubtype();
+    superD.setSupertype(clabjectD);
+    subA.setSubtype(clabjectA);
+    inheritanceDA.getSubtype().add(subA);
+    inheritanceDA.getSupertype().add(superD);
+    inheritanceDA.setComplete(false);// this is important for this test!!!!
+    this.l1.getContent().add(inheritanceDA);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(0);
+    this.l2.getContent().add(clabjectB);
+
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(1);
+    this.l2.getContent().add(clabjectF);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+
+    Clabject clabjectG = PLMFactory.eINSTANCE.createEntity();
+    clabjectG.setName("G");
+    clabjectG.setPotency(1);
+    this.l2.getContent().add(clabjectG);
+
+    Classification classificationEG = PLMFactory.eINSTANCE.createClassification();
+    classificationEG.setInstance(clabjectG);
+    classificationEG.setType(clabjectE);
+    this.l2.getContent().add(classificationEG);
+
+    Inheritance inheritanceBG = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superB = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subG = PLMFactory.eINSTANCE.createSubtype();
+    superB.setSupertype(clabjectB);
+    subG.setSubtype(clabjectG);
+    inheritanceBG.getSubtype().add(subG);
+    inheritanceBG.getSupertype().add(superB);
+    inheritanceBG.setComplete(false);// this is important for this test!!!!
+    this.l2.getContent().add(inheritanceBG);
+
+    Clabject clabjectH = PLMFactory.eINSTANCE.createEntity();
+    clabjectH.setName("H");
+    clabjectH.setPotency(1);
+    this.l2.getContent().add(clabjectH);
+
+    Classification classificationEH = PLMFactory.eINSTANCE.createClassification();
+    classificationEH.setInstance(clabjectH);
+    classificationEH.setType(clabjectE);
+    this.l2.getContent().add(classificationEH);
+
+    Inheritance inheritanceBH = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superB1 = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subH = PLMFactory.eINSTANCE.createSubtype();
+    superB1.setSupertype(clabjectB);
+    subH.setSubtype(clabjectH);
+    inheritanceBH.getSubtype().add(subH);
+    inheritanceBH.getSupertype().add(superB1);
+    inheritanceBH.setComplete(false);// this is important for this test!!!!
+    this.l2.getContent().add(inheritanceBH);
+
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(
         new ANTLRInputStream("if self.#getPotency()# = 0 and self.#getSubtypes()# -> size() > 0\n"
-            + "        then self.#getDirectType()# -> isEmpty()\n" + "        else true\n"
+            + "        then self.getDirectType() -> isEmpty()\n" + "        else true\n"
             + "        endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    Boolean aggregatedResult = true;
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        aggregatedResult = aggregatedResult && Boolean.parseBoolean(returnValue.toString());
+      }
+    }
+    assertTrue(aggregatedResult);
   }
 
   @Test
   public void harminiousHorizontalSupertypesStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
 
+    Clabject clabjectE = PLMFactory.eINSTANCE.createEntity();
+    clabjectE.setName("E");
+    clabjectE.setPotency(2);
+    this.l1.getContent().add(clabjectE);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(0);
+    this.l1.getContent().add(clabjectD);
+
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(0);
+    this.l2.getContent().add(clabjectB);
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(1);
+    this.l2.getContent().add(clabjectF);
+
+    Clabject clabjectG = PLMFactory.eINSTANCE.createEntity();
+    clabjectG.setName("G");
+    clabjectG.setPotency(1);
+    this.l2.getContent().add(clabjectG);
+
+    Clabject clabjectH = PLMFactory.eINSTANCE.createEntity();
+    clabjectH.setName("H");
+    clabjectH.setPotency(1);
+    this.l2.getContent().add(clabjectH);
+
+    Clabject clabjectI = PLMFactory.eINSTANCE.createEntity();
+    clabjectI.setName("I");
+    clabjectI.setPotency(1);
+    this.l2.getContent().add(clabjectI);
+
+    Classification classificationEH = PLMFactory.eINSTANCE.createClassification();
+    classificationEH.setInstance(clabjectH);
+    classificationEH.setType(clabjectE);
+    this.l2.getContent().add(classificationEH);
+
+    Classification classificationEG = PLMFactory.eINSTANCE.createClassification();
+    classificationEG.setInstance(clabjectG);
+    classificationEG.setType(clabjectE);
+    this.l2.getContent().add(classificationEG);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Classification classificationDI = PLMFactory.eINSTANCE.createClassification();
+    classificationDI.setInstance(clabjectI);
+    classificationDI.setType(clabjectD);
+    this.l2.getContent().add(classificationDI);
+
+    Inheritance inheritanceBG = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superB = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subG = PLMFactory.eINSTANCE.createSubtype();
+    superB.setSupertype(clabjectB);
+    subG.setSubtype(clabjectG);
+    inheritanceBG.getSubtype().add(subG);
+    inheritanceBG.getSupertype().add(superB);
+    this.l2.getContent().add(inheritanceBG);
+
+    Inheritance inheritanceBH = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superB1 = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subH = PLMFactory.eINSTANCE.createSubtype();
+    superB1.setSupertype(clabjectB);
+    subH.setSubtype(clabjectH);
+    inheritanceBH.getSubtype().add(subH);
+    inheritanceBH.getSupertype().add(superB1);
+    this.l2.getContent().add(inheritanceBH);
+
+    Inheritance inheritanceHF = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superH = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subF = PLMFactory.eINSTANCE.createSubtype();
+    superH.setSupertype(clabjectH);
+    subF.setSubtype(clabjectF);
+    inheritanceHF.getSubtype().add(subF);
+    inheritanceHF.getSupertype().add(superH);
+    this.l2.getContent().add(inheritanceHF);
+
+    Inheritance inheritanceHI = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superH1 = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subI = PLMFactory.eINSTANCE.createSubtype();
+    superH1.setSupertype(clabjectH);
+    subI.setSubtype(clabjectI);
+    inheritanceHI.getSubtype().add(subI);
+    inheritanceHI.getSupertype().add(superH1);
+    this.l2.getContent().add(inheritanceHI);
+
+    // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "not (self.#getSupertypes()# -> exists(super|super.oclIsTypeOf(self.#getDirectType()#))"));
+        "let type:Clabject = self.#getDirectType()# in not (self.#getSupertypes()# -> exists(s|s.doclIsDeepTypeOf(type)))"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    Boolean aggregatedResult = true;
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        aggregatedResult = aggregatedResult && Boolean.parseBoolean(returnValue.toString());
+      }
+    }
+    assertTrue(aggregatedResult);
   }
 
   @Test
   public void absenceOfMetacycleStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectE = PLMFactory.eINSTANCE.createEntity();
+    clabjectE.setName("E");
+    clabjectE.setPotency(2);
+    this.l1.getContent().add(clabjectE);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(0);
+    this.l1.getContent().add(clabjectD);
+
+    Connection connectionAD = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndA = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndA.setDestination(clabjectA);
+    connectEndA.setConnection(connectionAD);
+    ConnectionEnd connectEndD = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndD.setDestination(clabjectD);
+    connectEndD.setConnection(connectionAD);
+    this.l1.getContent().add(connectionAD);
+
+    Connection connectionDE = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndD1 = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndD1.setDestination(clabjectD);
+    connectEndD1.setConnection(connectionDE);
+    ConnectionEnd connectEndE = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndE.setDestination(clabjectE);
+    connectEndE.setConnection(connectionDE);
+    this.l1.getContent().add(connectionDE);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(0);
+    this.l2.getContent().add(clabjectB);
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(1);
+    this.l2.getContent().add(clabjectF);
+
+    Clabject clabjectG = PLMFactory.eINSTANCE.createEntity();
+    clabjectG.setName("G");
+    clabjectG.setPotency(1);
+    this.l2.getContent().add(clabjectG);
+
+    Clabject clabjectH = PLMFactory.eINSTANCE.createEntity();
+    clabjectH.setName("H");
+    clabjectH.setPotency(1);
+    this.l2.getContent().add(clabjectH);
+
+    Clabject clabjectI = PLMFactory.eINSTANCE.createEntity();
+    clabjectI.setName("I");
+    clabjectI.setPotency(1);
+    this.l2.getContent().add(clabjectI);
+
+    Connection connectionIH = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndI = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndI.setDestination(clabjectI);
+    connectEndI.setConnection(connectionIH);
+    ConnectionEnd connectEndH = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndH.setDestination(clabjectH);
+    connectEndH.setConnection(connectionIH);
+    this.l2.getContent().add(connectionIH);
+
+    Classification classificationEH = PLMFactory.eINSTANCE.createClassification();
+    classificationEH.setInstance(clabjectH);
+    classificationEH.setType(clabjectE);
+    this.l2.getContent().add(classificationEH);
+
+    Classification classificationEG = PLMFactory.eINSTANCE.createClassification();
+    classificationEG.setInstance(clabjectG);
+    classificationEG.setType(clabjectE);
+    this.l2.getContent().add(classificationEG);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Classification classificationDI = PLMFactory.eINSTANCE.createClassification();
+    classificationDI.setInstance(clabjectI);
+    classificationDI.setType(clabjectD);
+    this.l2.getContent().add(classificationDI);
+
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self -> nonReflexiveClosure(clabject|clabject.#getDirectTypes()# -> union(clabject.#getAllNavigations()#.#destination#)) -> excludes(self)"));
+        "self.#getClassificationTreeAsInstance()# -> closure(c|c.#getAllNavigations()#.#destination#) -> excludes(self)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
+    Boolean aggregatedResult = true;
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        aggregatedResult = aggregatedResult && Boolean.parseBoolean(returnValue.toString());
+      }
+    }
+    assertTrue(aggregatedResult);
+  }
 
-    fail();
+  @Test
+  public void detectMetacycleStyleTest() {
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectE = PLMFactory.eINSTANCE.createEntity();
+    clabjectE.setName("E");
+    clabjectE.setPotency(2);
+    this.l1.getContent().add(clabjectE);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(0);
+    this.l1.getContent().add(clabjectD);
+
+    Clabject clabjectH = PLMFactory.eINSTANCE.createEntity();
+    clabjectH.setName("H");
+    clabjectH.setPotency(1);
+    this.l2.getContent().add(clabjectH);
+
+    Connection connectionAD = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndA = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndA.setDestination(clabjectA);
+    connectEndA.setConnection(connectionAD);
+    ConnectionEnd connectEndD = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndD.setDestination(clabjectD);
+    connectEndD.setConnection(connectionAD);
+    this.l1.getContent().add(connectionAD);
+
+    Connection connectionEH = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndE1 = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndE1.setDestination(clabjectE);
+    connectEndE1.setConnection(connectionEH);
+    ConnectionEnd connectEndH = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndH.setDestination(clabjectH);
+    connectEndH.setConnection(connectionEH);
+    this.l1.getContent().add(connectionEH);
+
+    Connection connectionDE = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndD1 = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndD1.setDestination(clabjectD);
+    connectEndD1.setConnection(connectionDE);
+    ConnectionEnd connectEndE = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndE.setDestination(clabjectE);
+    connectEndE.setConnection(connectionDE);
+    this.l1.getContent().add(connectionDE);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(0);
+    this.l2.getContent().add(clabjectB);
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(1);
+    this.l2.getContent().add(clabjectF);
+
+    Clabject clabjectG = PLMFactory.eINSTANCE.createEntity();
+    clabjectG.setName("G");
+    clabjectG.setPotency(1);
+    this.l2.getContent().add(clabjectG);
+
+    Clabject clabjectI = PLMFactory.eINSTANCE.createEntity();
+    clabjectI.setName("I");
+    clabjectI.setPotency(1);
+    this.l2.getContent().add(clabjectI);
+
+    Connection connectionIH = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndI = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndI.setDestination(clabjectI);
+    connectEndI.setConnection(connectionIH);
+    ConnectionEnd connectEndH1 = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndH1.setDestination(clabjectH);
+    connectEndH1.setConnection(connectionIH);
+    this.l2.getContent().add(connectionIH);
+
+    Classification classificationEH = PLMFactory.eINSTANCE.createClassification();
+    classificationEH.setInstance(clabjectH);
+    classificationEH.setType(clabjectE);
+    this.l2.getContent().add(classificationEH);
+
+    Classification classificationEG = PLMFactory.eINSTANCE.createClassification();
+    classificationEG.setInstance(clabjectG);
+    classificationEG.setType(clabjectE);
+    this.l2.getContent().add(classificationEG);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Classification classificationDI = PLMFactory.eINSTANCE.createClassification();
+    classificationDI.setInstance(clabjectI);
+    classificationDI.setType(clabjectD);
+    this.l2.getContent().add(classificationDI);
+
+
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "self.#getClassificationTreeAsInstance()# -> closure(c|c.#getAllNavigations()#.#destination#) -> excludes(self)"));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    Boolean aggregatedResult = true;
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        aggregatedResult = aggregatedResult && Boolean.parseBoolean(returnValue.toString());
+      }
+    }
+    assertFalse(aggregatedResult);
   }
 
   @Test
   public void absenceOfMetabombStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectE = PLMFactory.eINSTANCE.createEntity();
+    clabjectE.setName("E");
+    clabjectE.setPotency(2);
+    this.l1.getContent().add(clabjectE);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(0);
+    this.l1.getContent().add(clabjectD);
+
+    Connection connectionAD = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndA = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndA.setDestination(clabjectA);
+    connectEndA.setConnection(connectionAD);
+    ConnectionEnd connectEndD = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndD.setDestination(clabjectD);
+    connectEndD.setConnection(connectionAD);
+    this.l1.getContent().add(connectionAD);
+
+    Connection connectionDE = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndD1 = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndD1.setDestination(clabjectD);
+    connectEndD1.setConnection(connectionDE);
+    ConnectionEnd connectEndE = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndE.setDestination(clabjectE);
+    connectEndE.setConnection(connectionDE);
+    this.l1.getContent().add(connectionDE);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(0);
+    this.l2.getContent().add(clabjectB);
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(1);
+    this.l2.getContent().add(clabjectF);
+
+    Clabject clabjectG = PLMFactory.eINSTANCE.createEntity();
+    clabjectG.setName("G");
+    clabjectG.setPotency(1);
+    this.l2.getContent().add(clabjectG);
+
+    Clabject clabjectH = PLMFactory.eINSTANCE.createEntity();
+    clabjectH.setName("H");
+    clabjectH.setPotency(1);
+    this.l2.getContent().add(clabjectH);
+
+    Clabject clabjectI = PLMFactory.eINSTANCE.createEntity();
+    clabjectI.setName("I");
+    clabjectI.setPotency(1);
+    this.l2.getContent().add(clabjectI);
+
+    Connection connectionIH = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndI = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndI.setDestination(clabjectI);
+    connectEndI.setConnection(connectionIH);
+    ConnectionEnd connectEndH = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndH.setDestination(clabjectH);
+    connectEndH.setConnection(connectionIH);
+    this.l2.getContent().add(connectionIH);
+
+    Classification classificationEH = PLMFactory.eINSTANCE.createClassification();
+    classificationEH.setInstance(clabjectH);
+    classificationEH.setType(clabjectE);
+    this.l2.getContent().add(classificationEH);
+
+    Classification classificationEG = PLMFactory.eINSTANCE.createClassification();
+    classificationEG.setInstance(clabjectG);
+    classificationEG.setType(clabjectE);
+    this.l2.getContent().add(classificationEG);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Classification classificationDI = PLMFactory.eINSTANCE.createClassification();
+    classificationDI.setInstance(clabjectI);
+    classificationDI.setType(clabjectD);
+    this.l2.getContent().add(classificationDI);
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self -> nonReflexiveClosure(clabject|clabject.#getDirectTypes()#) -> excludesAll(self.#getAllNavigations()#.#destination#)"));
+        "self.#getClassificationTreeAsInstance()# -> closure(c|c.#getSupertypes()#) -> excludesAll(self.#getAllNavigations()#.#destination#)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
+    Boolean aggregatedResult = true;
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        aggregatedResult = aggregatedResult && Boolean.parseBoolean(returnValue.toString());
+      }
+    }
+    assertFalse(aggregatedResult);
+  }
 
-    fail();
+  @Test
+  public void detectMetabombStyleTest() {
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectE = PLMFactory.eINSTANCE.createEntity();
+    clabjectE.setName("E");
+    clabjectE.setPotency(2);
+    this.l1.getContent().add(clabjectE);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(0);
+    this.l1.getContent().add(clabjectD);
+
+    Clabject clabjectH = PLMFactory.eINSTANCE.createEntity();
+    clabjectH.setName("H");
+    clabjectH.setPotency(1);
+    this.l2.getContent().add(clabjectH);
+
+    Connection connectionAD = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndA = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndA.setDestination(clabjectA);
+    connectEndA.setConnection(connectionAD);
+    ConnectionEnd connectEndD = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndD.setDestination(clabjectD);
+    connectEndD.setConnection(connectionAD);
+    this.l1.getContent().add(connectionAD);
+
+    Connection connectionEH = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndE1 = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndE1.setDestination(clabjectE);
+    connectEndE1.setConnection(connectionEH);
+    ConnectionEnd connectEndH = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndH.setDestination(clabjectH);
+    connectEndH.setConnection(connectionEH);
+    this.l1.getContent().add(connectionEH);
+
+    Connection connectionDE = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndD1 = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndD1.setDestination(clabjectD);
+    connectEndD1.setConnection(connectionDE);
+    ConnectionEnd connectEndE = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndE.setDestination(clabjectE);
+    connectEndE.setConnection(connectionDE);
+    this.l1.getContent().add(connectionDE);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(0);
+    this.l2.getContent().add(clabjectB);
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(1);
+    this.l2.getContent().add(clabjectF);
+
+    Clabject clabjectG = PLMFactory.eINSTANCE.createEntity();
+    clabjectG.setName("G");
+    clabjectG.setPotency(1);
+    this.l2.getContent().add(clabjectG);
+
+    Clabject clabjectI = PLMFactory.eINSTANCE.createEntity();
+    clabjectI.setName("I");
+    clabjectI.setPotency(1);
+    this.l2.getContent().add(clabjectI);
+
+    Connection connectionIH = PLMFactory.eINSTANCE.createConnection();
+    ConnectionEnd connectEndI = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndI.setDestination(clabjectI);
+    connectEndI.setConnection(connectionIH);
+    ConnectionEnd connectEndH1 = PLMFactory.eINSTANCE.createConnectionEnd();
+    connectEndH1.setDestination(clabjectH);
+    connectEndH1.setConnection(connectionIH);
+    this.l2.getContent().add(connectionIH);
+
+    Classification classificationEH = PLMFactory.eINSTANCE.createClassification();
+    classificationEH.setInstance(clabjectH);
+    classificationEH.setType(clabjectE);
+    this.l2.getContent().add(classificationEH);
+
+    Classification classificationEG = PLMFactory.eINSTANCE.createClassification();
+    classificationEG.setInstance(clabjectG);
+    classificationEG.setType(clabjectE);
+    this.l2.getContent().add(classificationEG);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Classification classificationDI = PLMFactory.eINSTANCE.createClassification();
+    classificationDI.setInstance(clabjectI);
+    classificationDI.setType(clabjectD);
+    this.l2.getContent().add(classificationDI);
+
+
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "self.#getClassificationTreeAsInstance()# -> closure(c|c.#getSupertypes()#) -> excludesAll(self.#getAllNavigations()#.#destination#)"));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    Boolean aggregatedResult = true;
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        aggregatedResult = aggregatedResult && Boolean.parseBoolean(returnValue.toString());
+      }
+    }
+    assertFalse(aggregatedResult);
+  }
+
+  @Test
+  public void detectTypeSupertypeStyleTest() {
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectE = PLMFactory.eINSTANCE.createEntity();
+    clabjectE.setName("E");
+    clabjectE.setPotency(2);
+    this.l1.getContent().add(clabjectE);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(0);
+    this.l1.getContent().add(clabjectD);
+
+    Clabject clabjectH = PLMFactory.eINSTANCE.createEntity();
+    clabjectH.setName("H");
+    clabjectH.setPotency(1);
+    this.l2.getContent().add(clabjectH);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(0);
+    this.l2.getContent().add(clabjectB);
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(1);
+    this.l2.getContent().add(clabjectF);
+
+    Clabject clabjectG = PLMFactory.eINSTANCE.createEntity();
+    clabjectG.setName("G");
+    clabjectG.setPotency(1);
+    this.l2.getContent().add(clabjectG);
+
+    Clabject clabjectI = PLMFactory.eINSTANCE.createEntity();
+    clabjectI.setName("I");
+    clabjectI.setPotency(1);
+    this.l2.getContent().add(clabjectI);
+
+    Classification classificationEH = PLMFactory.eINSTANCE.createClassification();
+    classificationEH.setInstance(clabjectH);
+    classificationEH.setType(clabjectE);
+    this.l2.getContent().add(classificationEH);
+
+    Classification classificationEG = PLMFactory.eINSTANCE.createClassification();
+    classificationEG.setInstance(clabjectG);
+    classificationEG.setType(clabjectE);
+    this.l2.getContent().add(classificationEG);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Classification classificationDI = PLMFactory.eINSTANCE.createClassification();
+    classificationDI.setInstance(clabjectI);
+    classificationDI.setType(clabjectD);
+    this.l2.getContent().add(classificationDI);
+
+    Inheritance inheritanceAB = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superA = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subB = PLMFactory.eINSTANCE.createSubtype();
+    superA.setSupertype(clabjectA);
+    superA.setInheritance(inheritanceAB);
+    subB.setSubtype(clabjectB);
+    subB.setInheritance(inheritanceAB);
+    this.l2.getContent().add(inheritanceAB);
+
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "self.#getDirectType()# -> closure(c|c.#getTypes()#) -> excludesAll(self.#getSupertypes()#)"));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    Boolean aggregatedResult = true;
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        aggregatedResult = aggregatedResult && Boolean.parseBoolean(returnValue.toString());
+      }
+    }
+    assertFalse(aggregatedResult);
   }
 
   @Test
   public void absenceOfTypeSupertypeStyleTest() {
-    Clabject clabject = PLMFactory.eINSTANCE.createEntity();
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
 
-    DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("self.#getSupertypes()# -> excludesAll(self.#getTypes()#)"));
+    Clabject clabjectE = PLMFactory.eINSTANCE.createEntity();
+    clabjectE.setName("E");
+    clabjectE.setPotency(2);
+    this.l1.getContent().add(clabjectE);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(0);
+    this.l1.getContent().add(clabjectD);
+
+    Clabject clabjectH = PLMFactory.eINSTANCE.createEntity();
+    clabjectH.setName("H");
+    clabjectH.setPotency(1);
+    this.l2.getContent().add(clabjectH);
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(0);
+    this.l2.getContent().add(clabjectB);
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(1);
+    this.l2.getContent().add(clabjectF);
+
+    Clabject clabjectG = PLMFactory.eINSTANCE.createEntity();
+    clabjectG.setName("G");
+    clabjectG.setPotency(1);
+    this.l2.getContent().add(clabjectG);
+
+    Clabject clabjectI = PLMFactory.eINSTANCE.createEntity();
+    clabjectI.setName("I");
+    clabjectI.setPotency(1);
+    this.l2.getContent().add(clabjectI);
+
+    Classification classificationEH = PLMFactory.eINSTANCE.createClassification();
+    classificationEH.setInstance(clabjectH);
+    classificationEH.setType(clabjectE);
+    this.l2.getContent().add(classificationEH);
+
+    Classification classificationEG = PLMFactory.eINSTANCE.createClassification();
+    classificationEG.setInstance(clabjectG);
+    classificationEG.setType(clabjectE);
+    this.l2.getContent().add(classificationEG);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Classification classificationDI = PLMFactory.eINSTANCE.createClassification();
+    classificationDI.setInstance(clabjectI);
+    classificationDI.setType(clabjectD);
+    this.l2.getContent().add(classificationDI);
+
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "self.#getDirectType()# -> closure(c|c.#getTypes()#) -> excludesAll(self.#getSupertypes()#)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
-    Object returnValue = visitor.visit(tree);
-
-    fail();
+    Boolean aggregatedResult = true;
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        aggregatedResult = aggregatedResult && Boolean.parseBoolean(returnValue.toString());
+      }
+    }
+    assertTrue(aggregatedResult);
   }
 }

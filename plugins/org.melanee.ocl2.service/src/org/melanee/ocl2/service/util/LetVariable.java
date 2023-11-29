@@ -1,20 +1,18 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * Copyright (c) 2012, 2016 University of Mannheim: Chair for Software Engineering All rights
+ * reserved. This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *    Ralph Gerbig - initial API and implementation and initial documentation
- *    Arne Lange - ocl2 implementation
+ * Contributors: Ralph Gerbig - initial API and implementation and initial documentation Arne Lange
+ * - ocl2 implementation
  *******************************************************************************/
 package org.melanee.ocl2.service.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-
+import org.melanee.core.models.plm.PLM.Attribute;
 import org.melanee.core.models.plm.PLM.Clabject;
 import org.melanee.core.models.plm.PLM.Element;
 import org.melanee.core.models.plm.PLM.PLMFactory;
@@ -24,9 +22,9 @@ public class LetVariable {
   private String type;
   private String name;
   private Object value;
-  private Clabject context;
+  private Element context;
 
-  public LetVariable(String letName, String letType, String value, Clabject context)
+  public LetVariable(String letName, String letType, String value, Element context)
       throws InterpreterException {
     this.type = letType;
     this.name = letName;
@@ -36,7 +34,11 @@ public class LetVariable {
 
   public void setValue(String value) throws InterpreterException {
     if (this.type.equals("Integer")) {
-      this.value = Integer.parseInt(value);
+      if (value.contains(".")) {
+        this.value = Integer.parseInt(value.substring(0, value.indexOf(".")));
+      } else {
+        this.value = Integer.parseInt(value);
+      }
       return;
     } else if (this.type.equals("Real")) {
       this.value = Double.parseDouble(value);
@@ -56,15 +58,19 @@ public class LetVariable {
     } else if (this.type.equals("Bag") || this.type.equals("Sequence")) {
       this.value = new ArrayList<>();
       return;
-    }
-    Iterator<?> it = this.context.getDeepModel().eAllContents();
-    while (it.hasNext()) {
-      Element e = (Element) it.next();
-      if (e.getName().equals(this.type)) {
-        this.value = PLMFactory.eINSTANCE.createClabjectFromTemplate((Clabject) e, null);
-      } else {
-        throw new InterpreterException(
-            "could not instantiate let variable " + this.name + " with the type " + this.type);
+    } else if (this.type.equals("Clabject")) {
+      this.value = value;
+    } else if (this.context instanceof Clabject) {
+      Clabject context = (Clabject) this.context;
+      Iterator<?> it = context.getDeepModel().eAllContents();
+      while (it.hasNext()) {
+        Element e = (Element) it.next();
+        if (e.getName().equals(this.type)) {
+          this.value = PLMFactory.eINSTANCE.createClabjectFromTemplate((Clabject) e, null);
+        } else {
+          throw new InterpreterException(
+              "could not instantiate let variable " + this.name + " with the type " + this.type);
+        }
       }
     }
   }

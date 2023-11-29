@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.melanee.core.models.plm.PLM.Attribute;
 import org.melanee.core.models.plm.PLM.Clabject;
 import org.melanee.core.models.plm.PLM.Element;
@@ -156,7 +157,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   /**
    * Different constructor.
    * 
-   * @param context is a Clabject (context of the OCL statement)
+   * @param context is a Element (context of the OCL statement)
    */
   public DeepOclRuleVisitor(Element context) {
     super();
@@ -334,10 +335,16 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
   public Object visitIfExpCS(IfExpCSContext ctx) {
     this.assign = false;
     Object result = visit(ctx.ifexp);
+    if (result instanceof Collection) {
+      Object res = ((Collection<?>) result).toArray()[0];
+      if (res instanceof Attribute) {
+        Attribute attr = (Attribute) res;
+        result = attr.getValue();
+      }
+    }
     try {
       Boolean bool = Boolean.parseBoolean(result.toString());
-      //why this assign = true
-      //this.assign = true;
+      this.assign = true;
       if (bool) {
         return visit(ctx.thenexp);
       } else {
@@ -355,6 +362,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
 
   @Override
   public Object visitLetVariableCS(LetVariableCSContext ctx) {
+    this.assign = false;
     try {
       Object type = visit(ctx.type);
       Object exp = visit(ctx.exp);
@@ -363,6 +371,9 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         for (Object o : (Collection<?>) exp) {
           if (o instanceof Attribute) {
             value = ((Attribute) o).getValue();
+          } else if (type.equals("Set") || type.equals("Bag") || type.equals("OrderedSet")
+              || type.equals("Sequence")) {
+            value = exp;
           }
         }
       }
@@ -470,8 +481,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             return this.wrapper.getNavigationStack().peek().getSecond().toArray()[0];
           }
         }
-
-
         // at
         else if (ctx.opName.getText().equals("at")) {
           Integer index;
@@ -501,6 +510,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           String type = ctx.arg.getText().substring(ctx.arg.getText().indexOf(":") + 1,
               ctx.arg.getText().length());
           // defining a collection beforehand, like Set{1,2,3}
+          DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
           if (type.equals("Integer") || type.equals("Real") || type.equals("Boolean")
               || type.equals("String")) {
             if (this.tempCollection != null && this.tempCollection.size() > 0) {
@@ -508,7 +518,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
                   ctx.getText().indexOf(")"));
               Object[] semiArgs = (Object[]) visit(ctx.semiArg);
               String var = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf(":"));
-
               Object accu = semiArgs[2].toString();
               Iterator it = this.tempCollection.iterator();
               while (it.hasNext()) {
@@ -541,6 +550,15 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
               Iterator it = this.wrapper.getCurrentCollectionIterator();
               while (it.hasNext()) {
                 Object itElement = it.next();
+                DeepOCLClabjectWrapperImpl newWrapper =
+                    new DeepOCLClabjectWrapperImpl((Element) it);
+                this.wrapper = newWrapper;
+                this.wrapper.setSelf(oldWrapper.getSelf());
+                if (ctx.arg.getText().contains("|")) {
+                  String iteratorName =
+                      ctx.arg.getText().substring(0, ctx.arg.getText().indexOf("|"));
+                  this.wrapper.setIteratorName(iteratorName);
+                }
                 DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(iterationExpression));
                 DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
                 ParseTree tree = parser.specificationCS();
@@ -565,13 +583,27 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           // this is the section for real model navigation
           else {
             String iterationExpression =
-                ctx.getText().substring(ctx.getText().indexOf("|") + 1, ctx.getText().indexOf(")"));
-            Object[] semiArgs = (Object[]) visit(ctx.semiArg);
-            String var = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf(":"));
-            Object accu = semiArgs[2].toString();
+                ctx.getText().substring(ctx.getText().indexOf("|") + 1, ctx.getText().length() - 1);
+            this.assign = true;
             Iterator<Element> it = this.wrapper.getCurrentCollectionIterator();
+            Object[] semiArgs = (Object[]) visit(ctx.semiArg);
+            String var = null;
+            if (ctx.arg.getText().contains(":")) {
+              var = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf(":"));
+            } else {
+              var = ctx.arg.getText();
+            }
+            Object accu = semiArgs[2].toString();
             while (it.hasNext()) {
               Element itElement = it.next();
+              DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(itElement);
+              this.wrapper = newWrapper;
+              this.wrapper.setSelf(oldWrapper.getSelf());
+              if (ctx.arg.getText().contains(";")) {
+                String iteratorName = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf(";"))
+                    .replaceAll("\\s", "");
+                this.wrapper.setIteratorName(iteratorName);
+              }
               DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(iterationExpression));
               DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
               ParseTree tree = parser.specificationCS();
@@ -579,11 +611,14 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
               visitor.getWrapper().addIterationMap(semiArgs[0].toString(), accu);
               visitor.wrapper.setIteratorName(var);
               accu = visitor.visit(tree);
+              this.wrapper = oldWrapper;
             }
             Attribute returnAttribute = PLMFactory.eINSTANCE.createAttribute();
             returnAttribute.setValue(accu.toString());
+            this.wrapper = oldWrapper;
             this.wrapper.getNavigationStack().push(
                 new Tuple<String, Collection<Element>>("iterate", Arrays.asList(returnAttribute)));
+            this.assign = false;
             return accu;
           }
 
@@ -639,48 +674,99 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           String expression = ctx.arg.getText();
           Collection<?> returnCollection = new ArrayList<>();
           if (!collection.isEmpty()) {
-            Clabject clabject = (Clabject) collection.toArray()[0];
-            Attribute a = (Attribute) clabject.getFeatureForName(expression);
-            if (a.getDatatype().equals("Integer") || a.getDatatype().equals("Natural")) {
-              List<Integer> integerCollection = new ArrayList<>();
-              Iterator<?> it = collection.iterator();
-              while (it.hasNext()) {
-                Clabject c = (Clabject) it.next();
-                integerCollection.add(
-                    Integer.parseInt(((Attribute) c.getFeatureForName(expression)).getValue()));
+            Element element = (Element) collection.toArray()[0];
+            if (element instanceof Clabject) {
+              Clabject clabject = (Clabject) collection.toArray()[0];
+              Attribute a = (Attribute) clabject.getFeatureForName(expression);
+              if (a.getDatatype().equals("Integer") || a.getDatatype().equals("Natural")) {
+                List<Integer> integerCollection = new ArrayList<>();
+                Iterator<?> it = collection.iterator();
+                while (it.hasNext()) {
+                  Clabject c = (Clabject) it.next();
+                  integerCollection.add(
+                      Integer.parseInt(((Attribute) c.getFeatureForName(expression)).getValue()));
+                }
+                this.tempCollection = integerCollection;
+                return this.tempCollection;
+              } else if (a.getDatatype().equals("Real")) {
+                List<Double> doubleCollection = new ArrayList<>();
+                Iterator<?> it = collection.iterator();
+                while (it.hasNext()) {
+                  Clabject c = (Clabject) it.next();
+                  doubleCollection.add(
+                      Double.parseDouble(((Attribute) c.getFeatureForName(expression)).getValue()));
+                }
+                this.tempCollection = doubleCollection;
+                return this.tempCollection;
+              } else if (a.getDatatype().equals("String")) {
+                List<String> stringCollection = new ArrayList<>();
+                Iterator<?> it = collection.iterator();
+                while (it.hasNext()) {
+                  Clabject c = (Clabject) it.next();
+                  stringCollection.add(((Attribute) c.getFeatureForName(expression)).getValue());
+                }
+                return stringCollection;
+              } else if (a.getDatatype().equals("Boolean")) {
+                List<Boolean> booleanCollection = new ArrayList<>();
+                Iterator<?> it = collection.iterator();
+                while (it.hasNext()) {
+                  Clabject c = (Clabject) it.next();
+                  booleanCollection.add(Boolean
+                      .parseBoolean(((Attribute) c.getFeatureForName(expression)).getValue()));
+                }
+                this.tempCollection = booleanCollection;
               }
-              this.tempCollection = integerCollection;
               return this.tempCollection;
-            } else if (a.getDatatype().equals("Real")) {
-              List<Double> doubleCollection = new ArrayList<>();
-              Iterator<?> it = collection.iterator();
-              while (it.hasNext()) {
-                Clabject c = (Clabject) it.next();
-                doubleCollection.add(
-                    Double.parseDouble(((Attribute) c.getFeatureForName(expression)).getValue()));
+            }
+            if (element instanceof Attribute) {
+              String e;
+              if (expression.contains("#")) {
+                e = expression.substring(1, expression.length() - 1);
+              } else {
+                e = expression;
               }
-              this.tempCollection = doubleCollection;
-              return this.tempCollection;
-            } else if (a.getDatatype().equals("String")) {
-              List<String> stringCollection = new ArrayList<>();
-              Iterator<?> it = collection.iterator();
-              while (it.hasNext()) {
-                Clabject c = (Clabject) it.next();
-                stringCollection.add(((Attribute) c.getFeatureForName(expression)).getValue());
+              Object result = null;
+              EStructuralFeature feature = null;
+              Attribute attribute = (Attribute) collection.toArray()[0];
+              for (EStructuralFeature feat : attribute.eClass().getEAllStructuralFeatures()) {
+                if (feat.getName().equals(e)) {
+                  result = attribute.eGet(feat);
+                  feature = feat;
+                  continue;
+                }
               }
-              return stringCollection;
-            } else if (a.getDatatype().equals("Boolean")) {
-              List<Boolean> booleanCollection = new ArrayList<>();
-              Iterator<?> it = collection.iterator();
-              while (it.hasNext()) {
-                Clabject c = (Clabject) it.next();
-                booleanCollection.add(
-                    Boolean.parseBoolean(((Attribute) c.getFeatureForName(expression)).getValue()));
+              if (feature.getEType().getName().equals("EInt")) {
+                Integer.parseInt(result.toString());
+                List<Integer> integerCollection = new ArrayList<>();
+                Iterator<?> it = collection.iterator();
+                while (it.hasNext()) {
+                  Attribute a = (Attribute) it.next();
+                  integerCollection.add(Integer.parseInt(a.eGet(feature).toString()));
+                }
+                this.tempCollection = integerCollection;
+                return this.tempCollection;
+
+              } else if (feature.getEType().getName().equals("EString")) {
+                List<String> stringCollection = new ArrayList<>();
+                Iterator<?> it = collection.iterator();
+                while (it.hasNext()) {
+                  Attribute a = (Attribute) it.next();
+                  stringCollection.add(a.eGet(feature).toString());
+                }
+                return stringCollection;
+              } else if (feature.getEType().getName().equals("EBoolean")) {
+                List<Boolean> booleanCollection = new ArrayList<>();
+                Iterator<?> it = collection.iterator();
+                while (it.hasNext()) {
+                  Attribute a = (Attribute) it.next();
+                  booleanCollection.add(Boolean.parseBoolean(a.eGet(feature).toString()));
+                }
+                this.tempCollection = booleanCollection;
               }
-              this.tempCollection = booleanCollection;
               return this.tempCollection;
             }
           }
+
         }
         // collectNested
         else if (ctx.opName.getText().equals("collectNested")) {
@@ -996,11 +1082,19 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           DeepOCLClabjectWrapperImpl newWrapper =
               new DeepOCLClabjectWrapperImpl(oldWrapper.getContext());
           this.wrapper = newWrapper;
-          if (this.tempCollection.isEmpty()) {
+          this.wrapper.setSelf(oldWrapper.getSelf());
+          if (ctx.arg.getText().contains("|")) {
+            String iteratorName = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf("|"));
+            this.wrapper.setIteratorName(iteratorName);
+          } else {
+            this.wrapper.setIteratorName(oldWrapper.getIteratorName());
+          }
+          if (this.tempCollection == null || this.tempCollection.isEmpty()) {
             leftCollection = this.wrapper.getNavigationStack().peek().getSecond();
           } else {
             leftCollection = this.tempCollection;
           }
+
           Object rightCollection = visit(ctx.arg);
           if (rightCollection != null) {
             Object[] args = new Object[] {leftCollection, rightCollection};
@@ -1014,8 +1108,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
               return new OclInvalid(errorMessage);
             }
           } else {
-            oldWrapper.getNavigationStack()
-                .push(new Tuple<String, Collection<Element>>("union", null));
+            oldWrapper.getNavigationStack().push(new Tuple<String, Collection<Element>>("union",
+                (Collection<Element>) leftCollection));
           }
           this.wrapper = oldWrapper;
           this.wrapper.getNavigationStack().push(
@@ -1032,8 +1126,9 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             Element element = it.next();
             DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(element);
             this.wrapper = newWrapper;
+            this.wrapper.setSelf(oldWrapper.getSelf());
             if (ctx.arg.getText().contains("|")) {
-              String iteratorName = ctx.arg.getText().substring(0, 1);
+              String iteratorName = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf("|"));
               this.wrapper.setIteratorName(iteratorName);
             }
             Object result = visit(ctx.arg);
@@ -1050,7 +1145,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
               }
             } else {
               oldWrapper.getNavigationStack()
-                  .push(new Tuple<String, Collection<Element>>("select", null));
+                  .push(new Tuple<String, Collection<Element>>("select", list));
             }
           }
           this.wrapper = oldWrapper;
@@ -1090,6 +1185,11 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             removed = true;
             DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
             this.wrapper = newWrapper;
+            this.wrapper.setSelf(oldWrapper.getSelf());
+            if (ctx.arg.getText().contains("|")) {
+              String iteratorName = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf("|"));
+              this.wrapper.setIteratorName(iteratorName);
+            }
             Object result = visit(ctx.arg);
             if (result != null) {
               if (result instanceof Collection) {
@@ -1126,6 +1226,11 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             list.add(clab);
             DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
             this.wrapper = newWrapper;
+            this.wrapper.setSelf(oldWrapper.getSelf());
+            if (ctx.arg.getText().contains("|")) {
+              String iteratorName = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf("|"));
+              this.wrapper.setIteratorName(iteratorName);
+            }
             Object result = visit(ctx.arg);
             if (result != null) {
               if (result instanceof Collection) {
@@ -1184,12 +1289,21 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         } // forAll operation: similar to select operation)
         else if (ctx.opName.getText().equals("forAll")) {
           this.collectionOperation = true;
+          this.tempCollection = null;
           DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
           Iterator<Element> it = wrapper.getCurrentCollectionIterator();
           while (it.hasNext()) {
             Element element = it.next();
             DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(element);
             this.wrapper = newWrapper;
+            this.assign = false;
+            this.wrapper.setSelf(oldWrapper.getSelf());
+            this.wrapper.setLetVariables(oldWrapper.getLetVaribles());
+            this.wrapper.setSelf(oldWrapper.getSelf());
+            if (ctx.arg.getText().contains("|")) {
+              String iteratorName = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf("|"));
+              this.wrapper.setIteratorName(iteratorName);
+            }
             Object result = visit(ctx.arg);
             if (result != null) {
               try {
@@ -1387,8 +1501,6 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           return this.tempCollection;
         }
 
-      } else {
-        return visitChildren(ctx);
       }
     } // concat // TODO not finished yet
     else if (ctx.opName.getText().equals("concat")) {
@@ -1414,7 +1526,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         }
 
       }
-    } else if (ctx.opName.getText().equals("substring")) {
+    } // substring
+    else if (ctx.opName.getText().equals("substring")) {
       if (this.tempString != null) {
         this.tempString = this.tempString + visitChildren(ctx);
         return this.tempString;
@@ -1531,7 +1644,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
         }
       }
     }
-    if (this.wrapper.operationOnClabject(ctx.opName.getText())) {
+    if (this.wrapper.isOperationOnClabject(ctx.opName.getText())) {
       Object[] args = {};
       return this.wrapper.executeClabjectOperation(ctx.opName.getText(), args);
     }
@@ -1703,9 +1816,13 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     Object left = visit(ctx.left);
     Boolean bLeft = Boolean.parseBoolean(left.toString());
     Object right = visit(ctx.right);
-    Boolean bRight = Boolean.parseBoolean(right.toString());
+    Boolean bRight = new Boolean(null);
     switch (ctx.op.getText()) {
       case "and":
+        if (right == null && !bLeft) {
+          return false;
+        }
+        bRight = Boolean.parseBoolean(right.toString());
         return bLeft && bRight;
       case "or":
         return bLeft || bRight;
@@ -1728,7 +1845,8 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     if (!this.assign) {
       try {
         Object left = visit(ctx.left);
-        return this.wrapper.eval(left, visit(ctx.right), ctx.op.getText());
+        result = this.wrapper.eval(left, visit(ctx.right), ctx.op.getText());
+        return result;
       } catch (InterpreterException e) {
         this.wrapper.getNavigationStack().clear();
         return new OclInvalid();
@@ -1770,6 +1888,9 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     if (ctx.op.getText().equals("implies")) {
       Object left = visit(ctx.left);
       Boolean bLeft = Boolean.parseBoolean(left.toString());
+      if (!bLeft) {
+        return true;
+      }
       Object right = visit(ctx.right);
       Boolean bRight = Boolean.parseBoolean(right.toString());
       return wrapper.implies(bLeft, bRight);
@@ -1864,6 +1985,13 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
      * if (collectionOperation == true && this.context instanceof Clabject) {
      * this.wrapper.self((Clabject) this.context); } this.wrapper.self(); return this.context;
      */
+    try {
+      this.wrapper.getNavigationStack().push(
+          new Tuple<String, Collection<Element>>("self", Arrays.asList(this.wrapper.getSelf())));
+      return this.wrapper.getSelf();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     if (this.context instanceof Clabject) {
       this.wrapper.self((Clabject) this.context);
       return this.context;

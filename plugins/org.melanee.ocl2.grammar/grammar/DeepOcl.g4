@@ -135,7 +135,7 @@
 
  collectionTypeCS
  :
-     collectionTypeIDentifier
+     collectionType = collectionTypeIDentifier
      (
          '(' typeExpCS ')'
          | '<' typeExpCS '>'

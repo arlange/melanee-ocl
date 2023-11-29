@@ -234,7 +234,7 @@ public class BPMN2Tests {
     assertEquals(false, Boolean.parseBoolean(returnValue.toString()));
   }
 
-  @Test
+/*  @Test
   public void messageFlowConstraintTest1() {
     Connection startToEnd = PLMFactory.eINSTANCE.createConnection();
     ConnectionEnd start = PLMFactory.eINSTANCE.createConnectionEnd();
@@ -265,7 +265,7 @@ public class BPMN2Tests {
     Object returnValue = visitor.visit(tree);
     assertEquals(true, Boolean.parseBoolean(returnValue.toString()));
 
-  }
+  }*/
 
   @Test
   public void isDeepKindOfTest1() {

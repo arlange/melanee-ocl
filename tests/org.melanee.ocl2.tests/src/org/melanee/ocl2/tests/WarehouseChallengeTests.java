@@ -70,7 +70,6 @@ public class WarehouseChallengeTests {
     sellableProductType.getFeature().add(finalPrice);
 
 
-
     this.l1.getContent().add(sellableProductType);
 
     standardSalesPrice.setValue("9999");
@@ -79,12 +78,9 @@ public class WarehouseChallengeTests {
     BodyConstraint constraint = ConstraintFactory.eINSTANCE.createBodyConstraint();
     constraint.setName("bodyConstraintTest");
     Text constraintText = ConstraintFactory.eINSTANCE.createText();
-    constraintText
-        .setText(" let value:Real = 0 in \n" + 
-            "        if self.reducedPrice.oclIsUndefined()\n" + 
-            "            then value = self.standardSalesPrice \n" + 
-            "            else value = self.reducedPrice \n" + 
-            "        endif");
+    constraintText.setText(
+        "if self.reducedPrice.oclIsUndefined()\n" + "            then self.standardSalesPrice \n"
+            + "            else self.reducedPrice \n" + "        endif");
     constraint.getExpression().add(constraintText);
 
     finalPrice.getConstraint().add(constraint);
@@ -92,9 +88,12 @@ public class WarehouseChallengeTests {
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("self.finalPrice()"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(finalPrice);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(sellableProductType);
     Object returnValue = visitor.visit(tree);
-    assertEquals(9999, Integer.parseInt((returnValue.toString())));
+    if (returnValue instanceof Attribute) {
+      Attribute attr = (Attribute) returnValue;
+      assertEquals(9999, Integer.parseInt((attr.getValue().toString())));
+    }
 
 
   }

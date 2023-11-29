@@ -767,7 +767,7 @@ public class DeepOCLTreeVisitorTest {
     this.c.getFeature().add(attr);
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "context A \ninv test: let correctDate:Boolean=self.valid in if self.notValid then correctDate = false else correctDate = true endif"));
+        "context A inv test: let correctDate:Boolean=self.valid in if self.notValid then correctDate = false else correctDate = true endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.contextDeclCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.c);
