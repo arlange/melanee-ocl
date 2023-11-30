@@ -146,9 +146,8 @@ public class Ocl2StringTests {
     level1.getContent().add(invoice1);
 
     DeepOclLexer oclLexer = new DeepOclLexer(
-        new ANTLRInputStream("self.allInstances() -> select(c|c.#getPotency()# = 0 and c.Invoice.date.substring(7,10) = \"2017\") "
-            + "-> collectNested(Invoice.price) -> sum() / self.allInstances() -> select(c|c.#getPotency()# = 0 and "
-            + "c.Invoice.date.substring(7,10) = \"2017\") -> size()"));
+        new ANTLRInputStream("self.allInstances() -> select(c|c.#getPotency()# = 0) -> select(c|c.Invoice.date.substring(7,10) = \"2017\") "
+            + "-> collectNested(Invoice.price) -> sum() / self.allInstances() -> select(c|c.#getPotency()# = 0) -> select(c|c.Invoice.date.substring(7,10) = \"2017\") -> size()"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(product);

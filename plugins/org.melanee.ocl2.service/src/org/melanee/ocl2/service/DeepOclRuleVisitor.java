@@ -385,7 +385,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
       System.out.println("Could not create let variable");
       return new OclInvalid();
     }
-    return visitChildren(ctx);
+    return null;
   }
 
   @Override
@@ -885,6 +885,11 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             Clabject clab = (Clabject) it.next();
             DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
             this.wrapper = newWrapper;
+            this.wrapper.setSelf(oldWrapper.getSelf());
+            if (ctx.arg.getText().contains("|")) {
+              String iteratorName = ctx.arg.getText().substring(0, ctx.arg.getText().indexOf("|"));
+              this.wrapper.setIteratorName(iteratorName);
+            }
             Object result = visit(ctx.arg);
             if (result != null) {
               try {
@@ -1817,6 +1822,11 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     Boolean bLeft = Boolean.parseBoolean(left.toString());
     Object right = visit(ctx.right);
     Boolean bRight = new Boolean(null);
+    try {
+      bRight = Boolean.parseBoolean(right.toString());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     switch (ctx.op.getText()) {
       case "and":
         if (right == null && !bLeft) {

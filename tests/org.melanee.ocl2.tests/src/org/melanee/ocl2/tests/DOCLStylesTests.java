@@ -481,7 +481,7 @@ public class DOCLStylesTests {
 
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.#getDirectSupertypes()#.#getAllAttributes()# -> reject(a|a.#getDurability()# = 0) -> forAll(a| let name:String = a.#name# in self.#getAttributeByName(name)#.#getDurability# = a.#getDurability()#)"));
+        "self.#getDirectSupertypes()#.#getAllAttributes()# -> reject(a|a.#getDurability()# = 0) -> forAll(a| let name:String = a.#getName()# in self.#getAttributeByName(name)#.#getDurability()# = a.#getDurability()#)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
 
@@ -1024,7 +1024,7 @@ public class DOCLStylesTests {
 
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> exists(c|(self.doclIsHyponymOf(c) or self.doclIsIsonymOf(c)) implies self.doclIsInstanceOf(c))"));
+        "Clabject -> reject(self) ->exists(c|(self.doclIsHyponymOf(c) or self.doclIsIsonymOf(c)) implies self.doclIsInstanceOf(c))"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     for (Level level : dm.getContent()) {
@@ -1047,32 +1047,13 @@ public class DOCLStylesTests {
     Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
     clabjectA.setName("A");
     clabjectA.setPotency(2);
-    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
-    attributeA.setDurability(2);
-    attributeA.setMutability(2);
-    attributeA.setName("a");
-    attributeA.setDatatype("String");
-    attributeA.setValue("test");
-    clabjectA.getFeature().add(attributeA);
-    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
-    attributeZ.setDurability(0);
-    attributeZ.setMutability(0);
-    attributeZ.setName("z");
-    attributeZ.setDatatype("String");
-    attributeZ.setValue("test");
-    clabjectA.getFeature().add(attributeZ);
+
     this.l1.getContent().add(clabjectA);
 
     Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
     clabjectD.setName("D");
     clabjectD.setPotency(2);
-    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
-    attributeY.setDurability(2);
-    attributeY.setMutability(2);
-    attributeY.setName("y");
-    attributeY.setDatatype("String");
-    attributeY.setValue("test");
-    clabjectD.getFeature().add(attributeY);
+
     this.l1.getContent().add(clabjectD);
 
     Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
@@ -1087,20 +1068,6 @@ public class DOCLStylesTests {
     Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
     clabjectB.setName("B");
     clabjectB.setPotency(1);
-    Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
-    attributeB.setDurability(1);
-    attributeB.setMutability(1);
-    attributeB.setName("a");
-    attributeB.setDatatype("String");
-    attributeB.setValue("test");
-    clabjectB.getFeature().add(attributeB);
-    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
-    attributeV.setDurability(1);
-    attributeV.setMutability(1);
-    attributeV.setName("y");
-    attributeV.setDatatype("String");
-    attributeV.setValue("test");
-    clabjectB.getFeature().add(attributeV);
     this.l2.getContent().add(clabjectB);
 
     Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
@@ -1295,32 +1262,11 @@ public class DOCLStylesTests {
     Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
     clabjectA.setName("A");
     clabjectA.setPotency(2);
-    Attribute attributeA = PLMFactory.eINSTANCE.createAttribute();
-    attributeA.setDurability(2);
-    attributeA.setMutability(2);
-    attributeA.setName("a");
-    attributeA.setDatatype("String");
-    attributeA.setValue("test");
-    clabjectA.getFeature().add(attributeA);
-    Attribute attributeZ = PLMFactory.eINSTANCE.createAttribute();
-    attributeZ.setDurability(0);
-    attributeZ.setMutability(0);
-    attributeZ.setName("z");
-    attributeZ.setDatatype("String");
-    attributeZ.setValue("test");
-    clabjectA.getFeature().add(attributeZ);
     this.l1.getContent().add(clabjectA);
 
     Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
     clabjectD.setName("D");
     clabjectD.setPotency(0);
-    Attribute attributeY = PLMFactory.eINSTANCE.createAttribute();
-    attributeY.setDurability(2);
-    attributeY.setMutability(2);
-    attributeY.setName("y");
-    attributeY.setDatatype("String");
-    attributeY.setValue("test");
-    clabjectD.getFeature().add(attributeY);
     this.l1.getContent().add(clabjectD);
 
     Inheritance inheritanceDA = PLMFactory.eINSTANCE.createInheritance();
@@ -1328,8 +1274,8 @@ public class DOCLStylesTests {
     Subtype subA = PLMFactory.eINSTANCE.createSubtype();
     superD.setSupertype(clabjectD);
     subA.setSubtype(clabjectA);
-    inheritanceDA.getSubtype().add(subA);
-    inheritanceDA.getSupertype().add(superD);
+    superD.setInheritance(inheritanceDA);
+    subA.setInheritance(inheritanceDA);
     inheritanceDA.setComplete(true);// this is important for this test!!!!
     this.l1.getContent().add(inheritanceDA);
 
@@ -1337,25 +1283,13 @@ public class DOCLStylesTests {
     clabjectB.setName("B");
     clabjectB.setPotency(1);
     Attribute attributeB = PLMFactory.eINSTANCE.createAttribute();
-    attributeB.setDurability(1);
-    attributeB.setMutability(1);
-    attributeB.setName("a");
-    attributeB.setDatatype("String");
-    attributeB.setValue("test");
-    clabjectB.getFeature().add(attributeB);
-    Attribute attributeV = PLMFactory.eINSTANCE.createAttribute();
-    attributeV.setDurability(1);
-    attributeV.setMutability(1);
-    attributeV.setName("y");
-    attributeV.setDatatype("String");
-    attributeV.setValue("test");
-    clabjectB.getFeature().add(attributeV);
     this.l2.getContent().add(clabjectB);
 
     Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
     classificationAB.setInstance(clabjectB);
     classificationAB.setType(clabjectA);
     this.l2.getContent().add(classificationAB);
+
     // context is Inheritance
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
         "self.#getSupertypes()# -> forAll(s|s.#getPotency()# = 0 and s.getDirectInstances() -> size() = 0) and self.#isComplete()# = true"));

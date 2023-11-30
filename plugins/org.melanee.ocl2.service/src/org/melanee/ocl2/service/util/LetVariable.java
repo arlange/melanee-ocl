@@ -24,7 +24,7 @@ public class LetVariable {
   private Object value;
   private Element context;
 
-  public LetVariable(String letName, String letType, String value, Element context)
+  public LetVariable(String letName, String letType, Object value, Element context)
       throws InterpreterException {
     this.type = letType;
     this.name = letName;
@@ -32,46 +32,52 @@ public class LetVariable {
     setValue(value);
   }
 
-  public void setValue(String value) throws InterpreterException {
-    if (this.type.equals("Integer")) {
-      if (value.contains(".")) {
-        this.value = Integer.parseInt(value.substring(0, value.indexOf(".")));
-      } else {
-        this.value = Integer.parseInt(value);
-      }
-      return;
-    } else if (this.type.equals("Real")) {
-      this.value = Double.parseDouble(value);
-      return;
-    } else if (this.type.equals("String")) {
-      this.value = value;
-      return;
-    } else if (this.type.equals("Boolean")) {
-      this.value = Boolean.parseBoolean(value);
-      return;
-    } else if (this.type.equals("oclAny")) {
-      this.value = new Object();
-      return;
-    } else if (this.type.equals("Set") || this.type.equals("OrderedSet")) {
-      this.value = new HashSet<>();
-      return;
-    } else if (this.type.equals("Bag") || this.type.equals("Sequence")) {
-      this.value = new ArrayList<>();
-      return;
-    } else if (this.type.equals("Clabject")) {
-      this.value = value;
-    } else if (this.context instanceof Clabject) {
-      Clabject context = (Clabject) this.context;
-      Iterator<?> it = context.getDeepModel().eAllContents();
-      while (it.hasNext()) {
-        Element e = (Element) it.next();
-        if (e.getName().equals(this.type)) {
-          this.value = PLMFactory.eINSTANCE.createClabjectFromTemplate((Clabject) e, null);
+  public void setValue(Object value) throws InterpreterException {
+    if (value instanceof String) {
+      String stringValue = value.toString();
+      if (this.type.equals("Integer")) {
+        if (stringValue.contains(".")) {
+          this.value = Integer.parseInt(stringValue.substring(0, stringValue.indexOf(".")));
         } else {
-          throw new InterpreterException(
-              "could not instantiate let variable " + this.name + " with the type " + this.type);
+          this.value = Integer.parseInt(stringValue);
+        }
+        return;
+      } else if (this.type.equals("Real")) {
+        this.value = Double.parseDouble(stringValue);
+        return;
+      } else if (this.type.equals("String")) {
+        this.value = value;
+        return;
+      } else if (this.type.equals("Boolean")) {
+        this.value = Boolean.parseBoolean(stringValue);
+        return;
+      } else if (this.type.equals("oclAny")) {
+        this.value = new Object();
+        return;
+      } else if (this.type.equals("Set") || this.type.equals("OrderedSet")) {
+        this.value = new HashSet<>();
+        return;
+      } else if (this.type.equals("Bag") || this.type.equals("Sequence")) {
+        this.value = new ArrayList<>();
+        return;
+      } else if (this.type.equals("Clabject")) {
+        this.value = value;
+      } else if (this.context instanceof Clabject) {
+        Clabject context = (Clabject) this.context;
+        Iterator<?> it = context.getDeepModel().eAllContents();
+        while (it.hasNext()) {
+          Element e = (Element) it.next();
+          if (e.getName().equals(this.type)) {
+            this.value = PLMFactory.eINSTANCE.createClabjectFromTemplate((Clabject) e, null);
+          } else {
+            throw new InterpreterException(
+                "could not instantiate let variable " + this.name + " with the type " + this.type);
+          }
         }
       }
+    }
+    if (value instanceof Clabject) {
+      this.value = value;
     }
   }
 
