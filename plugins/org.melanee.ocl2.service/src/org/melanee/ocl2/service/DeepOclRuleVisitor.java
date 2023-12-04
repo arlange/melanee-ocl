@@ -380,7 +380,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
       if (value == null) {
         value = exp;
       }
-      this.wrapper.createLetVariable(ctx.name.getText(), type.toString(), value.toString());
+      this.wrapper.createLetVariable(ctx.name.getText(), type.toString(), value);
     } catch (InterpreterException e) {
       System.out.println("Could not create let variable");
       return new OclInvalid();
@@ -478,7 +478,11 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
             tempCollection = null;
             return e;
           } else {
-            return this.wrapper.getNavigationStack().peek().getSecond().toArray()[0];
+            Element element =
+                (Element) this.wrapper.getNavigationStack().peek().getSecond().toArray()[0];
+            this.wrapper.getNavigationStack()
+                .push(new Tuple<String, Collection<Element>>("first", Arrays.asList(element)));
+            return element;
           }
         }
         // at
@@ -846,15 +850,15 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
           DeepOCLClabjectWrapperImpl oldWrapper = this.wrapper;
           Iterator<Element> it = wrapper.getCurrentCollectionIterator();
           while (it.hasNext()) {
-            Clabject clab = (Clabject) it.next();
-            DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(clab);
+            Element element = (Element) it.next();
+            DeepOCLClabjectWrapperImpl newWrapper = new DeepOCLClabjectWrapperImpl(element);
             this.wrapper = newWrapper;
             Object result = visit(ctx.arg);
             if (result != null) {
               try {
                 boolean r = Boolean.parseBoolean(result.toString());
                 if (r == true) {
-                  list.add(clab);
+                  list.add(element);
                 }
               } catch (Exception e) {
                 oldWrapper.getNavigationStack()

@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -157,9 +158,9 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     operationList.add("allInstances");
     operationList.add("allDeepInstances");
     operationList.add("getindirectInstances");
-    operationList.add("getDirectInstances");
+    operationList.add("doclGetDirectInstances");
 
-    operationList.add("getDirectOffspring");
+    operationList.add("doclGetDirectOffspring");
     operationList.add("getDeepIndirectInstances");
     operationList.add("getDeepInstances");
     operationList.add("doclGetInstances");
@@ -295,6 +296,8 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       return doclGetInstances(arg);
     } else if (operation.equals("doclIsInstanceOf")) {
       return doclIsInstanceOf(arg);
+    } else if (operation.equals("doclIsIndirectInstanceOf")) {
+      return doclIsIndirectInstanceOf(arg);
     } else if (operation.equals("allInstances")) {
       return allInstances(arg);
     } else if (operation.equals("allDeepInstances")) {
@@ -305,17 +308,17 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
       return including(arg);
     } else if (operation.equals("sortedBy")) {
       return sortedBy(arg);
-    } else if (operation.equals("getDirectInstances")) {
-      return getDirectInstances();
-    } else if (operation.equals("getDirectOffspring")) {
-      return getDirectOffspring();
+    } else if (operation.equals("doclGetDirectInstances")) {
+      return doclGetDirectInstances();
+    } else if (operation.equals("doclGetDirectOffspring")) {
+      return doclGetDirectOffspring();
     } else if (operation.equals("doclIsDeepKindOf")) {
       return doclIsDeepKindOf(arg);
     }
     return null;
   }
 
-  private Object doclIsInstanceOf(Object[] arg) {
+  private Object doclIsIndirectInstanceOf(Object[] arg) {
     Boolean result = false;
     try {
       Clabject argClabject = null;
@@ -328,10 +331,14 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         }
       }
       if (arg[0] instanceof List) {
-        List argList = (List) arg[0];
+        List<?> argList = (List<?>) arg[0];
         if (argList.size() == 1 && argList.get(0) instanceof Clabject) {
           Clabject clabject = (Clabject) argList.get(0);
-          result = clabject.getInstances().contains(argClabject);
+          for (Clabject subtype : argClabject.getSubtypes()) {
+            result = subtype.getInstances().contains(clabject);
+            if (result)
+              return result;
+          }
         }
       }
     } catch (Exception e) {
@@ -340,9 +347,45 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return result;
   }
 
-  /*
-   * public void addOperation(String operation){ this.operationList.add(operation); }
-   */
+  private Object doclIsInstanceOf(Object[] arg) {
+    Boolean result = false;
+    try {
+      Clabject argClabject = null;
+      if (iteratorName != null && iteratorName.contains((String) arg[1])) {
+        argClabject = (Clabject) this.context;
+      } else if ("self".equals((String) arg[1])) {
+        if (this.getSelf() instanceof Clabject) {
+          argClabject = (Clabject) this.getSelf();
+        }
+      }
+      for (LetVariable let : this.letVariables) {
+        if (let.getName().equals(arg[1])) {
+          argClabject = (Clabject) let.getValue();
+        }
+      }
+      if (arg[0] instanceof List) {
+        List<?> argList = (List<?>) arg[0];
+        for (Object clb : argList) {
+          if (clb instanceof Clabject) {
+            List<Clabject> subtypes = new ArrayList<>();
+            for (Clabject cl : argClabject.getSubtypes()) {
+              subtypes.add(cl);
+            }
+            subtypes.add(argClabject);
+            for (Clabject clab : subtypes) {
+              Clabject clabject = (Clabject) clb;
+              result = clab.getInstances().contains(clabject);
+              if (result)
+                return result;
+            }
+          }
+        }
+      }
+    } catch (Exception e) {
+      // TODO: handle exception
+    }
+    return result;
+  }
 
   private Object collectNested(Object[] arg) {
     // TODO Auto-generated method stub
@@ -583,11 +626,15 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
         if (letVariable.getName().equals(target)) {
           // necessary because second item of the tuple has to
           // be a collection of elements
-          Attribute attr = PLMFactory.eINSTANCE.createAttribute();
-          attr.setDatatype(letVariable.getDataType());
-          attr.setValue(letVariable.getValue().toString());
-          attr.setName(letVariable.getName());
-          returnList.add(attr);
+          if (letVariable.getValue() instanceof Element) {
+            returnList.add((Element) letVariable.getValue());
+          } else {
+            Attribute attr = PLMFactory.eINSTANCE.createAttribute();
+            attr.setDatatype(letVariable.getDataType());
+            attr.setValue(letVariable.getValue().toString());
+            attr.setName(letVariable.getName());
+            returnList.add(attr);
+          }
           this.navigationStack.push(new Tuple<String, Collection<Element>>(target, returnList));
         }
       }
@@ -626,19 +673,27 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
    * 
    * @return the direct instances as a collection
    */
-  public Collection<Clabject> getDirectInstances() {
-    if (this.context instanceof Clabject) {
-      Clabject clab = (Clabject) this.context;
-      @SuppressWarnings("rawtypes")
-      List returnList = clab.getInstances();
-      this.navigationStack
-          .push(new Tuple<String, Collection<Element>>("directInstances", returnList));
-      return returnList;
+  public Collection<Element> doclGetDirectInstances() {
+    Collection<Element> resultList = new ArrayList<>();
+    for (Element element : this.navigationStack.peek().getSecond()) {
+      if (element instanceof Clabject) {
+        Clabject clabject = (Clabject) element;
+        resultList.addAll(clabject.getInstances());
+      }
     }
-    return null;
+    this.navigationStack
+        .push(new Tuple<String, Collection<Element>>("directInstances", resultList));
+    return resultList;
+    /*
+     * if (this.context instanceof Clabject) { Clabject clab = (Clabject) this.context;
+     * 
+     * @SuppressWarnings("rawtypes") List returnList = clab.getInstances(); this.navigationStack
+     * .push(new Tuple<String, Collection<Element>>("directInstances", returnList)); return
+     * returnList; }
+     */
   }
 
-  public Collection<Clabject> getDirectOffspring() {
+  public Collection<Clabject> doclGetDirectOffspring() {
     if (this.context instanceof Clabject) {
       Clabject clab = (Clabject) this.context;
       @SuppressWarnings("rawtypes")
@@ -942,8 +997,35 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     return result;
   }
 
-  public Boolean doclIsHyponymOf(String text) {
+  public Object doclIsHyponymOf(String text) {
     Boolean result = false;
+    Clabject argClabject = null;
+    try {
+      if (text.equals(iteratorName)) {
+        argClabject = (Clabject) this.context;
+      }
+      Clabject clabject = (Clabject) this.navigationStack.peek().getSecond().toArray()[0];
+      if (clabject.getAllFeatures().size() == 0 || clabject.getDirectTypes().isEmpty()) {
+        return false;
+      }
+      HashMap<String, Feature> featureMapType = new HashMap<>();
+      for (Feature feature : clabject.getAllFeatures()) {
+        if (feature.getDurability() > 0) {
+          featureMapType.put(feature.getName(), feature);
+        }
+      }
+      Boolean foundAll = true;
+      for (Entry<String, Feature> entry : featureMapType.entrySet()) {
+        Feature value = entry.getValue();
+        String key = entry.getKey();
+        if (!(argClabject != null && argClabject.getFeatureForName(key) != null)) {
+          foundAll = false;
+        }
+      }
+      result = foundAll;
+    } catch (ClassCastException e) {
+      return new OclInvalid();
+    }
     return result;
   }
 
@@ -1259,28 +1341,24 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
   }
 
   private Object doclGetInstances(Object[] arg) {
-    if (this.navigationStack.peek().getSecond().size() == 1) {
-      List<Element> returnCollection = new ArrayList<>();
-      if (this.navigationStack.peek().getSecond().toArray()[0] instanceof Clabject) {
+    List<Element> returnCollection = new ArrayList<>();
+    for (Element element : this.navigationStack.peek().getSecond()) {
+      if (element instanceof Clabject) {
         List<Clabject> tempCollection = new ArrayList<>();
-        tempCollection.addAll(
-            ((Clabject) this.navigationStack.peek().getSecond().toArray()[0]).getInstances());
-        for (Clabject subTypes : ((Clabject) this.navigationStack.peek().getSecond().toArray()[0])
-            .getSubtypes()) {
+        tempCollection.addAll(((Clabject) element).getInstances());
+        for (Clabject subTypes : ((Clabject) element).getSubtypes()) {
           tempCollection.addAll(subTypes.getInstances());
         }
         for (Clabject c : tempCollection) {
           returnCollection.add(c);
         }
-        this.navigationStack.push(new Tuple<String, Collection<Element>>("instances",
-            (Collection<Element>) returnCollection));
-        return returnCollection;
       } else {
         return new OclInvalid();
       }
-    } else {
-      return new OclInvalid();
     }
+    this.navigationStack.push(new Tuple<String, Collection<Element>>("doclGetInstances",
+        (Collection<Element>) returnCollection));
+    return returnCollection;
   }
 
   private Object allInstances(Object[] arg) {
@@ -1404,6 +1482,13 @@ public class DeepOCLClabjectWrapperImpl implements DeepOCLClabjectWrapper {
     }
     if (left instanceof Collection && !((Collection) left).isEmpty()) {
       left = ((Collection) left).toArray()[0];
+    }
+    if (left instanceof Inheritance && right instanceof Inheritance) {
+      if (operator.equals("=")) {
+        return left.equals(right);
+      } else if (operator.equals("<>")) {
+        return left != right;
+      }
     }
     if (left instanceof Integer && right instanceof Attribute) {
       Attribute attributeRight = (Attribute) right;

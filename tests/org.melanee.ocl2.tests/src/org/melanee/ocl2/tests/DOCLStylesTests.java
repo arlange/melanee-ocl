@@ -1,8 +1,10 @@
 package org.melanee.ocl2.tests;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import java.util.Arrays;
+import java.util.Collection;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -15,6 +17,7 @@ import org.melanee.core.models.plm.PLM.Classification;
 import org.melanee.core.models.plm.PLM.Connection;
 import org.melanee.core.models.plm.PLM.ConnectionEnd;
 import org.melanee.core.models.plm.PLM.DeepModel;
+import org.melanee.core.models.plm.PLM.Element;
 import org.melanee.core.models.plm.PLM.Inheritance;
 import org.melanee.core.models.plm.PLM.Level;
 import org.melanee.core.models.plm.PLM.PLMFactory;
@@ -22,7 +25,9 @@ import org.melanee.core.models.plm.PLM.Subtype;
 import org.melanee.core.models.plm.PLM.Supertype;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclLexer;
 import org.melanee.ocl2.grammar.definition.grammar.DeepOclParser;
+import org.melanee.ocl2.service.DeepOCLClabjectWrapperImpl;
 import org.melanee.ocl2.service.DeepOclRuleVisitor;
+import org.melanee.ocl2.service.util.Tuple;
 
 public class DOCLStylesTests {
   private DeepModel dm;
@@ -81,7 +86,7 @@ public class DOCLStylesTests {
     this.l2.getContent().add(classificationBY);
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.getDirectInstances() -> forAll(inst|inst.#getLevelIndex()# > self.#getLevelIndex()#)"));
+        "self.doclGetDirectInstances() -> forAll(inst|inst.#getLevelIndex()# > self.#getLevelIndex()#)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     for (Level level : dm.getContent()) {
@@ -264,7 +269,7 @@ public class DOCLStylesTests {
 
     // context is clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.getDirectInstances() -> forAll(p|p.#getPotency()# < self.#getPotency()#)"));
+        "self.doclGetDirectInstances() -> forAll(p|p.#getPotency()# < self.#getPotency()#)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
 
@@ -422,7 +427,7 @@ public class DOCLStylesTests {
 
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "if self.#getDirectType()# -> size() = 1 then true else self.#getDirectType()#.#getDefinedAttributes()# -> select(attr|attr.#durability# > 0) -> collect(#name#) -> includesAll(self.#getAllAttributes()# -> collect(#name#)) endif"));
+        "if self.#getDirectType()# -> size() = 1 then true else self.#getDirectType()#.#getDefinedAttributes()# -> select(attr|attr.#getDurability()# > 0) -> collect(#name#) -> includesAll(self.#getAllAttributes()# -> collect(#name#)) endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
 
@@ -565,7 +570,7 @@ public class DOCLStylesTests {
 
     // context is Attribute
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.#getClabject()#.#getDirectType()#.#getDefinedAttributes()# -> reject(a|a.#getDurability()# = 0) -> forAll(a| if a.#name# = self.#name# and a.#getMutabilityAsString()# > 0 then a.#getMutabilityAsString()# > self.#getMutabilityAsString()# else if a.#name# = self.#name# and a.#getMutabilityAsString()# = 0 then self.#getMutabilityAsString()# = 0 else true endif endif)"));
+        "self.#getClabject()#.#getDirectType()#.#getDefinedAttributes()# -> reject(a|a.#getDurability()# = 0) -> forAll(a| if a.#name# = self.#name# and a.#getMutability()# > 0 then a.#getMutability()# > self.#getMutability()# else if a.#name# = self.#name# and a.#getMutability()# = 0 then self.#getMutability()# = 0 else true endif endif)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
 
@@ -758,11 +763,9 @@ public class DOCLStylesTests {
     this.l2.getContent().add(classificationAB);
     this.l2.getContent().add(classificationAD);
 
-
-
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "let levelIndex:Integer = self.#getLevelIndex()# in if self.getDirectInstances() -> size() = 0 then true else self.getDirectInstances() -> forAll(c|c.#getLevelIndex()# = levelIndex + 1) endif"));
+        "let levelIndex:Integer = self.#getLevelIndex()# in if self.doclGetDirectInstances() -> size() = 0 then true else self.doclGetDirectInstances() -> forAll(c|c.#getLevelIndex()# = levelIndex + 1) endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     for (Level level : dm.getContent()) {
@@ -894,7 +897,7 @@ public class DOCLStylesTests {
 
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "if self.getDirectInstances() -> size > 0 then let featureSize:Integer = self.#getFeature()# -> select(f|f.#getDurability()# > 0) -> size() in self.getDirectInstances() -> forAll(i|i.#getFeature()# -> size() = featureSize) else true endif"));
+        "if self.doclGetDirectInstances() -> size > 0 then let featureSize:Integer = self.#getFeature()# -> select(f|f.#getDurability()# > 0) -> size() in self.doclGetDirectInstances() -> forAll(i|i.#getFeature()# -> size() = featureSize) else true endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     for (Level level : dm.getContent()) {
@@ -939,7 +942,7 @@ public class DOCLStylesTests {
 
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "if self.getDirectInstances() -> size > 0 then let featureNames:Set = self.#getFeature()# -> select(f|f.#getDurability()# > 0) -> collect(#name#) in self.getDirectInstances() -> forAll(i|i.#getFeature()# -> collect(#name#) -> includesAll(featureNames)) else true endif"));
+        "if self.doclGetDirectInstances() -> size > 0 then let featureNames:Set = self.#getFeature()# -> select(f|f.#getDurability()# > 0) -> collect(#name#) in self.doclGetDirectInstances() -> forAll(i|i.#getFeature()# -> collect(#name#) -> includesAll(featureNames)) else true endif"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     for (Level level : dm.getContent()) {
@@ -1024,7 +1027,7 @@ public class DOCLStylesTests {
 
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> reject(self) ->exists(c|(self.doclIsHyponymOf(c) or self.doclIsIsonymOf(c)) implies self.doclIsInstanceOf(c))"));
+        "Clabject -> reject(self) -> exists(c|(self.doclIsHyponymOf(c) or self.doclIsIsonymOf(c)) implies self.doclIsInstanceOf(c))"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     for (Level level : dm.getContent()) {
@@ -1075,9 +1078,17 @@ public class DOCLStylesTests {
     classificationAB.setType(clabjectA);
     this.l2.getContent().add(classificationAB);
 
+    DeepOCLClabjectWrapperImpl wrapper = new DeepOCLClabjectWrapperImpl(clabjectD);
+    try {
+      assertEquals(wrapper.invoke("doclGetInstances", null), Arrays.asList(clabjectB));
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> reject(self) -> select(c|c.doclGetInstances() -> size() > 0 and c.doclGetInstances() -> includesAll(self.doclGetInstances())) -> forAll(c| if c.#getSubtypes()# -> size() = 0 then true else c.#getSubtypes()# -> includes(self) endif)"));
+        "Clabject -> reject(self) -> select(c|c.doclGetDirectInstances() -> size() > 0 and c.doclGetDirectInstances() -> includesAll(self.doclGetInstances())) -> forAll(c|if self.#getSubtypes()# -> size() = 0  then true else self.#getSubtypes()# -> includes(c) endif)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     for (Level level : dm.getContent()) {
@@ -1161,9 +1172,16 @@ public class DOCLStylesTests {
     classificationAB.setType(clabjectA);
     this.l2.getContent().add(classificationAB);
 
+    DeepOCLClabjectWrapperImpl wrapper = new DeepOCLClabjectWrapperImpl(clabjectA);
+    wrapper.setIteratorName("c");
+    wrapper.getNavigationStack()
+        .push(new Tuple<String, Collection<Element>>("B", Arrays.asList((Element) clabjectB)));
+    assertTrue(Boolean.parseBoolean(wrapper.doclIsHyponymOf("c").toString()));
+
+
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "Clabject -> select(c|self.doclIsHyponymOf(c) or self.doclIsIsonymOf(c) and c.#getSubtypes()# -> size() = 0) -> forAll(c|self.#getDirectType()# = c)"));
+        "Clabject -> reject(self) -> select(c|(self.doclIsHyponymOf(c) or self.doclIsIsonymOf(c)) and c.#getSubtypes()# -> size() = 0) -> forAll(c|self.#getDirectType()# = c)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     for (Level level : dm.getContent()) {
@@ -1292,7 +1310,7 @@ public class DOCLStylesTests {
 
     // context is Inheritance
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.#getSupertypes()# -> forAll(s|s.#getPotency()# = 0 and s.getDirectInstances() -> size() = 0) and self.#isComplete()# = true"));
+        "self.#getSupertypes()# -> forAll(s|s.#getPotency()# = 0 and s.doclGetDirectInstances() -> size() = 0) and self.#isComplete()# = true"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     for (Level level : dm.getContent()) {
@@ -1600,7 +1618,7 @@ public class DOCLStylesTests {
     this.l3.getContent().add(classificationBG);
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
-        "self.getDirectInstances() -> forAll(c|c.#getPotency()# = self.#getPotency()# - 1)"));
+        "self.doclGetDirectInstances() -> forAll(c|c.#getPotency()# = self.#getPotency()# - 1)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     Boolean aggregatedResult = true;
@@ -1824,6 +1842,114 @@ public class DOCLStylesTests {
     // context is Clabject
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
         "let type:Clabject = self.#getDirectType()# in not (self.#getSupertypes()# -> exists(s|s.doclIsDeepTypeOf(type)))"));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    Boolean aggregatedResult = true;
+    for (Level level : this.dm.getContent()) {
+      for (Clabject clabject : level.getClabjects()) {
+        DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(clabject);
+        Object returnValue = visitor.visit(tree);
+        aggregatedResult = aggregatedResult && Boolean.parseBoolean(returnValue.toString());
+      }
+    }
+    assertTrue(aggregatedResult);
+  }
+
+  @Test
+  public void harminiousHorizontalSupertypesStyle1Test() {
+    Clabject clabjectA = PLMFactory.eINSTANCE.createEntity();
+    clabjectA.setName("A");
+    clabjectA.setPotency(2);
+    this.l1.getContent().add(clabjectA);
+
+    Clabject clabjectE = PLMFactory.eINSTANCE.createEntity();
+    clabjectE.setName("E");
+    clabjectE.setPotency(2);
+    this.l1.getContent().add(clabjectE);
+
+    Clabject clabjectD = PLMFactory.eINSTANCE.createEntity();
+    clabjectD.setName("D");
+    clabjectD.setPotency(0);
+    this.l1.getContent().add(clabjectD);
+
+
+    Clabject clabjectB = PLMFactory.eINSTANCE.createEntity();
+    clabjectB.setName("B");
+    clabjectB.setPotency(0);
+    this.l2.getContent().add(clabjectB);
+
+    Clabject clabjectF = PLMFactory.eINSTANCE.createEntity();
+    clabjectF.setName("F");
+    clabjectF.setPotency(1);
+    this.l2.getContent().add(clabjectF);
+
+    Clabject clabjectG = PLMFactory.eINSTANCE.createEntity();
+    clabjectG.setName("G");
+    clabjectG.setPotency(1);
+    this.l2.getContent().add(clabjectG);
+
+    Clabject clabjectH = PLMFactory.eINSTANCE.createEntity();
+    clabjectH.setName("H");
+    clabjectH.setPotency(1);
+    this.l2.getContent().add(clabjectH);
+
+    Clabject clabjectI = PLMFactory.eINSTANCE.createEntity();
+    clabjectI.setName("I");
+    clabjectI.setPotency(1);
+    this.l2.getContent().add(clabjectI);
+
+    Classification classificationEH = PLMFactory.eINSTANCE.createClassification();
+    classificationEH.setInstance(clabjectH);
+    classificationEH.setType(clabjectE);
+    this.l2.getContent().add(classificationEH);
+
+    Classification classificationEG = PLMFactory.eINSTANCE.createClassification();
+    classificationEG.setInstance(clabjectG);
+    classificationEG.setType(clabjectE);
+    this.l2.getContent().add(classificationEG);
+
+    Classification classificationAB = PLMFactory.eINSTANCE.createClassification();
+    classificationAB.setInstance(clabjectB);
+    classificationAB.setType(clabjectA);
+    this.l2.getContent().add(classificationAB);
+
+    Classification classificationDF = PLMFactory.eINSTANCE.createClassification();
+    classificationDF.setInstance(clabjectF);
+    classificationDF.setType(clabjectD);
+    this.l2.getContent().add(classificationDF);
+
+    Classification classificationDI = PLMFactory.eINSTANCE.createClassification();
+    classificationDI.setInstance(clabjectI);
+    classificationDI.setType(clabjectD);
+    this.l2.getContent().add(classificationDI);
+
+    Inheritance inheritanceBGH = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superB = PLMFactory.eINSTANCE.createSupertype();
+    superB.setInheritance(inheritanceBGH);
+    superB.setSupertype(clabjectB);
+    Subtype subG = PLMFactory.eINSTANCE.createSubtype();
+    subG.setSubtype(clabjectG);
+    subG.setInheritance(inheritanceBGH);
+    Subtype subH = PLMFactory.eINSTANCE.createSubtype();
+    subH.setSubtype(clabjectH);
+    subH.setInheritance(inheritanceBGH);
+    this.l2.getContent().add(inheritanceBGH);
+
+    Inheritance inheritanceHFI = PLMFactory.eINSTANCE.createInheritance();
+    Supertype superH = PLMFactory.eINSTANCE.createSupertype();
+    Subtype subF = PLMFactory.eINSTANCE.createSubtype();
+    superH.setSupertype(clabjectH);
+    superH.setInheritance(inheritanceHFI);
+    subF.setSubtype(clabjectF);
+    subF.setInheritance(inheritanceHFI);
+    Subtype subI = PLMFactory.eINSTANCE.createSubtype();
+    subI.setSubtype(clabjectI);
+    subI.setInheritance(inheritanceHFI);
+    this.l2.getContent().add(inheritanceHFI);
+
+    // context is Clabject
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream(
+        "let type:Clabject = self.#getDirectType()# in not (self.#getDirectSupertypes()# -> exists(s|s.doclIsDeepTypeOf(type)))"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
     Boolean aggregatedResult = true;

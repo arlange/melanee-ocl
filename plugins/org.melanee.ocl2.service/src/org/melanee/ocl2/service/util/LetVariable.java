@@ -15,6 +15,7 @@ import java.util.Iterator;
 import org.melanee.core.models.plm.PLM.Attribute;
 import org.melanee.core.models.plm.PLM.Clabject;
 import org.melanee.core.models.plm.PLM.Element;
+import org.melanee.core.models.plm.PLM.Inheritance;
 import org.melanee.core.models.plm.PLM.PLMFactory;
 import org.melanee.ocl2.service.exception.InterpreterException;
 
@@ -32,7 +33,7 @@ public class LetVariable {
     setValue(value);
   }
 
-  public void setValue(Object value) throws InterpreterException {
+  public void setValue(Object value) throws InterpreterException {// completely useless trash
     if (value instanceof String) {
       String stringValue = value.toString();
       if (this.type.equals("Integer")) {
@@ -62,6 +63,10 @@ public class LetVariable {
         return;
       } else if (this.type.equals("Clabject")) {
         this.value = value;
+        return;
+      } else if (this.type.equals("Inheritance")) {
+        this.value = value;
+        return;
       } else if (this.context instanceof Clabject) {
         Clabject context = (Clabject) this.context;
         Iterator<?> it = context.getDeepModel().eAllContents();
@@ -75,8 +80,13 @@ public class LetVariable {
           }
         }
       }
+    }else if (value instanceof Integer) {
+      this.value = value;
     }
     if (value instanceof Clabject) {
+      this.value = value;
+    }
+    if (value instanceof Inheritance) {
       this.value = value;
     }
   }
