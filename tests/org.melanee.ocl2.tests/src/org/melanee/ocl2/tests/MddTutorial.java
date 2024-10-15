@@ -22,6 +22,7 @@ public class MddTutorial {
   DeepModel dm;
   Level level0;
   Level level1;
+  Clabject sdCard;
 
   @Before
   public void setUp() {
@@ -30,18 +31,7 @@ public class MddTutorial {
     this.level1 = PLMFactory.eINSTANCE.createLevel();
     this.dm.getContent().add(level0);
     this.dm.getContent().add(level1);
-  }
-
-  @After
-  public void destroy() {
-    this.dm = null;
-    this.level0 = null;
-    this.level1 = null;
-  }
-
-  @Test
-  public void songUniqueTest() {
-    Clabject sdCard = PLMFactory.eINSTANCE.createEntity();
+    this.sdCard = PLMFactory.eINSTANCE.createEntity();
     sdCard.setName("SdCard");
     Attribute size = PLMFactory.eINSTANCE.createAttribute();
     size.setName("size");
@@ -53,11 +43,22 @@ public class MddTutorial {
     sdCard.getFeature().add(averageSongLength);
     Clabject Song1 = PLMFactory.eINSTANCE.createEntity();
     Song1.setName("Song1");
+    
     Attribute title1 = PLMFactory.eINSTANCE.createAttribute();
     title1.setName("title");
     title1.setDatatype("String");
     title1.setValue("test");
     Song1.getFeature().add(title1);
+    
+    Attribute size1 = PLMFactory.eINSTANCE.createAttribute();
+    size1.setDatatype("Real");
+    size1.setValue("3");
+    size1.setName("size");
+    
+    Song1.getFeature().add(size1);
+
+
+    
     Clabject Song2 = PLMFactory.eINSTANCE.createEntity();
     Song2.setName("Song2");
     Attribute title2 = PLMFactory.eINSTANCE.createAttribute();
@@ -65,6 +66,13 @@ public class MddTutorial {
     title2.setDatatype("String");
     title2.setValue("test");
     Song2.getFeature().add(title2);
+    
+    Attribute size2 = PLMFactory.eINSTANCE.createAttribute();
+    size2.setDatatype("Real");
+    size2.setValue("3");
+    size2.setName("size");
+    
+    Song2.getFeature().add(size2);
 
     // Connections
     Connection song1Connection = PLMFactory.eINSTANCE.createConnection();
@@ -95,16 +103,39 @@ public class MddTutorial {
 
     level0.getContent().add(Song2);
     level0.getContent().add(Song1);
-    level0.getContent().add(sdCard);
+    level0.getContent().add(this.sdCard);
 
     level0.getContent().add(song1Connection);
     level0.getContent().add(song2Connection);
+  }
+
+  @After
+  public void destroy() {
+    this.dm = null;
+    this.level0 = null;
+    this.level1 = null;
+  }
+
+  @Test
+  public void songUniqueTest() {
+
 
     DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("song -> isUnique(title)"));
     DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
     ParseTree tree = parser.specificationCS();
-    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(sdCard);
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.sdCard);
     Object returnValue = visitor.visit(tree);
     assertEquals(false, returnValue);
+  }
+  @Test
+  public void remainingSize() {
+	Attribute size = (Attribute) this.sdCard.getFeatureForName("size");	
+	size.setValue("45");
+    DeepOclLexer oclLexer = new DeepOclLexer(new ANTLRInputStream("self.size - self.song.size -> sum()"));
+    DeepOclParser parser = new DeepOclParser(new CommonTokenStream(oclLexer));
+    ParseTree tree = parser.specificationCS();
+    DeepOclRuleVisitor visitor = new DeepOclRuleVisitor(this.sdCard);
+    Object returnValue = visitor.visit(tree);
+    assertEquals(Double.parseDouble("39.0"), returnValue);
   }
 }

@@ -1637,7 +1637,7 @@ public class DeepOclRuleVisitor extends AbstractParseTreeVisitor<Object>
     } else if (ctx.opName.getText().equals("oclIsUndefined")) {
       return this.wrapper.oclIsUndefined();
     }
-    if (this.wrapper.operationExist(ctx.opName.getText())) {
+    if (this.wrapper.operationExist(ctx.opName.getText()) && ctx.getText().contains("(")) {
       if (ctx.arg != null && ctx.arg.getText() != "") {
         Object[] arg = {this.wrapper.getNavigationStack().peek().getSecond(), ctx.arg.getText()};
         try {
